@@ -1,19 +1,18 @@
-import { GlobalStyles } from '@mui/material';
-// import { Route } from 'react-router';
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Route, BrowserRouter, Routes, Outlet } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import PublicRoutes from './routes/PublicRoutes';
-import { globalStyles } from './styles/global';
+import Campanhas from './views/Campanhas';
+import CreateCampanha from './views/CreateCampanha';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <PublicRoutes /> */}
-        <Route path="/">
-          <Route path="/teste" element={<h1>Teste teste</h1>} />
+        <Route element={<MainLayout />}>
+          {/* <Route index element={<h2>Otro Teste</h2>} /> */}
+          <Route path="campanhas" element={<Campanhas />} />
+          <Route path="criar-campanha" element={<CreateCampanha />} />
+          <Route path="*" element={<h2>Error 404</h2>} />
         </Route>
-        {/* <GlobalStyles styles={globalStyles} /> */}
       </Routes>
     </BrowserRouter>
   );
