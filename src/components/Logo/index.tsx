@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function Logo() {
   return (
-    <Link to="/" style={{ cursor: 'pointer' }}>
+    <Link to="campanhas" style={{ cursor: 'pointer' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
         LOGO
       </Typography>

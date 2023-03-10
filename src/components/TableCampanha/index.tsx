@@ -8,29 +8,12 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import { EnhancedTableHead } from './components/TableHead';
 import { getComparator, stableSort } from './components/sorting';
 import { EnhancedTableToolbar } from './components/Toolbar';
-
-const rows = new Array(30).fill(null).map(() => ({
-  id: crypto.randomUUID(),
-  title: 'Titulo de Teste',
-  startDate: new Date().toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }),
-  finishDate: new Date().toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }),
-  status: 'Em Progresso',
-}));
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import api from '../../services/api';
 
 export type Order = 'asc' | 'desc';
 
@@ -39,6 +22,7 @@ export interface Data {
   title: string;
   startDate: string;
   finishDate: string;
+  scheduleDate: string;
   status: string;
 }
 
@@ -54,13 +38,21 @@ export interface EnhancedTableProps {
   rowCount: number;
 }
 
-export default function TableCampanha() {
+export default function TableCampaign() {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('id');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const { data } = useQuery(
+    ['campaign', page],
+    async () => {
+      return await api.get(`campaign?page=${page}`);
+    },
+    { staleTime: 1000 * 4 } //60 seconds
+  );
+
+  const rows: Data[] = data?.data?.result || [];
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -72,11 +64,12 @@ export default function TableCampanha() {
   };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
+    if (selected.length === 0) {
       const newSelected = rows.map((n) => n.id);
       setSelected(newSelected);
       return;
     }
+
     setSelected([]);
   };
 
@@ -104,45 +97,28 @@ export default function TableCampanha() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
-
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          selectedItem={selected}
+        />
         <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
+          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={data?.data.total}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+              {stableSort(rows, getComparator(order, orderBy)).map(
+                (row, index) => {
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -166,40 +142,28 @@ export default function TableCampanha() {
                           }}
                         />
                       </TableCell>
-                      <TableCell align="left">{row.id}</TableCell>
+                      <TableCell align="left">{row.id.slice(0, 10)}</TableCell>
                       <TableCell align="left">{row.title}</TableCell>
+                      <TableCell align="left">{row.scheduleDate}</TableCell>
                       <TableCell align="left">{row.startDate}</TableCell>
                       <TableCell align="left">{row.finishDate}</TableCell>
                       <TableCell align="left">{row.status}</TableCell>
                     </TableRow>
                   );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
+                }
               )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[]}
           component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
+          count={data?.data.total || 6}
+          rowsPerPage={5}
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Tabela densa"
-      />
     </Box>
   );
 }

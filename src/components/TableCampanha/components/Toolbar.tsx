@@ -1,17 +1,19 @@
-import { Toolbar, alpha, Typography, Button, Modal, Box } from '@mui/material';
-import { useState } from 'react';
-import ContactsTable from './ContactsTable';
-import CloseIcon from '@mui/icons-material/Close';
+import { Toolbar, alpha, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  selectedItem: any;
 }
 
-export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+export function EnhancedTableToolbar({
+  numSelected,
+  selectedItem,
+}: EnhancedTableToolbarProps) {
+  const navigate = useNavigate();
+  function handleSeeDetailsButton() {
+    navigate(`${selectedItem}`);
+  }
 
   return (
     <Toolbar
@@ -61,7 +63,7 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                 fontSize: 12,
                 fontWeight: 700,
               }}
-              onClick={handleOpen}
+              onClick={handleSeeDetailsButton}
             >
               Ver
             </Button>
@@ -97,7 +99,7 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       ) : null}
 
       {/* MODAL */}
-      <Modal
+      {/* <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -130,7 +132,7 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           />
           <ContactsTable />
         </Box>
-      </Modal>
+      </Modal> */}
     </Toolbar>
   );
 }

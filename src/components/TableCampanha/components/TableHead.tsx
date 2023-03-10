@@ -23,6 +23,12 @@ const headCells = [
     label: 'Titulo',
   },
   {
+    id: 'schedule-date',
+    numeric: false,
+    disablePadding: false,
+    label: 'Data Agendada',
+  },
+  {
     id: 'start-date',
     numeric: false,
     disablePadding: false,
