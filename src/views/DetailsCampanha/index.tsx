@@ -4,6 +4,7 @@ import {
   Stack,
   Typography,
   TextField as Input,
+  Box,
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
@@ -63,23 +64,30 @@ export default function DetailsCampanha() {
     <Stack justifyContent="center">
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Stack direction={'row'} justifyContent="space-between" gap={4}>
+          <Stack
+            direction={'row'}
+            justifyContent="space-between"
+            gap={4}
+            flexWrap="wrap"
+          >
             <Typography variant="h4">Detalhes da campanha</Typography>
             <Stack direction={'row'} gap={2}>
               <Link to={'editar'}>
                 <Button>Editar</Button>
               </Link>
-              <Button
-                color="danger"
-                loading={isLoading}
-                onClick={handleRemoveCampaign}
-              >
-                Remover
-              </Button>
+              <Box>
+                <Button
+                  color="danger"
+                  loading={isLoading}
+                  onClick={handleRemoveCampaign}
+                >
+                  Remover
+                </Button>
+              </Box>
             </Stack>
           </Stack>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <InputLabel>Titulo da Campanha</InputLabel>
           <Input
             variant="outlined"
@@ -88,7 +96,7 @@ export default function DetailsCampanha() {
             fullWidth
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>
           <Input
             variant="outlined"

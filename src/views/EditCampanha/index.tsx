@@ -7,6 +7,7 @@ import {
   FormControl,
   MenuItem,
   Select,
+  Box,
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
@@ -14,7 +15,7 @@ import TableContacts from '../../components/TableContacts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import { z } from 'Zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { TextArea } from '../../components/TextArea';
@@ -134,19 +135,28 @@ export default function EditCampanha() {
         onSubmit={handleSubmit(handleSave)}
       >
         <Grid item xs={12}>
-          <Stack direction={'row'} justifyContent="space-between" gap={4}>
+          <Stack
+            direction={'row'}
+            flexWrap="wrap"
+            justifyContent="space-between"
+            gap={4}
+          >
             <Typography variant="h4">Editando campanha</Typography>
             <Stack direction={'row'} gap={2}>
-              <Button color="success" type="submit">
-                Salvar
-              </Button>
-              <Button color="neutral" onClick={handleCancelButton}>
-                Cancelar
-              </Button>
+              <Box>
+                <Button color="success" type="submit">
+                  Salvar
+                </Button>
+              </Box>
+              <Box>
+                <Button color="neutral" onClick={handleCancelButton}>
+                  Cancelar
+                </Button>
+              </Box>
             </Stack>
           </Stack>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <InputLabel>Titulo da Campanha</InputLabel>
           <Input
             disabled={isLoading}
@@ -157,7 +167,7 @@ export default function EditCampanha() {
             fullWidth
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>
           <FormControl fullWidth>
             <Select

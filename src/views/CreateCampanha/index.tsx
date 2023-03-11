@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useXLSX } from '../../hooks/useXLSX';
 import Swal from 'sweetalert2';
 
-import { z } from 'Zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
@@ -42,6 +42,7 @@ const campaignSchema = z.object({
     .optional(),
   variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
   contacts: z.any().array().min(1, 'Arquivo vazio.'),
+  fileName: z.string().optional(),
 });
 
 //USE TO DEBUG
@@ -90,15 +91,15 @@ export default function CreateCampanha() {
     const key = lowerVariables.find((item) => item.toLowerCase() === 'contato');
 
     const formattedContacts = data.map((item: any) => ({
-      contact: data?.[key!],
+      contact: item?.[key!],
       variables: JSON.stringify(item),
     }));
 
-    console.log(formattedContacts);
-
     setValue('contacts', formattedContacts as CampaignSchemaType['contacts']);
     setValue('variables', Object.keys(data[0]));
+    setValue('fileName', e.target.files?.[0].name);
     trigger('variables');
+    e.target.value = '';
   }
 
   function handleSelectOption(e: SelectChangeEvent<'null'>) {
@@ -106,12 +107,8 @@ export default function CreateCampanha() {
   }
 
   async function handleCreateCampaign(values: CampaignSchemaType) {
-    console.log(values);
-
     setIsLoading(true);
     try {
-      console.log(1);
-
       await api.post('campaign', {
         title: values.title,
         message: values.message,
@@ -119,9 +116,15 @@ export default function CreateCampanha() {
         contacts: values.contacts,
       });
 
-      console.log(2);
+      reset({
+        contacts: [],
+        message: '',
+        scheduleDate: '',
+        title: '',
+        variables: [],
+        fileName: '',
+      });
       Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
-      reset();
     } catch (error) {
       console.error(error);
       Swal.fire(
@@ -197,7 +200,9 @@ export default function CreateCampanha() {
             variant={errors.variables ? 'outlined' : 'contained'}
             component="label"
           >
-            Enviar Arquivo do Excel
+            {getValues('fileName')
+              ? getValues('fileName')
+              : 'Enviar Arquivo do Excel'}
             <input
               id="fileSelect"
               type="file"
