@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React from 'react';
 import { FieldError } from 'react-hook-form';
 import * as Styles from './styles';
 

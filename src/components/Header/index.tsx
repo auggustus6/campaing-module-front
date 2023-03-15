@@ -16,7 +16,7 @@ import Button from '@mui/material/Button';
 import Logo from '../Logo';
 import { PATHS } from '../../utils/constants';
 import { Link } from 'react-router-dom';
-import { Stack } from '@mui/system';
+import Stack from '@mui/system/Stack';
 
 const drawerWidth = 240;
 

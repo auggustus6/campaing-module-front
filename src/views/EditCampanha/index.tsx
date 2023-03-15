@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
-import TableContacts from '../../components/TableContacts';
+import TableContactsFromApi from '../../components/TableContacts/TableContactsFromApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
 import api from '../../services/api';
+import moment from 'moment';
 
 const editCampaignSchema = z.object({
   id: z.string(),
@@ -35,7 +36,7 @@ const editCampaignSchema = z.object({
     .transform((date) => (date ? new Date(date) : ''))
     .refine(
       (date) => {
-        if (!date) return true;
+        if (!date) return false;
         return new Date(date) > new Date();
       },
       { message: 'Escolha uma data no futuro!' }
@@ -44,6 +45,16 @@ const editCampaignSchema = z.object({
   status: z.string(),
   startDate: z.string(),
   endDate: z.string().optional(),
+  sendDelay: z
+    .string()
+    .transform((delay) => Number(delay))
+    .refine(
+      (delay) => {
+        if (delay < 10) return false;
+        return true;
+      },
+      { message: 'O tempo mínimo é de 10 segundos.' }
+    ),
 });
 
 type EditCampaignSchemaType = z.infer<typeof editCampaignSchema>;
@@ -53,7 +64,6 @@ export default function EditCampanha() {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     getValues,
     reset,
     watch,
@@ -70,16 +80,17 @@ export default function EditCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const formatDate = (date: string) => date?.slice(0, 16);
+  const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
     try {
-      await api.patch(`campaign/${id}`, {
+      await api.patch(`/campaign/${id}`, {
         title: values.title,
         message: values.message,
         scheduleDate: values.scheduleDate || undefined,
         status: values.status,
+        sendDelay: values.sendDelay,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('./..');
@@ -100,18 +111,8 @@ export default function EditCampanha() {
 
   useEffect(() => {
     async function getData() {
-      const { data } = await api.get(`campaign/${id}`);
+      const { data } = await api.get(`/campaign/${id}`);
       if (data) {
-        // setValue('id', data.id);
-        // setValue('title', data.title);
-        // setValue('message', data.message);
-        // setValue('scheduleDate', formatDate(data.scheduleDate) as any);
-        // setValue('status', data.status);
-        // setValue('startDate', formatDate(data.startDate) as any);
-        // setValue('endDate', formatDate(data.endDate) as any);
-
-        console.log({ data });
-
         reset({
           id: data.id,
           title: data.title,
@@ -120,6 +121,7 @@ export default function EditCampanha() {
           status: data.status,
           startDate: formatDate(data.startDate) as any,
           endDate: formatDate(data.endDate) as any,
+          sendDelay: data.sendDelay,
         });
       }
     }
@@ -207,6 +209,17 @@ export default function EditCampanha() {
             type="datetime-local"
           />
         </Grid>
+        <Grid item xs={6}>
+          <InputLabel>Delay</InputLabel>
+          <Input
+            variant="outlined"
+            fullWidth
+            {...register('sendDelay')}
+            type="number"
+            error={!!errors.sendDelay}
+            helperText={errors.sendDelay?.message}
+          />
+        </Grid>
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
           <TextArea
@@ -216,7 +229,7 @@ export default function EditCampanha() {
           />
         </Grid>
       </Grid>
-      <TableContacts id={id} message={getValues('id')} />
+      <TableContactsFromApi id={id} message={getValues('id')} />
     </Stack>
   );
 }

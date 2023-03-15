@@ -1,4 +1,4 @@
-import { Box } from '@mui/system';
+import Box  from '@mui/system/Box';
 import { Outlet } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';

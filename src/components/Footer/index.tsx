@@ -1,4 +1,7 @@
-import { Paper, Container, Box, Typography } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import Logo from '../Logo';
 
 export default function Footer() {

@@ -18,12 +18,12 @@ export function getFormattedMessage({
   variables?: string;
 }) {
   if (variables && message) {
-    const variablesFromJson = JSON.parse(variables);
+    let variablesReceived = JSON.parse(variables);
 
-    for (let key in variablesFromJson) {
+    for (let key in variablesReceived) {
       message = message.replace(
         new RegExp('{{' + key + '}}', 'gi'),
-        variablesFromJson[key]
+        variablesReceived[key]
       );
     }
   }

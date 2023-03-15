@@ -8,11 +8,10 @@ import Paper from '@mui/material/Paper';
 import { TablePagination } from '@mui/material';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
-import axios from 'axios';
 import { getFormattedMessage } from '../../utils/variablesUtils';
 import api from '../../services/api';
 
-export default function TableContacts({
+export default function TableContactsFromApi({
   id,
   message,
 }: {
@@ -24,7 +23,7 @@ export default function TableContacts({
   const { data } = useQuery(
     ['contacts-by-id', id, page],
     async () => {
-      return await api.get(`contacts/${id}?page=${page}`);
+      return await api.get(`/contacts/${id}?page=${page}`);
     },
     { staleTime: 1000 * 60 } //60 seconds
   );
@@ -62,6 +61,8 @@ export default function TableContacts({
         component="div"
         count={data?.data.total || 6}
         rowsPerPage={5}
+        showFirstButton
+        showLastButton
         page={page}
         onPageChange={handleChangePage}
       />

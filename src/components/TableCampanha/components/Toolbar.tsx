@@ -1,18 +1,88 @@
 import { Toolbar, alpha, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { queryClient } from '../../../main';
+import api from '../../../services/api';
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
-  selectedItem: any;
+  selectedItem: string[];
+  setSelectedItem: (value: []) => void;
+  page: number;
 }
 
 export function EnhancedTableToolbar({
   numSelected,
   selectedItem,
+  page,
+  setSelectedItem,
 }: EnhancedTableToolbarProps) {
+  // const { invalidateQueries } = useQueryClient();
   const navigate = useNavigate();
   function handleSeeDetailsButton() {
     navigate(`${selectedItem}`);
+  }
+
+  async function handleStartButton() {
+    try {
+      await api.post(`/campaign/start`, selectedItem);
+      await queryClient.invalidateQueries('campaign');
+      Swal.fire('Sucesso', 'Campanha iniciada com sucesso!', 'success');
+    } catch (error) {
+      Swal.fire(
+        'Erro',
+        'Erro ao iniciar campanha, por favor tente novamente.',
+        'error'
+      );
+    }
+  }
+
+  async function handleFinishButton() {
+    try {
+      await api.post(`/campaign/finish`, selectedItem);
+      await queryClient.invalidateQueries('campaign');
+      Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire(
+        'Erro',
+        'Erro ao encerrar campanha, por favor tente novamente.',
+        'error'
+      );
+    }
+  }
+
+  async function handlePauseButton() {
+    try {
+      await api.post(`/campaign/pause`, selectedItem);
+      await queryClient.invalidateQueries('campaign');
+      Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire(
+        'Erro',
+        'Erro ao pausar campanha, por favor tente novamente.',
+        'error'
+      );
+    }
+  }
+  async function handleRemoveButton() {
+    try {
+      await api.post(`/campaign/delete`, selectedItem);
+      await queryClient.invalidateQueries('campaign');
+      setSelectedItem([]);
+      Swal.fire('Sucesso', 'Campanha removida com sucesso!', 'success');
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire(
+        'Erro',
+        'Erro ao remover campanha, por favor tente novamente.',
+        'error'
+      );
+    }
   }
 
   return (
@@ -79,11 +149,42 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            onClick={handleStartButton}
           >
             Iniciar
           </Button>
           <Button
-            title="Iniciar Campanha"
+            title="Pausar Campanha"
+            variant="contained"
+            color="secondary"
+            sx={{
+              mr: '1rem',
+              height: '40px',
+              paddingInline: '2rem',
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+            onClick={handlePauseButton}
+          >
+            Pausar
+          </Button>
+          <Button
+            title="Encerrar Campanha"
+            variant="contained"
+            color="error"
+            sx={{
+              mr: '1rem',
+              height: '40px',
+              paddingInline: '2rem',
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+            onClick={handleFinishButton}
+          >
+            Encerrar
+          </Button>
+          <Button
+            title="Remover Campanha"
             variant="contained"
             color="error"
             sx={{
@@ -92,8 +193,9 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            onClick={handleRemoveButton}
           >
-            Encerrar
+            Remover
           </Button>
         </>
       ) : null}

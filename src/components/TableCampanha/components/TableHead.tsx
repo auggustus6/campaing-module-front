@@ -1,13 +1,10 @@
-import {
-  TableHead,
-  TableRow,
-  TableCell,
-  Checkbox,
-  TableSortLabel,
-  Box,
-} from '@mui/material';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import Checkbox from '@mui/material/Checkbox';
+
 import { EnhancedTableProps } from '..';
-import { visuallyHidden } from '@mui/utils';
+import { Typography } from '@mui/joy';
 
 const headCells = [
   {
@@ -40,6 +37,7 @@ const headCells = [
     disablePadding: false,
     label: 'Data de Término',
   },
+  { id: 'delay', numeric: false, disablePadding: false, label: 'Delay' },
   {
     id: 'status',
     numeric: false,
@@ -49,18 +47,7 @@ const headCells = [
 ];
 
 export function EnhancedTableHead(props: EnhancedTableProps) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-  const createSortHandler =
-    (property: any) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
+  const { onSelectAllClick, numSelected, rowCount } = props;
 
   return (
     <TableHead>
@@ -77,23 +64,8 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
           />
         </TableCell>
         {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+          <TableCell key={headCell.id} align={'left'}>
+            <Typography>{headCell.label}</Typography>
           </TableCell>
         ))}
       </TableRow>
