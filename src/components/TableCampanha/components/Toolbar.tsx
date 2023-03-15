@@ -1,4 +1,5 @@
 import { Toolbar, alpha, Typography, Button } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { queryClient } from '../../../main';
@@ -17,13 +18,14 @@ export function EnhancedTableToolbar({
   page,
   setSelectedItem,
 }: EnhancedTableToolbarProps) {
-  // const { invalidateQueries } = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   function handleSeeDetailsButton() {
     navigate(`${selectedItem}`);
   }
 
   async function handleStartButton() {
+    setIsLoading(true);
     try {
       await api.post(`/campaign/start`, selectedItem);
       await queryClient.invalidateQueries('campaign');
@@ -35,9 +37,11 @@ export function EnhancedTableToolbar({
         'error'
       );
     }
+    setIsLoading(false);
   }
 
   async function handleFinishButton() {
+    setIsLoading(true);
     try {
       await api.post(`/campaign/finish`, selectedItem);
       await queryClient.invalidateQueries('campaign');
@@ -50,10 +54,12 @@ export function EnhancedTableToolbar({
         'Erro ao encerrar campanha, por favor tente novamente.',
         'error'
       );
+      setIsLoading(false);
     }
   }
 
   async function handlePauseButton() {
+    setIsLoading(true);
     try {
       await api.post(`/campaign/pause`, selectedItem);
       await queryClient.invalidateQueries('campaign');
@@ -67,8 +73,10 @@ export function EnhancedTableToolbar({
         'error'
       );
     }
+    setIsLoading(false);
   }
   async function handleRemoveButton() {
+    setIsLoading(true);
     try {
       await api.post(`/campaign/delete`, selectedItem);
       await queryClient.invalidateQueries('campaign');
@@ -82,6 +90,7 @@ export function EnhancedTableToolbar({
         'Erro ao remover campanha, por favor tente novamente.',
         'error'
       );
+      setIsLoading(false);
     }
   }
 
@@ -133,6 +142,7 @@ export function EnhancedTableToolbar({
                 fontSize: 12,
                 fontWeight: 700,
               }}
+              disabled={isLoading}
               onClick={handleSeeDetailsButton}
             >
               Ver
@@ -149,6 +159,7 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            disabled={isLoading}
             onClick={handleStartButton}
           >
             Iniciar
@@ -164,6 +175,7 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            disabled={isLoading}
             onClick={handlePauseButton}
           >
             Pausar
@@ -179,6 +191,7 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            disabled={isLoading}
             onClick={handleFinishButton}
           >
             Encerrar
@@ -193,6 +206,7 @@ export function EnhancedTableToolbar({
               fontSize: 12,
               fontWeight: 700,
             }}
+            disabled={isLoading}
             onClick={handleRemoveButton}
           >
             Remover
