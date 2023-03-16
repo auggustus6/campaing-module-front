@@ -1,7 +1,8 @@
-import { Toolbar, alpha, Typography, Button } from '@mui/material';
+import { Toolbar, alpha, Typography, Button, Switch } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { Data } from '..';
 import { queryClient } from '../../../main';
 import api from '../../../services/api';
 
@@ -10,6 +11,9 @@ interface EnhancedTableToolbarProps {
   selectedItem: string[];
   setSelectedItem: (value: []) => void;
   page: number;
+  showDeleted: boolean;
+  setShowDeleted: (option: boolean) => void;
+  campaign: Data[];
 }
 
 export function EnhancedTableToolbar({
@@ -17,12 +21,17 @@ export function EnhancedTableToolbar({
   selectedItem,
   page,
   setSelectedItem,
+  showDeleted,
+  setShowDeleted,
+  campaign,
 }: EnhancedTableToolbarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   function handleSeeDetailsButton() {
     navigate(`${selectedItem}`);
   }
+
+  console.log({ campaign });
 
   async function handleStartButton() {
     setIsLoading(true);
@@ -54,8 +63,8 @@ export function EnhancedTableToolbar({
         'Erro ao encerrar campanha, por favor tente novamente.',
         'error'
       );
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }
 
   async function handlePauseButton() {
@@ -90,8 +99,8 @@ export function EnhancedTableToolbar({
         'Erro ao remover campanha, por favor tente novamente.',
         'error'
       );
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }
 
   return (
@@ -148,38 +157,44 @@ export function EnhancedTableToolbar({
               Ver
             </Button>
           )}
-          <Button
-            title="Iniciar Campanha"
-            variant="contained"
-            color="success"
-            sx={{
-              mr: '1rem',
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            disabled={isLoading}
-            onClick={handleStartButton}
-          >
-            Iniciar
-          </Button>
-          <Button
-            title="Pausar Campanha"
-            variant="contained"
-            color="secondary"
-            sx={{
-              mr: '1rem',
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            disabled={isLoading}
-            onClick={handlePauseButton}
-          >
-            Pausar
-          </Button>
+          {campaign[0].status !== 'CONCLUIDO' && (
+            <>
+              {' '}
+              <Button
+                title="Iniciar Campanha"
+                variant="contained"
+                color="success"
+                sx={{
+                  mr: '1rem',
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+                disabled={isLoading}
+                onClick={handleStartButton}
+              >
+                Iniciar
+              </Button>
+              <Button
+                title="Pausar Campanha"
+                variant="contained"
+                color="secondary"
+                sx={{
+                  mr: '1rem',
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+                disabled={isLoading}
+                onClick={handlePauseButton}
+              >
+                Pausar
+              </Button>
+            </>
+          )}
+
           <Button
             title="Encerrar Campanha"
             variant="contained"
@@ -196,23 +211,33 @@ export function EnhancedTableToolbar({
           >
             Encerrar
           </Button>
-          <Button
-            title="Remover Campanha"
-            variant="contained"
-            color="error"
-            sx={{
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            disabled={isLoading}
-            onClick={handleRemoveButton}
-          >
-            Remover
-          </Button>
+          {campaign[0].status !== 'CONCLUIDO' && (
+            <Button
+              title="Remover Campanha"
+              variant="contained"
+              color="error"
+              sx={{
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+              disabled={isLoading}
+              onClick={handleRemoveButton}
+            >
+              Remover
+            </Button>
+          )}
         </>
-      ) : null}
+      ) : (
+        <>
+          <Typography>Mostrar campanhas removidas</Typography>
+          <Switch
+            value={showDeleted}
+            onChange={() => setShowDeleted(!showDeleted)}
+          />
+        </>
+      )}
 
       {/* MODAL */}
       {/* <Modal

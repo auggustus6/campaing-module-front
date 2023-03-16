@@ -3,7 +3,6 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
 
-import { EnhancedTableProps } from '..';
 import { Typography } from '@mui/joy';
 
 const headCells = [
@@ -45,6 +44,12 @@ const headCells = [
     label: 'Status',
   },
 ];
+
+export interface EnhancedTableProps {
+  numSelected: number;
+  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  rowCount: number;
+}
 
 export function EnhancedTableHead(props: EnhancedTableProps) {
   const { onSelectAllClick, numSelected, rowCount } = props;

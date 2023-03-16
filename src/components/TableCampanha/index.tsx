@@ -13,6 +13,8 @@ import { EnhancedTableToolbar } from './components/Toolbar';
 import { useQuery } from 'react-query';
 import api from '../../services/api';
 import moment from 'moment';
+import { useState } from 'react';
+import StatusLabel from '../StatusLabel';
 
 export type Order = 'asc' | 'desc';
 
@@ -24,27 +26,31 @@ export interface Data {
   scheduleDate: string;
   status: string;
   sendDelay: string;
-}
-
-export interface EnhancedTableProps {
-  numSelected: number;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  rowCount: number;
+  isDeleted: boolean;
 }
 
 export default function TableCampaign() {
   const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
+  const [showDeleted, setShowDeleted] = useState(false);
 
   const formatDate = (date?: string) =>
     moment(date).format('DD/MM/YYYY - HH:mm');
 
   const { data } = useQuery(
-    ['campaign', page],
+    ['campaign', page, showDeleted],
     async () => {
-      return await api.get(`/campaign?page=${page}`);
+      return await api.get(
+        `/campaign?page=${page}&list_deleted=${showDeleted}`
+      );
     },
     { staleTime: 1000 * 4 } //60 seconds
+  );
+
+  console.log(data);
+
+  const selectedCampaign = data?.data?.result?.filter(
+    (item: any) => item.id === selected[0]
   );
 
   const rows: Data[] = data?.data?.result || [];
@@ -93,6 +99,9 @@ export default function TableCampaign() {
           selectedItem={selected}
           setSelectedItem={setSelected}
           page={page}
+          showDeleted={showDeleted}
+          setShowDeleted={setShowDeleted}
+          campaign={selectedCampaign}
         />
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
@@ -115,7 +124,15 @@ export default function TableCampaign() {
                     tabIndex={-1}
                     key={row.id}
                     selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
+                    sx={{
+                      cursor: 'pointer',
+                      background: row.isDeleted ? '#ffd0d0' : 'initial',
+                      '&:hover': {
+                        background: row.isDeleted
+                          ? '#fab2b2 !important'
+                          : 'initial',
+                      },
+                    }}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -138,7 +155,9 @@ export default function TableCampaign() {
                       {formatDate(row.finishDate)}
                     </TableCell>
                     <TableCell>{row.sendDelay}</TableCell>
-                    <TableCell align="left">{row.status}</TableCell>
+                    <TableCell align="left">
+                      <StatusLabel status={row.status} />
+                    </TableCell>
                   </TableRow>
                 );
               })}
