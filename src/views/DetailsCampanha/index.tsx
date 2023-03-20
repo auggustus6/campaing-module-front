@@ -174,6 +174,16 @@ export default function DetailsCampanha() {
             type="datetime-local"
           />
         </Grid>
+        <Grid item xs={12} sm={6}>
+          <InputLabel>Data de término:</InputLabel>
+          <Input
+            variant="outlined"
+            fullWidth
+            value={formatDate(data?.data?.endDate)}
+            disabled
+            type="datetime-local"
+          />
+        </Grid>
         <Grid item xs={6}>
           <InputLabel>Delay</InputLabel>
           <Input

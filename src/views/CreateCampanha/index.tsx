@@ -99,7 +99,11 @@ export default function CreateCampanha() {
       return;
     }
 
-    const key = lowerVariables.find((item) => item.toLowerCase() === 'contato');
+    const key = Object.keys(data[0]).find(
+      (item) => item.toLowerCase() === 'contato'
+    );
+
+    console.log({ key });
 
     const formattedContacts = data.map((item: any) => ({
       contact: item?.[key!],
@@ -120,7 +124,6 @@ export default function CreateCampanha() {
 
   async function handleCreateCampaign(values: CampaignSchemaType) {
     setIsLoading(true);
-    // console.log({ data: values.scheduleDate.toISOString() });
 
     try {
       await api.post('/campaign', {

@@ -22,7 +22,7 @@ export interface Data {
   id: string;
   title: string;
   startDate: string;
-  finishDate: string;
+  endDate: string;
   scheduleDate: string;
   status: string;
   sendDelay: string;
@@ -34,8 +34,11 @@ export default function TableCampaign() {
   const [page, setPage] = React.useState(0);
   const [showDeleted, setShowDeleted] = useState(false);
 
-  const formatDate = (date?: string) =>
-    moment(date).format('DD/MM/YYYY - HH:mm');
+  const formatDate = (date?: string) => {
+    console.log({ date });
+    if (date) return moment(date).format('DD/MM/YYYY - HH:mm');
+    else return '- - - - - - - - - - - - - -';
+  };
 
   const { data } = useQuery(
     ['campaign', page, showDeleted],
@@ -54,6 +57,8 @@ export default function TableCampaign() {
   );
 
   const rows: Data[] = data?.data?.result || [];
+
+  console.log({ rows });
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (selected.length === 0) {
@@ -152,7 +157,7 @@ export default function TableCampaign() {
                       {formatDate(row.startDate)}
                     </TableCell>
                     <TableCell align="left">
-                      {formatDate(row.finishDate)}
+                      {formatDate(row.endDate)}
                     </TableCell>
                     <TableCell>{row.sendDelay}</TableCell>
                     <TableCell align="left">
