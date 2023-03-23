@@ -153,9 +153,7 @@ export default function DetailsCampanha() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <InputLabel>
-            Data para disparo(vazio caso nao tenha data definida):
-          </InputLabel>
+          <InputLabel>Data para disparo:</InputLabel>
           <Input
             variant="outlined"
             fullWidth
@@ -197,53 +195,55 @@ export default function DetailsCampanha() {
           <InputLabel>Mensagem:</InputLabel>
           <TextArea value={data?.data.message} disabled />
         </Grid>
-        <Stack
-          direction={'row'}
-          gap={4}
-          justifyContent={'flex-end'}
-          width={'100%'}
-          py={2}
-        >
-          <Button
-            title="Iniciar Campanha"
-            color="success"
-            sx={{
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            onClick={handleStartButton}
+        {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (
+          <Stack
+            direction={'row'}
+            gap={4}
+            justifyContent={'flex-end'}
+            width={'100%'}
+            py={2}
           >
-            Iniciar
-          </Button>
-          <Button
-            title="Pausar Campanha"
-            color="neutral"
-            sx={{
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            onClick={handlePauseButton}
-          >
-            Pausar
-          </Button>
-          <Button
-            title="Encerrar Campanha"
-            color="danger"
-            sx={{
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-            onClick={handleFinishButton}
-          >
-            Encerrar
-          </Button>
-        </Stack>
+            <Button
+              title="Iniciar Campanha"
+              color="success"
+              sx={{
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+              onClick={handleStartButton}
+            >
+              Iniciar
+            </Button>
+            <Button
+              title="Pausar Campanha"
+              color="neutral"
+              sx={{
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+              onClick={handlePauseButton}
+            >
+              Pausar
+            </Button>
+            <Button
+              title="Encerrar Campanha"
+              color="danger"
+              sx={{
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+              onClick={handleFinishButton}
+            >
+              Encerrar
+            </Button>
+          </Stack>
+        )}
       </Grid>
       <TableContactsFromApi id={id} message={data?.data.message} />
     </Stack>

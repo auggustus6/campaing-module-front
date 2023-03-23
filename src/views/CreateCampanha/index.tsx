@@ -175,7 +175,7 @@ export default function CreateCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.scheduleDate}>
-            Data para disparo(deixe vazio caso nao queira uma data):
+            Data para disparo:
           </InputLabel>
           <Input
             disabled={isLoading}

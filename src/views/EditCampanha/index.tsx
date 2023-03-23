@@ -188,7 +188,7 @@ export default function EditCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>
-            Data para disparo(vazio caso nao tenha data definida):
+            Data para disparo:
           </InputLabel>
           <Input
             disabled={isLoading}
