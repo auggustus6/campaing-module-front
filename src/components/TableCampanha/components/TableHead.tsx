@@ -38,6 +38,12 @@ const headCells = [
   },
   { id: 'delay', numeric: false, disablePadding: false, label: 'Delay' },
   {
+    id: 'sentContacts',
+    numeric: true,
+    disablePadding: false,
+    label: 'Contatos Enviados',
+  },
+  {
     id: 'status',
     numeric: false,
     disablePadding: false,

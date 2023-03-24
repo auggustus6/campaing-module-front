@@ -191,6 +191,15 @@ export default function DetailsCampanha() {
             disabled
           />
         </Grid>
+        <Grid item xs={6}>
+          <InputLabel>Contatos enviados</InputLabel>
+          <Input
+            variant="outlined"
+            fullWidth
+            value={data?.data?.sentContactsCount}
+            disabled
+          />
+        </Grid>
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
           <TextArea value={data?.data.message} disabled />

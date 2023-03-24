@@ -26,6 +26,7 @@ export interface Data {
   scheduleDate: string;
   status: string;
   sendDelay: string;
+  sentContactsCount: number;
   isDeleted: boolean;
 }
 
@@ -160,6 +161,7 @@ export default function TableCampaign() {
                       {formatDate(row.endDate)}
                     </TableCell>
                     <TableCell>{row.sendDelay}</TableCell>
+                    <TableCell>{row.sentContactsCount}</TableCell>
                     <TableCell align="left">
                       <StatusLabel status={row.status} />
                     </TableCell>
