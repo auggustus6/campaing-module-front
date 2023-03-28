@@ -8,6 +8,10 @@ import Input from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 
 import MaterialButton from '@mui/material/Button';
+import DownloadIcon from '@mui/icons-material/Download';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import Button from '@mui/joy/Button';
 import Container from '@mui/system/Container';
@@ -213,7 +217,7 @@ export default function CreateCampanha() {
             error={!!errors.message}
             sx={{ color: theme.palette.primary.main }}
           >
-            Preview da mensagemMensagem:
+            Preview da mensagem:
           </InputLabel>
           <Paper
             sx={{
@@ -246,13 +250,21 @@ export default function CreateCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <MaterialButton
-            sx={{ height: '3.5rem' }}
+            sx={{
+              height: '3.5rem',
+              textTransform: 'uppercase',
+              background: '#232323',
+              '&:hover': {
+                background: '#595959',
+              },
+            }}
             disabled={isLoading}
             color={errors.variables ? 'error' : 'secondary'}
             fullWidth
             variant={errors.variables ? 'outlined' : 'contained'}
             component="label"
           >
+            <AttachFileIcon />
             {getValues('fileName')
               ? getValues('fileName')
               : 'Enviar Arquivo do Excel'}
@@ -268,12 +280,13 @@ export default function CreateCampanha() {
 
         <Grid item xs={12} sm={6}>
           <Button
-            sx={{ height: '3.5rem' }}
+            sx={{ height: '3.5rem', textTransform: 'uppercase' }}
             fullWidth
             disabled={isLoading}
             loading={isLoading}
             onClick={handleSubmit(handleCreateCampaign)}
           >
+            <AddCircleOutlineIcon />
             Criar Campanha
           </Button>
         </Grid>
@@ -281,18 +294,23 @@ export default function CreateCampanha() {
           <a href={'/modelo_planilha.xlsx'} target="_blank">
             <Button
               variant="outlined"
-              sx={{ height: '3.5rem' }}
+              sx={{ height: '3.5rem', textTransform: 'uppercase' }}
               fullWidth
               disabled={isLoading}
             >
+              <DownloadIcon />
               Baixar template do excel
             </Button>
           </a>
         </Grid>
       </Grid>
 
-      <InputLabel sx={{ marginTop: 4 }}>Valores da Planilha</InputLabel>
-      <TableContactsFromFile header={variables} contacts={contactsObject} />
+      {!!contactsObject.length && (
+        <>
+          <InputLabel sx={{ marginTop: 4 }}>Valores da Planilha</InputLabel>
+          <TableContactsFromFile header={variables} contacts={contactsObject} />
+        </>
+      )}
     </Container>
   );
 }

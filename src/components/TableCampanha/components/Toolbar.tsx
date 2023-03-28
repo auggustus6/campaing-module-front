@@ -1,11 +1,17 @@
-import { Toolbar, alpha, Typography, Button, Switch } from '@mui/material';
+import { Toolbar, alpha, Typography, Button, Switch, Box } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Data } from '..';
 import { queryClient } from '../../../main';
 import api from '../../../services/api';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
+import PreviewIcon from '@mui/icons-material/Preview';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
@@ -109,7 +115,9 @@ export function EnhancedTableToolbar({
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         flexWrap: { xs: 'wrap', sm: 'nowrap' },
+        justifyContent: 'space-between',
         py: { xs: 2, sm: 0 },
+        gap: '1rem',
         ...(numSelected > 0 && {
           bgcolor: (theme) =>
             alpha(
@@ -130,11 +138,12 @@ export function EnhancedTableToolbar({
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' }}
           variant="h6"
           id="tableTitle"
           component="div"
+          sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
+          <CampaignIcon fontSize='large'/>
           Campanhas
         </Typography>
       )}
@@ -154,12 +163,12 @@ export function EnhancedTableToolbar({
               disabled={isLoading}
               onClick={handleSeeDetailsButton}
             >
+              <PreviewIcon />
               Ver
             </Button>
           )}
           {campaign[0].status !== 'CONCLUIDO' && (
             <>
-              {' '}
               <Button
                 title="Iniciar Campanha"
                 variant="contained"
@@ -174,6 +183,7 @@ export function EnhancedTableToolbar({
                 disabled={isLoading}
                 onClick={handleStartButton}
               >
+                <PlayCircleOutlineIcon />
                 Iniciar
               </Button>
               <Button
@@ -190,6 +200,7 @@ export function EnhancedTableToolbar({
                 disabled={isLoading}
                 onClick={handlePauseButton}
               >
+                <PauseCircleOutlineIcon />
                 Pausar
               </Button>
             </>
@@ -198,17 +209,22 @@ export function EnhancedTableToolbar({
           <Button
             title="Encerrar Campanha"
             variant="contained"
-            color="error"
+            // color="error"
             sx={{
               mr: '1rem',
               height: '40px',
               paddingInline: '2rem',
               fontSize: 12,
               fontWeight: 700,
+              background: '#232323',
+              '&:hover': {
+                background: '#595959',
+              },
             }}
             disabled={isLoading}
             onClick={handleFinishButton}
           >
+            <CheckCircleOutlineIcon />
             Encerrar
           </Button>
           {campaign[0].status !== 'CONCLUIDO' && (
@@ -225,18 +241,19 @@ export function EnhancedTableToolbar({
               disabled={isLoading}
               onClick={handleRemoveButton}
             >
+              <DeleteOutlineIcon />
               Remover
             </Button>
           )}
         </>
       ) : (
-        <>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Typography>Mostrar campanhas removidas</Typography>
           <Switch
             value={showDeleted}
             onChange={() => setShowDeleted(!showDeleted)}
           />
-        </>
+        </Box>
       )}
 
       {/* MODAL */}

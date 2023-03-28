@@ -5,7 +5,7 @@ import Header from '../components/Header';
 
 export default function MainLayout() {
   return (
-    <div>
+    <div style={{minHeight: "100vh", position: "relative"}}>
       <Header />
       <Box pt={8} />
       <Box p={4}>

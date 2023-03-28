@@ -1,4 +1,10 @@
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import {
+  Route,
+  BrowserRouter,
+  Routes,
+  useNavigate,
+  Navigate,
+} from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Campanhas from './views/Campanhas';
 import CreateCampanha from './views/CreateCampanha';
@@ -14,7 +20,7 @@ function App() {
           <Route path="campanhas/criar" element={<CreateCampanha />} />
           <Route path="campanhas/:id" element={<DetailsCampanha />} />
           <Route path="campanhas/:id/editar" element={<EditCampanha />} />
-          <Route path="*" element={<h2>Error 404</h2>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

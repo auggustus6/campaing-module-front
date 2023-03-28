@@ -23,6 +23,9 @@ import Swal from 'sweetalert2';
 import api from '../../services/api';
 import moment from 'moment';
 
+import SaveIcon from '@mui/icons-material/Save';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+
 const editCampaignSchema = z.object({
   id: z.string(),
   title: z
@@ -98,7 +101,7 @@ export default function EditCampanha() {
       console.error(error);
       Swal.fire(
         'Erro',
-        'Erro ao criar campanha, por favor tente novamente.',
+        'Erro ao editar campanha, por favor tente novamente.',
         'error'
       );
     }
@@ -111,18 +114,22 @@ export default function EditCampanha() {
 
   useEffect(() => {
     async function getData() {
-      const { data } = await api.get(`/campaign/${id}`);
-      if (data) {
-        reset({
-          id: data.id,
-          title: data.title,
-          message: data.message,
-          scheduleDate: formatDate(data.scheduleDate) as any,
-          status: data.status,
-          startDate: formatDate(data.startDate) as any,
-          endDate: formatDate(data.endDate) as any,
-          sendDelay: data.sendDelay,
-        });
+      try {
+        const { data } = await api.get(`/campaign/${id}`);
+        if (data) {
+          reset({
+            id: data.id,
+            title: data.title,
+            message: data.message,
+            scheduleDate: formatDate(data.scheduleDate) as any,
+            status: data.status,
+            startDate: formatDate(data.startDate) as any,
+            endDate: formatDate(data.endDate) as any,
+            sendDelay: data.sendDelay,
+          });
+        }
+      } catch (error) {
+        navigate('/campanhas');
       }
     }
     getData();
@@ -146,12 +153,23 @@ export default function EditCampanha() {
             <Typography variant="h4">Editando campanha</Typography>
             <Stack direction={'row'} gap={2}>
               <Box>
-                <Button color="success" type="submit">
+                <Button
+                  color="success"
+                  type="submit"
+                  sx={{ textTransform: 'uppercase' }}
+                >
+                  <SaveIcon fontSize='small'/>
                   Salvar
                 </Button>
               </Box>
               <Box>
-                <Button color="neutral" onClick={handleCancelButton}>
+                <Button
+                  color="neutral"
+                  variant='outlined'
+                  onClick={handleCancelButton}
+                  sx={{ textTransform: 'uppercase', borderWidth: "2px" }}
+                >
+                  <DoDisturbIcon fontSize='small'/>
                   Cancelar
                 </Button>
               </Box>
@@ -187,9 +205,7 @@ export default function EditCampanha() {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <InputLabel>
-            Data para disparo:
-          </InputLabel>
+          <InputLabel>Data para disparo:</InputLabel>
           <Input
             disabled={isLoading}
             type="datetime-local"

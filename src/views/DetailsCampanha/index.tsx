@@ -13,6 +13,12 @@ import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
 import api from '../../services/api';
 
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+
 import moment from 'moment';
 
 export default function DetailsCampanha() {
@@ -24,8 +30,12 @@ export default function DetailsCampanha() {
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
   async function getData() {
-    const result = await api.get(`/campaign/${id}`);
-    setData(result);
+    try {
+      const result = await api.get(`/campaign/${id}`);
+      setData(result);
+    } catch (error) {
+      navigate('/campanhas');
+    }
   }
 
   useEffect(() => {
@@ -120,14 +130,19 @@ export default function DetailsCampanha() {
             <Typography variant="h4">Detalhes da campanha</Typography>
             <Stack direction={'row'} gap={2}>
               <Link to={'editar'}>
-                <Button>Editar</Button>
+                <Button sx={{ textTransform: 'uppercase' }}>
+                  <EditIcon fontSize="small" />
+                  Editar
+                </Button>
               </Link>
               <Box>
                 <Button
                   color="danger"
                   loading={isLoading}
                   onClick={handleRemoveCampaign}
+                  sx={{ textTransform: 'uppercase' }}
                 >
+                  <DeleteOutlineIcon fontSize="small" />
                   Remover
                 </Button>
               </Box>
@@ -220,35 +235,45 @@ export default function DetailsCampanha() {
                 paddingInline: '2rem',
                 fontSize: 12,
                 fontWeight: 700,
+                textTransform: 'uppercase',
               }}
               onClick={handleStartButton}
             >
+              <PlayCircleOutlineIcon fontSize="small" />
               Iniciar
             </Button>
             <Button
               title="Pausar Campanha"
+              sx={{
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                background: '#9c27b0',
+                '&:hover': {
+                  background: '#882999',
+                },
+              }}
+              onClick={handlePauseButton}
+            >
+              <PauseCircleOutlineIcon fontSize="small" />
+              Pausar
+            </Button>
+            <Button
+              title="Encerrar Campanha"
               color="neutral"
               sx={{
                 height: '40px',
                 paddingInline: '2rem',
                 fontSize: 12,
                 fontWeight: 700,
-              }}
-              onClick={handlePauseButton}
-            >
-              Pausar
-            </Button>
-            <Button
-              title="Encerrar Campanha"
-              color="danger"
-              sx={{
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
+                textTransform: 'uppercase',
+                background: "#232323"
               }}
               onClick={handleFinishButton}
             >
+              <CheckCircleOutlineIcon />
               Encerrar
             </Button>
           </Stack>

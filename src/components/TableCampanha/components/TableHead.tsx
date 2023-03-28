@@ -2,8 +2,17 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
+import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
+import KeyIcon from '@mui/icons-material/Key';
+import AbcIcon from '@mui/icons-material/Abc';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AlarmAddIcon from '@mui/icons-material/AlarmAdd';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import InfoIcon from '@mui/icons-material/Info';
 
 import { Typography } from '@mui/joy';
+import { theme } from '../../../styles/theme';
 
 const headCells = [
   {
@@ -11,43 +20,56 @@ const headCells = [
     numeric: false,
     disablePadding: true,
     label: 'id',
+    Icon: KeyIcon,
   },
   {
     id: 'title',
     numeric: false,
     disablePadding: true,
     label: 'Titulo',
+    Icon: AbcIcon,
   },
   {
     id: 'schedule-date',
     numeric: false,
     disablePadding: false,
     label: 'Data Agendada',
+    Icon: CalendarMonthIcon,
   },
   {
     id: 'start-date',
     numeric: false,
     disablePadding: false,
     label: 'Data de Início',
+    Icon: AlarmAddIcon,
   },
   {
     id: 'end-date',
     numeric: false,
     disablePadding: false,
     label: 'Data de Término',
+    Icon: EventAvailableIcon,
   },
-  { id: 'delay', numeric: false, disablePadding: false, label: 'Delay' },
+  {
+    id: 'delay',
+    numeric: false,
+    disablePadding: false,
+    label: 'Delay',
+    Icon: HourglassBottomIcon,
+  },
   {
     id: 'sentContacts',
     numeric: true,
     disablePadding: false,
     label: 'Contatos Enviados',
+    Icon: MarkEmailReadIcon,
   },
   {
     id: 'status',
     numeric: false,
     disablePadding: false,
     label: 'Status',
+    Icon: InfoIcon,
   },
 ];
 
@@ -76,7 +98,18 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell key={headCell.id} align={'left'}>
-            <Typography>{headCell.label}</Typography>
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                svg: {
+                  fontSize: '1rem',
+                },
+              }}
+            >
+              {headCell.label} <headCell.Icon />
+            </Typography>
           </TableCell>
         ))}
       </TableRow>
