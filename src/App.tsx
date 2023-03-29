@@ -20,7 +20,7 @@ function App() {
           <Route path="campanhas/criar" element={<CreateCampanha />} />
           <Route path="campanhas/:id" element={<DetailsCampanha />} />
           <Route path="campanhas/:id/editar" element={<EditCampanha />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/*" element={<Navigate to="/campanhas" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
