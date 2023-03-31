@@ -198,8 +198,8 @@ export default function CreateCampanha() {
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
               {CANAL.map((option) => (
-                <MenuItem value={option} key={option}>
-                  {option}
+                <MenuItem value={option[1]} key={option[1]}>
+                  {option[0]}
                 </MenuItem>
               ))}
             </Select>

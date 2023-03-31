@@ -34,10 +34,10 @@ export default function DetailsCampanha() {
     try {
       const result = await api.get(`/campaign/${id}`);
       const selectedSession = CANAL.find((c) =>
-        c.includes(result.data.session)
+        c[1].includes(result.data.session)
       );
 
-      result.data.session = selectedSession;
+      result.data.session = selectedSession?.[0];
 
       setData(result);
     } catch (error) {

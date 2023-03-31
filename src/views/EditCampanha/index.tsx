@@ -128,9 +128,7 @@ export default function EditCampanha() {
       try {
         const { data } = await api.get(`/campaign/${id}`);
 
-        const selectedSession = CANAL.find((c) => c.includes(data.session));
 
-        console.log(selectedSession, 'selectedSession');
 
         if (data) {
           reset({
@@ -142,7 +140,7 @@ export default function EditCampanha() {
             startDate: formatDate(data.startDate) as any,
             endDate: formatDate(data.endDate) as any,
             sendDelay: String(data.sendDelay) as any,
-            session: selectedSession,
+            session: data.session,
           });
         }
       } catch (error) {
@@ -215,8 +213,8 @@ export default function EditCampanha() {
               onChange={handleCanalSelect}
             >
               {CANAL.map((option) => (
-                <MenuItem value={option} key={option}>
-                  {option}
+                <MenuItem value={option[1]} key={option[1]}>
+                  {option[0]}
                 </MenuItem>
               ))}
             </Select>
