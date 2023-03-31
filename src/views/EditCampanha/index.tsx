@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   Box,
+  SelectChangeEvent,
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
@@ -25,6 +26,7 @@ import moment from 'moment';
 
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import { CANAL } from '../../utils/constants';
 
 const editCampaignSchema = z.object({
   id: z.string(),
@@ -58,6 +60,7 @@ const editCampaignSchema = z.object({
       },
       { message: 'O tempo mínimo é de 10 segundos.' }
     ),
+  session: z.string().nonempty('Selecione uma opção!'),
 });
 
 type EditCampaignSchemaType = z.infer<typeof editCampaignSchema>;
@@ -70,10 +73,13 @@ export default function EditCampanha() {
     getValues,
     reset,
     watch,
+    setValue,
   } = useForm<EditCampaignSchemaType>({
     resolver: zodResolver(editCampaignSchema),
   });
   const status = watch('status');
+  const session = watch('session');
+
   const [statusState, setStatusState] = useState('');
   useEffect(() => {
     setStatusState(status);
@@ -94,6 +100,7 @@ export default function EditCampanha() {
         scheduleDate: values.scheduleDate || undefined,
         status: values.status,
         sendDelay: values.sendDelay,
+        session: values.session.split(' ').pop(),
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('./..');
@@ -112,10 +119,19 @@ export default function EditCampanha() {
     navigate('./..');
   }
 
+  function handleCanalSelect(e: SelectChangeEvent<string>) {
+    setValue('session', e.target.value);
+  }
+
   useEffect(() => {
     async function getData() {
       try {
         const { data } = await api.get(`/campaign/${id}`);
+
+        const selectedSession = CANAL.find((c) => c.includes(data.session));
+
+        console.log(selectedSession, 'selectedSession');
+
         if (data) {
           reset({
             id: data.id,
@@ -125,7 +141,8 @@ export default function EditCampanha() {
             status: data.status,
             startDate: formatDate(data.startDate) as any,
             endDate: formatDate(data.endDate) as any,
-            sendDelay: data.sendDelay,
+            sendDelay: String(data.sendDelay) as any,
+            session: selectedSession,
           });
         }
       } catch (error) {
@@ -158,18 +175,18 @@ export default function EditCampanha() {
                   type="submit"
                   sx={{ textTransform: 'uppercase' }}
                 >
-                  <SaveIcon fontSize='small'/>
+                  <SaveIcon fontSize="small" />
                   Salvar
                 </Button>
               </Box>
               <Box>
                 <Button
                   color="neutral"
-                  variant='outlined'
+                  variant="outlined"
                   onClick={handleCancelButton}
-                  sx={{ textTransform: 'uppercase', borderWidth: "2px" }}
+                  sx={{ textTransform: 'uppercase', borderWidth: '2px' }}
                 >
-                  <DoDisturbIcon fontSize='small'/>
+                  <DoDisturbIcon fontSize="small" />
                   Cancelar
                 </Button>
               </Box>
@@ -186,6 +203,24 @@ export default function EditCampanha() {
             helperText={errors.title?.message}
             fullWidth
           />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <InputLabel error={!!errors.session}>Canal</InputLabel>
+          <FormControl fullWidth>
+            <Select
+              {...register('session')}
+              error={!!errors.session}
+              disabled={isLoading}
+              value={session || ''}
+              onChange={handleCanalSelect}
+            >
+              {CANAL.map((option) => (
+                <MenuItem value={option} key={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>

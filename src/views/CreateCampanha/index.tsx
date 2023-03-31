@@ -28,6 +28,7 @@ import { getFormattedMessage } from '../../utils/variablesUtils';
 import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
+import { CANAL } from '../../utils/constants';
 
 const campaignSchema = z.object({
   title: z
@@ -60,6 +61,7 @@ const campaignSchema = z.object({
       },
       { message: 'O tempo mínimo é de 10 segundos.' }
     ),
+  session: z.string().min(10, 'Selecione uma opção!'),
 });
 
 type CampaignSchemaType = z.infer<typeof campaignSchema>;
@@ -78,6 +80,7 @@ export default function CreateCampanha() {
   });
   const variables = watch('variables', []);
   const message = watch('message', '');
+  const session = watch('session', '');
   const messagePreview = getFormattedMessage({
     message,
     variables: getValues('contacts')?.[0]?.variables,
@@ -122,8 +125,12 @@ export default function CreateCampanha() {
     e.target.value = '';
   }
 
-  function handleSelectOption(e: SelectChangeEvent<'null'>) {
+  function handleSelectOption(e: SelectChangeEvent<string>) {
     setValue('message', getValues('message') + `{{${e.target.value}}}`);
+  }
+
+  function handleCanalSelect(e: SelectChangeEvent<string>) {
+    setValue('session', e.target.value);
   }
 
   async function handleCreateCampaign(values: CampaignSchemaType) {
@@ -136,6 +143,7 @@ export default function CreateCampanha() {
         scheduleDate: (values.scheduleDate as Date) || undefined,
         contacts: values.contacts,
         sendDelay: values.sendDelay,
+        session: values.session.split(' ').pop(),
       });
 
       // reset({
@@ -167,7 +175,7 @@ export default function CreateCampanha() {
         <Grid item xs={12}>
           <Typography variant="h4">Criação de campanha</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.title}>Titulo da Campanha</InputLabel>
           <Input
             disabled={isLoading}
@@ -176,6 +184,37 @@ export default function CreateCampanha() {
             helperText={errors.title?.message}
             fullWidth
           />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <InputLabel error={!!errors.session}>Canal</InputLabel>
+          <FormControl fullWidth>
+            <Select
+              {...register('session')}
+              error={!!errors.session}
+              disabled={isLoading}
+              value={session || 'select'}
+              onChange={handleCanalSelect}
+            >
+              <MenuItem value={'select'}>Selecione um canal</MenuItem>
+              {CANAL.map((option) => (
+                <MenuItem value={option} key={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Typography
+            sx={{
+              color: '#d32f2f',
+              marginLeft: '0.875rem',
+              fontSize: '0.75rem',
+              marginTop: '3px',
+              // lineHeight: '1.66',
+            }}
+          >
+            {errors.session?.message}
+          </Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.scheduleDate}>
@@ -191,7 +230,7 @@ export default function CreateCampanha() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.scheduleDate}>
+          <InputLabel error={!!errors.sendDelay}>
             Delay entre cada mensagem:
           </InputLabel>
           <Input
@@ -213,10 +252,7 @@ export default function CreateCampanha() {
           />
         </Grid>
         <Grid item xs={12} sx={{ marginBottom: 2 }}>
-          <InputLabel
-            error={!!errors.message}
-            sx={{ color: theme.palette.primary.main }}
-          >
+          <InputLabel sx={{ color: theme.palette.primary.main }}>
             Preview da mensagem:
           </InputLabel>
           <Paper
@@ -236,10 +272,10 @@ export default function CreateCampanha() {
             <Select
               label="Variáveis"
               onChange={handleSelectOption}
-              value="null"
+              value="0"
               disabled={isLoading}
             >
-              <MenuItem value={'null'}>Selecione uma variável</MenuItem>
+              <MenuItem value={'0'}>Selecione uma variável</MenuItem>
               {variables.map((option) => (
                 <MenuItem value={option} key={option}>
                   {option}

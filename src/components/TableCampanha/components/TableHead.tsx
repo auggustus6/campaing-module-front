@@ -103,6 +103,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
+                whiteSpace: 'nowrap',
                 svg: {
                   fontSize: '1rem',
                 },

@@ -20,6 +20,7 @@ import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import moment from 'moment';
+import { CANAL } from '../../utils/constants';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
@@ -32,9 +33,17 @@ export default function DetailsCampanha() {
   async function getData() {
     try {
       const result = await api.get(`/campaign/${id}`);
+      const selectedSession = CANAL.find((c) =>
+        c.includes(result.data.session)
+      );
+
+      result.data.session = selectedSession;
+
       setData(result);
     } catch (error) {
-      navigate('/campanhas');
+      console.log(error, 'aqui');
+
+      // navigate('/campanhas');
     }
   }
 
@@ -159,6 +168,15 @@ export default function DetailsCampanha() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
+          <InputLabel>Canal</InputLabel>
+          <Input
+            variant="outlined"
+            value={data?.data.session}
+            disabled
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>
           <Input
             variant="outlined"
@@ -269,7 +287,7 @@ export default function DetailsCampanha() {
                 fontSize: 12,
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                background: "#232323"
+                background: '#232323',
               }}
               onClick={handleFinishButton}
             >
