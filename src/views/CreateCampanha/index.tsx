@@ -237,7 +237,7 @@ export default function CreateCampanha() {
             disabled={isLoading}
             type="number"
             {...register('sendDelay')}
-            defaultValue={10}
+            defaultValue={120}
             error={!!errors.sendDelay}
             helperText={errors.sendDelay?.message}
             fullWidth
