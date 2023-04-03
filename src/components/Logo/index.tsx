@@ -5,7 +5,7 @@ export default function Logo() {
   return (
     <Link to="campanhas" style={{ cursor: 'pointer' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        LOGO
+        Multiformulas
       </Typography>
     </Link>
   );

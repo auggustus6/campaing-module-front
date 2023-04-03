@@ -7,7 +7,7 @@ import Logo from '../Logo';
 export default function Footer() {
   return (
     <>
-    <div style={{paddingTop: "10rem"}}></div>
+      <div style={{ paddingTop: '10rem' }}></div>
       <Paper
         sx={{
           position: 'absolute',
@@ -21,15 +21,12 @@ export default function Footer() {
         <Container maxWidth="lg">
           <Box
             sx={{
-              // flexGrow: 1,
               justifyContent: 'center',
               display: 'flex',
-              // my: 1,
             }}
           >
             <div>
               <Logo />
-              {/* <Image priority src="/Logo.svg" width={75} height={30} alt="Logo" /> */}
             </div>
           </Box>
 
@@ -42,7 +39,7 @@ export default function Footer() {
             }}
           >
             <Typography variant="caption" color="initial">
-              Copyright ©2022. ID Design Limited
+              Copyright ©2022. Multiformulas
             </Typography>
           </Box>
         </Container>

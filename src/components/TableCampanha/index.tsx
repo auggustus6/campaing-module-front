@@ -51,15 +51,11 @@ export default function TableCampaign() {
     { staleTime: 1000 * 4 } //60 seconds
   );
 
-  console.log(data);
-
   const selectedCampaign = data?.data?.result?.filter(
     (item: any) => item.id === selected[0]
   );
 
   const rows: Data[] = data?.data?.result || [];
-
-  console.log({ rows });
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (selected.length === 0) {
@@ -149,7 +145,9 @@ export default function TableCampaign() {
                         }}
                       />
                     </TableCell>
-                    <TableCell align="left">{row.id.slice(0, 10)}</TableCell>
+                    <TableCell align="left">
+                      {row.id.slice(0, 10) + '...'}
+                    </TableCell>
                     <TableCell align="left">{row.title}</TableCell>
                     <TableCell align="left">
                       {formatDate(row.scheduleDate)}
