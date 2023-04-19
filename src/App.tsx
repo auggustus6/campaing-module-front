@@ -10,19 +10,24 @@ import Campanhas from './views/Campanhas';
 import CreateCampanha from './views/CreateCampanha';
 import DetailsCampanha from './views/DetailsCampanha';
 import EditCampanha from './views/EditCampanha';
+import Login from './views/Login';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="campanhas" element={<Campanhas />} />
-          <Route path="campanhas/criar" element={<CreateCampanha />} />
-          <Route path="campanhas/:id" element={<DetailsCampanha />} />
-          <Route path="campanhas/:id/editar" element={<EditCampanha />} />
-          <Route path="/*" element={<Navigate to="/campanhas" replace />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="campanhas" element={<Campanhas />} />
+            <Route path="campanhas/criar" element={<CreateCampanha />} />
+            <Route path="campanhas/:id" element={<DetailsCampanha />} />
+            <Route path="campanhas/:id/editar" element={<EditCampanha />} />
+            <Route path="/*" element={<Navigate to="/campanhas" replace />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
