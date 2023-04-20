@@ -12,6 +12,8 @@ import DetailsCampanha from './views/DetailsCampanha';
 import EditCampanha from './views/EditCampanha';
 import Login from './views/Login';
 import { AuthProvider } from './context/AuthContext';
+import AuthLayout from './layouts/AuthLayout';
+import Register from './views/Register';
 
 function App() {
   return (
@@ -25,7 +27,10 @@ function App() {
             <Route path="campanhas/:id/editar" element={<EditCampanha />} />
             <Route path="/*" element={<Navigate to="/campanhas" replace />} />
           </Route>
-          <Route path="/login" element={<Login />} />
+          <Route element={<AuthLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>

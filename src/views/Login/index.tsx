@@ -5,95 +5,91 @@ import { Checkbox } from '../../components/checkbox';
 import { ButtonLoading } from '../../components/buttonLoading';
 import { useAuth } from '../../context/AuthContext';
 import { FormEvent } from 'react';
+import { theme } from '../../styles/theme';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import AuthLayout from '../../layouts/AuthLayout';
+import { All_PATHS } from '../../utils/constants';
+
+const loginSchema = z.object({
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+});
+
+type LoginSchemaSchemaType = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  // const { signIn, authLoading } = useContext(AuthContext);
   const { login, isLogging } = useAuth();
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    login({ email: 'chriscoy@email.com', password: '123123' });
-    // signIn({
-    //   email: values.email,
-    //   password: values.password,
-    // });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues,
+    watch,
+    trigger,
+  } = useForm<LoginSchemaSchemaType>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const handleSubmitLogin = async (values: LoginSchemaSchemaType) => {
+    // event.preventDefault();
+    // TODO - add toats to show error
+    login({ email: values.email, password: values.password });
   };
 
   return (
-    <Styles.Wrapper>
-      <Styles.Content>
-        <Styles.LeftSide>
-          <Styles.Image
-            src="background-pc.jpg"
-            style={{ objectFit: 'cover' }}
+    <>
+      <Styles.FormsTitle>
+        <Typography variant={'h4'}>Entrar na conta</Typography>
+        <Typography variant="subtitle1">Faça o login para continuar</Typography>
+      </Styles.FormsTitle>
+      <form onSubmit={handleSubmit(handleSubmitLogin)}>
+        <Styles.Forms>
+          <TextField
+            label="Email"
+            margin="normal"
+            type="email"
+            {...register('email')}
+            error={!!errors.email}
+            // onChange={handleChange}
+            helperText={errors.email?.message}
+            // required
           />
-        </Styles.LeftSide>
-        <Styles.RightSide>
-          <Styles.LoginContent>
-            <Styles.FormsTitle>
-              <Typography component={'h4'}>Entrar na conta</Typography>
-              <Typography variant="subtitle1">
-                Faça o login para continuar
-              </Typography>
-            </Styles.FormsTitle>
 
-            <form onSubmit={handleSubmit}>
-              <Styles.Forms>
-                <TextField
-                  name="email"
-                  label="Email"
-                  margin="normal"
-                  type="email"
-                  // onChange={handleChange}
-                  // helperText={errors.email}
-                  required
-                />
+          <TextField
+            label="Senha"
+            margin="normal"
+            type="password"
+            {...register('password')}
+            error={!!errors.password}
+            // onChange={handleChange}
+            helperText={errors.password?.message}
+          />
 
-                <TextField
-                  name="password"
-                  label="Senha"
-                  margin="normal"
-                  type="password"
-                  // onChange={handleChange}
-                  // helperText={errors.password}
-                  required
-                />
+          <Styles.SubField>
+            <Link to={'/forgot-password'}>Esqueceu a senha?</Link>
+          </Styles.SubField>
 
-                <Styles.SubField>
-                  <Checkbox
-                    name="rememberMe"
-                    label="Manter-se conectado"
-                    // onChange={handleChange}
-                  />
-                  <Link
-                    // label=""
-                    to={'/forgot-password'}
-                  >
-                    Esqueceu a senha?
-                  </Link>
-                </Styles.SubField>
-
-                <ButtonLoading
-                  loading={isLogging}
-                  variant="contained"
-                  size="large"
-                  type="submit"
-                >
-                  ENTRAR
-                </ButtonLoading>
-              </Styles.Forms>
-            </form>
-
-            {/* <Styles.NewAccountOrAlreadyHaveAnAccount>
-              <Typography variant="subtitle2" textAlign="center">
-                Não possui conta ?{' '}
-                <Link href={AppRouters.register}>
-                Criar conta
-                </Link>
-              </Typography>
-            </Styles.NewAccountOrAlreadyHaveAnAccount> */}
-          </Styles.LoginContent>
-        </Styles.RightSide>
-      </Styles.Content>
-    </Styles.Wrapper>
+          <ButtonLoading
+            loading={isLogging}
+            variant="contained"
+            size="large"
+            type="submit"
+          >
+            ENTRAR
+          </ButtonLoading>
+        </Styles.Forms>
+      </form>
+      <Styles.NewAccountOrAlreadyHaveAnAccount>
+        <Typography variant="subtitle2" textAlign="center">
+          Não possui conta ?{' '}
+          <Link to={All_PATHS.REGISTER} style={{ color: theme.palette.primary.main }}>
+            Criar conta
+          </Link>
+        </Typography>
+      </Styles.NewAccountOrAlreadyHaveAnAccount>
+    </>
   );
 }

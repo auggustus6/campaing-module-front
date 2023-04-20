@@ -1,13 +1,21 @@
 export const PATHS = [
   {
     name: 'Campanhas',
-    path: 'campanhas',
+    path: '/campanhas',
   },
   {
     name: 'Criar Campanha',
-    path: 'campanhas/criar',
+    path: '/campanhas/criar',
   },
 ];
+
+export const All_PATHS = {
+  CAMPAIGNS: '/campanhas',
+  CREATE_CAMPAIGN: '/campanhas/criar',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  // HOME: 'home',
+};
 
 export const CANAL = [
   ['E-commerce', '5517992493829'],
