@@ -39,7 +39,7 @@ export default function Footer() {
             }}
           >
             <Typography variant="caption" color="initial">
-              Copyright ©2022. Multiformulas
+              {/* Copyright ©2022. Multiformulas */}
             </Typography>
           </Box>
         </Container>

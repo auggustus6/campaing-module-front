@@ -21,6 +21,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import moment from 'moment';
 import { CANAL } from '../../utils/constants';
+import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
@@ -33,17 +34,15 @@ export default function DetailsCampanha() {
   async function getData() {
     try {
       const result = await api.get(`/campaign/${id}`);
-      const selectedSession = CANAL.find((c) =>
-        c[1].includes(result.data.session)
-      );
+      // const selectedSession = CANAL.find((c) =>
+      //   c[1].includes(result.data.session)
+      // );
 
-      result.data.session = selectedSession?.[0];
+      // result.data.session = selectedSession?.[0];
 
       setData(result);
     } catch (error) {
-      console.log(error, 'aqui');
-
-      // navigate('/campanhas');
+      navigate('/campanhas');
     }
   }
 
@@ -100,8 +99,6 @@ export default function DetailsCampanha() {
       await getData();
       Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
     } catch (error) {
-      console.log(error);
-
       Swal.fire(
         'Erro',
         'Erro ao encerrar campanha, por favor tente novamente.',
@@ -116,8 +113,6 @@ export default function DetailsCampanha() {
       await getData();
       Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
     } catch (error) {
-      console.log(error);
-
       Swal.fire(
         'Erro',
         'Erro ao pausar campanha, por favor tente novamente.',
@@ -138,23 +133,25 @@ export default function DetailsCampanha() {
           >
             <Typography variant="h4">Detalhes da campanha</Typography>
             <Stack direction={'row'} gap={2}>
-              <Link to={'editar'}>
-                <Button sx={{ textTransform: 'uppercase' }}>
-                  <EditIcon fontSize="small" />
-                  Editar
-                </Button>
-              </Link>
-              <Box>
-                <Button
-                  color="danger"
-                  loading={isLoading}
-                  onClick={handleRemoveCampaign}
-                  sx={{ textTransform: 'uppercase' }}
-                >
-                  <DeleteOutlineIcon fontSize="small" />
-                  Remover
-                </Button>
-              </Box>
+              <ShowWhenAdmin>
+                <Link to={'editar'}>
+                  <Button sx={{ textTransform: 'uppercase' }}>
+                    <EditIcon fontSize="small" />
+                    Editar
+                  </Button>
+                </Link>
+                <Box>
+                  <Button
+                    color="danger"
+                    loading={isLoading}
+                    onClick={handleRemoveCampaign}
+                    sx={{ textTransform: 'uppercase' }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                    Remover
+                  </Button>
+                </Box>
+              </ShowWhenAdmin>
             </Stack>
           </Stack>
         </Grid>
@@ -171,7 +168,7 @@ export default function DetailsCampanha() {
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.data.session}
+            value={data?.data.Company.channelNick}
             disabled
             fullWidth
           />
@@ -238,63 +235,65 @@ export default function DetailsCampanha() {
           <TextArea value={data?.data.message} disabled />
         </Grid>
         {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (
-          <Stack
-            direction={'row'}
-            gap={4}
-            justifyContent={'flex-end'}
-            width={'100%'}
-            py={2}
-          >
-            <Button
-              title="Iniciar Campanha"
-              color="success"
-              sx={{
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-              }}
-              onClick={handleStartButton}
+          <ShowWhenAdmin>
+            <Stack
+              direction={'row'}
+              gap={4}
+              justifyContent={'flex-end'}
+              width={'100%'}
+              py={2}
             >
-              <PlayCircleOutlineIcon fontSize="small" />
-              Iniciar
-            </Button>
-            <Button
-              title="Pausar Campanha"
-              sx={{
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                background: '#9c27b0',
-                '&:hover': {
-                  background: '#882999',
-                },
-              }}
-              onClick={handlePauseButton}
-            >
-              <PauseCircleOutlineIcon fontSize="small" />
-              Pausar
-            </Button>
-            <Button
-              title="Encerrar Campanha"
-              color="neutral"
-              sx={{
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                background: '#232323',
-              }}
-              onClick={handleFinishButton}
-            >
-              <CheckCircleOutlineIcon />
-              Encerrar
-            </Button>
-          </Stack>
+              <Button
+                title="Iniciar Campanha"
+                color="success"
+                sx={{
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                }}
+                onClick={handleStartButton}
+              >
+                <PlayCircleOutlineIcon fontSize="small" />
+                Iniciar
+              </Button>
+              <Button
+                title="Pausar Campanha"
+                sx={{
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  background: '#9c27b0',
+                  '&:hover': {
+                    background: '#882999',
+                  },
+                }}
+                onClick={handlePauseButton}
+              >
+                <PauseCircleOutlineIcon fontSize="small" />
+                Pausar
+              </Button>
+              <Button
+                title="Encerrar Campanha"
+                color="neutral"
+                sx={{
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  background: '#232323',
+                }}
+                onClick={handleFinishButton}
+              >
+                <CheckCircleOutlineIcon />
+                Encerrar
+              </Button>
+            </Stack>
+          </ShowWhenAdmin>
         )}
       </Grid>
       <TableContactsFromApi id={id} message={data?.data.message} />

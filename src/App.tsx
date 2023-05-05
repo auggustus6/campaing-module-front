@@ -14,6 +14,9 @@ import Login from './views/Login';
 import { AuthProvider } from './context/AuthContext';
 import AuthLayout from './layouts/AuthLayout';
 import Register from './views/Register';
+import Painel from './views/Painel';
+import UserModal from './views/Painel/modals/UserModal';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -22,9 +25,25 @@ function App() {
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="campanhas" element={<Campanhas />} />
-            <Route path="campanhas/criar" element={<CreateCampanha />} />
+            <Route
+              path="campanhas/criar"
+              element={<AdminRoute e={<CreateCampanha />} />}
+            />
             <Route path="campanhas/:id" element={<DetailsCampanha />} />
-            <Route path="campanhas/:id/editar" element={<EditCampanha />} />
+            <Route
+              path="campanhas/:id/editar"
+              element={<AdminRoute e={<EditCampanha />} />}
+            />
+            <Route path="painel" element={<AdminRoute e={<Painel />} />}>
+              <Route
+                path="create-user"
+                element={<AdminRoute e={<UserModal />} />}
+              />
+              <Route
+                path="edit-user"
+                element={<AdminRoute e={<UserModal />} />}
+              />
+            </Route>
             <Route path="/*" element={<Navigate to="/campanhas" replace />} />
           </Route>
           <Route element={<AuthLayout />}>

@@ -59,7 +59,7 @@ export default function TableCampaign() {
   // }, []);
 
   const formatDate = (date?: string) => {
-    console.log({ date });
+    
     if (date) return moment(date).format('DD/MM/YYYY - HH:mm');
     else return '- - - - - - - - - - - - - -';
   };

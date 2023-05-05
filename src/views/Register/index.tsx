@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { All_PATHS } from '../../utils/constants';
+import { useToast } from '../../context/ToastContext';
 
 const registerSchema = z
   .object({
@@ -44,20 +45,20 @@ export default function Register() {
     resolver: zodResolver(registerSchema),
   });
 
-  console.error(errors, 'errors');
+  const toast = useToast();
 
   const checkbox = watch('acceptTerms');
 
-  console.log({ checkbox });
-
   const handleSubmitRegister = async (values: RegisterSchemaSchemaType) => {
-    signup({
-      email: values.email,
-      name: values.name,
-      password: values.password,
-    });
-    // TODO - add toats to show error
-    // login({ email: values.email, password: values.password });
+    try {
+      signup({
+        email: values.email,
+        name: values.name,
+        password: values.password,
+      });
+    } catch (error) {
+      toast.error('Erro ao criar conta, tente novamente mais tarde');
+    }
   };
 
   return (

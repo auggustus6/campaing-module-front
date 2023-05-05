@@ -9,6 +9,7 @@ import {
   Select,
   Box,
   SelectChangeEvent,
+  Divider,
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
@@ -27,6 +28,13 @@ import moment from 'moment';
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { CANAL } from '../../utils/constants';
+
+interface Company {
+  id: string;
+  name: string;
+  channelNick: string;
+  channelNumber: string;
+}
 
 const editCampaignSchema = z.object({
   id: z.string(),
@@ -85,6 +93,16 @@ export default function EditCampanha() {
     setStatusState(status);
   }, [status]);
 
+  const [company, setCompany] = useState<Company>();
+
+  useEffect(() => {
+    async function getCompany() {
+      const { data } = await api.get<Company>('/companies');
+      setCompany(data);
+    }
+    getCompany();
+  }, []);
+
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -127,8 +145,6 @@ export default function EditCampanha() {
     async function getData() {
       try {
         const { data } = await api.get(`/campaign/${id}`);
-
-
 
         if (data) {
           reset({
@@ -212,11 +228,14 @@ export default function EditCampanha() {
               value={session || ''}
               onChange={handleCanalSelect}
             >
-              {CANAL.map((option) => (
+              {/* {CANAL.map((option) => (
                 <MenuItem value={option[1]} key={option[1]}>
                   {option[0]}
                 </MenuItem>
-              ))}
+              ))} */}
+              <MenuItem value={company?.channelNumber}>
+                {company?.channelNick}
+              </MenuItem>
             </Select>
           </FormControl>
         </Grid>

@@ -9,8 +9,9 @@ import { theme } from '../../styles/theme';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import AuthLayout from '../../layouts/AuthLayout';
 import { All_PATHS } from '../../utils/constants';
+import { useToast } from '../../context/ToastContext';
+import { AxiosError } from 'axios';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -21,22 +22,29 @@ type LoginSchemaSchemaType = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { login, isLogging } = useAuth();
+  const toast = useToast();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    getValues,
-    watch,
-    trigger,
   } = useForm<LoginSchemaSchemaType>({
     resolver: zodResolver(loginSchema),
   });
 
   const handleSubmitLogin = async (values: LoginSchemaSchemaType) => {
     // event.preventDefault();
-    // TODO - add toats to show error
-    login({ email: values.email, password: values.password });
+    try {
+      await login({ email: values.email, password: values.password });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status.toString().startsWith('4')) {
+          toast.error('Email ou senha incorretos');
+          return;
+        }
+      } else {
+        toast.error('Erro ao fazer login, tente novamente mais tarde');
+      }
+    }
   };
 
   return (
@@ -85,7 +93,10 @@ export default function Login() {
       <Styles.NewAccountOrAlreadyHaveAnAccount>
         <Typography variant="subtitle2" textAlign="center">
           Não possui conta ?{' '}
-          <Link to={All_PATHS.REGISTER} style={{ color: theme.palette.primary.main }}>
+          <Link
+            to={All_PATHS.REGISTER}
+            style={{ color: theme.palette.primary.main }}
+          >
             Criar conta
           </Link>
         </Typography>

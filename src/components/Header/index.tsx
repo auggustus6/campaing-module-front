@@ -17,30 +17,51 @@ import Logo from '../Logo';
 import { PATHS } from '../../utils/constants';
 import { Link } from 'react-router-dom';
 import Stack from '@mui/system/Stack';
+import { useAuth } from '../../context/AuthContext';
 
 const drawerWidth = 240;
 
 export default function Header() {
+  const { logout, user } = useAuth();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
-  const drawer = (
+  const MobileDrawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Logo />
       <Divider />
       <List>
-        {PATHS.map((item) => (
-          <Link to={item.path} key={item.path}>
-            <ListItem disablePadding>
-              <ListItemButton sx={{ textAlign: 'center' }}>
-                <ListItemText primary={item.name} />
-              </ListItemButton>
-            </ListItem>
-          </Link>
-        ))}
+        {PATHS.map((item) => {
+          if (!item.isAdminRoute) {
+            return (
+              <Link to={item.path} key={item.path}>
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ textAlign: 'center' }}>
+                    <ListItemText primary={item.name} />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+            );
+          } else if (user?.isAdmin) {
+            return (
+              <Link to={item.path} key={item.path}>
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ textAlign: 'center' }}>
+                    <ListItemText primary={item.name} />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+            );
+          }
+        })}
+        <ListItem disablePadding onClick={logout}>
+          <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemText primary={'Sair'} />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   );
@@ -55,7 +76,7 @@ export default function Header() {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
@@ -66,19 +87,29 @@ export default function Header() {
             justifyContent={'space-between'}
             alignItems="center"
           >
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ display: { xs: 'none', sm: 'block' } }}
-            >
+            <Typography variant="h6" component="div" sx={{ display: {} }}>
               <Logo />
             </Typography>
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              {PATHS.map((item) => (
-                <Link to={item.path} key={item.path}>
-                  <Button sx={{ color: '#fff' }}>{item.name}</Button>
-                </Link>
-              ))}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              {PATHS.map((item) => {
+                if (!item.isAdminRoute) {
+                  return (
+                    <Link to={item.path} key={item.path}>
+                      <Button sx={{ color: '#fff' }}>{item.name}</Button>
+                    </Link>
+                  );
+                } else if (user?.isAdmin) {
+                  return (
+                    <Link to={item.path} key={item.path}>
+                      <Button sx={{ color: '#fff' }}>{item.name}</Button>
+                    </Link>
+                  );
+                }
+              })}
+
+              <Button sx={{ color: '#fff' }} onClick={logout}>
+                Sair
+              </Button>
             </Box>
           </Stack>
         </Toolbar>
@@ -92,14 +123,14 @@ export default function Header() {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
+            display: { xs: 'block', md: 'none' },
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
             },
           }}
         >
-          {drawer}
+          {MobileDrawer}
         </Drawer>
       </Box>
     </Box>

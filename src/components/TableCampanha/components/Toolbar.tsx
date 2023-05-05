@@ -12,6 +12,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PreviewIcon from '@mui/icons-material/Preview';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useAuth } from '../../../context/AuthContext';
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
@@ -31,13 +32,14 @@ export function EnhancedTableToolbar({
   setShowDeleted,
   campaign,
 }: EnhancedTableToolbarProps) {
+  const { user } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
   function handleSeeDetailsButton() {
     navigate(`${selectedItem}`);
   }
-
-  console.log({ campaign });
 
   async function handleStartButton() {
     setIsLoading(true);
@@ -62,8 +64,6 @@ export function EnhancedTableToolbar({
       await queryClient.invalidateQueries('campaign');
       Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
     } catch (error) {
-      console.log(error);
-
       Swal.fire(
         'Erro',
         'Erro ao encerrar campanha, por favor tente novamente.',
@@ -80,8 +80,6 @@ export function EnhancedTableToolbar({
       await queryClient.invalidateQueries('campaign');
       Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
     } catch (error) {
-      console.log(error);
-
       Swal.fire(
         'Erro',
         'Erro ao pausar campanha, por favor tente novamente.',
@@ -98,8 +96,6 @@ export function EnhancedTableToolbar({
       setSelectedItem([]);
       Swal.fire('Sucesso', 'Campanha removida com sucesso!', 'success');
     } catch (error) {
-      console.log(error);
-
       Swal.fire(
         'Erro',
         'Erro ao remover campanha, por favor tente novamente.',
@@ -143,7 +139,7 @@ export function EnhancedTableToolbar({
           component="div"
           sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
-          <CampaignIcon fontSize='large'/>
+          <CampaignIcon fontSize="large" />
           Campanhas
         </Typography>
       )}
@@ -167,7 +163,7 @@ export function EnhancedTableToolbar({
               Ver
             </Button>
           )}
-          {campaign[0].status !== 'CONCLUIDO' && (
+          {user?.isAdmin && campaign[0].status !== 'CONCLUIDO' && (
             <>
               <Button
                 title="Iniciar Campanha"
@@ -205,29 +201,31 @@ export function EnhancedTableToolbar({
               </Button>
             </>
           )}
+          {user?.isAdmin && (
+            <Button
+              title="Encerrar Campanha"
+              variant="contained"
+              // color="error"
+              sx={{
+                mr: '1rem',
+                height: '40px',
+                paddingInline: '2rem',
+                fontSize: 12,
+                fontWeight: 700,
+                background: '#232323',
+                '&:hover': {
+                  background: '#595959',
+                },
+              }}
+              disabled={isLoading}
+              onClick={handleFinishButton}
+            >
+              <CheckCircleOutlineIcon />
+              Encerrar
+            </Button>
+          )}
 
-          <Button
-            title="Encerrar Campanha"
-            variant="contained"
-            // color="error"
-            sx={{
-              mr: '1rem',
-              height: '40px',
-              paddingInline: '2rem',
-              fontSize: 12,
-              fontWeight: 700,
-              background: '#232323',
-              '&:hover': {
-                background: '#595959',
-              },
-            }}
-            disabled={isLoading}
-            onClick={handleFinishButton}
-          >
-            <CheckCircleOutlineIcon />
-            Encerrar
-          </Button>
-          {campaign[0].status !== 'CONCLUIDO' && (
+          {user?.isAdmin && campaign[0].status !== 'CONCLUIDO' && (
             <Button
               title="Remover Campanha"
               variant="contained"

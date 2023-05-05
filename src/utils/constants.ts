@@ -2,10 +2,17 @@ export const PATHS = [
   {
     name: 'Campanhas',
     path: '/campanhas',
+    isAdminRoute: false,
   },
   {
     name: 'Criar Campanha',
     path: '/campanhas/criar',
+    isAdminRoute: true,
+  },
+  {
+    name: 'Painel Administrativo',
+    path: '/painel',
+    isAdminRoute: true,
   },
 ];
 
@@ -14,6 +21,7 @@ export const All_PATHS = {
   CREATE_CAMPAIGN: '/campanhas/criar',
   LOGIN: '/login',
   REGISTER: '/register',
+  PAINEL_ADMINISTRATIVO: '/painel',
   // HOME: 'home',
 };
 

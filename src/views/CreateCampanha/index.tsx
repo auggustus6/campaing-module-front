@@ -21,7 +21,7 @@ import Swal from 'sweetalert2';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextArea } from '../../components/TextArea';
 import api from '../../services/api';
 import { getFormattedMessage } from '../../utils/variablesUtils';
@@ -29,6 +29,15 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { CANAL } from '../../utils/constants';
+import { Box, Divider } from '@mui/material';
+import { useAuth } from '../../context/AuthContext';
+
+interface Company {
+  id: string;
+  name: string;
+  channelNick: string;
+  channelNumber: string;
+}
 
 const campaignSchema = z.object({
   title: z
@@ -64,6 +73,8 @@ const campaignSchema = z.object({
   session: z.string().min(10, 'Selecione uma opção!'),
 });
 
+// TODO - VOLTAR COM O SELECT DOS CANAIS.
+
 type CampaignSchemaType = z.infer<typeof campaignSchema>;
 
 export default function CreateCampanha() {
@@ -85,6 +96,18 @@ export default function CreateCampanha() {
     message,
     variables: getValues('contacts')?.[0]?.variables,
   });
+
+  const [company, setCompany] = useState<Company>();
+
+  useEffect(() => {
+    async function getCompany() {
+      const { data } = await api.get<Company>('/companies');
+      setCompany(data);
+    }
+    getCompany();
+  }, []);
+
+  const { user } = useAuth();
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
 
@@ -109,8 +132,6 @@ export default function CreateCampanha() {
     const key = Object.keys(data[0]).find(
       (item) => item.toLowerCase() === 'contato'
     );
-
-    console.log({ key });
 
     const formattedContacts = data.map((item: any) => ({
       contact: item?.[key!],
@@ -146,16 +167,6 @@ export default function CreateCampanha() {
         session: values.session.split(' ').pop(),
       });
 
-      // reset({
-      //   contacts: [],
-      //   message: '',
-      //   scheduleDate: '',
-      //   title: '',
-      //   variables: [],
-      //   fileName: '',
-      // });
-      // setContactsObject([]);
-
       navigate('/campanhas');
       Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
     } catch (error) {
@@ -170,7 +181,7 @@ export default function CreateCampanha() {
   }
 
   return (
-    <Container>
+    <Container sx={{ p: 0 }}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">Criação de campanha</Typography>
@@ -197,11 +208,14 @@ export default function CreateCampanha() {
               onChange={handleCanalSelect}
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
-              {CANAL.map((option) => (
+              <MenuItem value={company?.channelNumber}>
+                {company?.channelNick}
+              </MenuItem>
+              {/* {CANAL.map((option) => (
                 <MenuItem value={option[1]} key={option[1]}>
                   {option[0]}
                 </MenuItem>
-              ))}
+              ))} */}
             </Select>
           </FormControl>
           <Typography
@@ -257,13 +271,31 @@ export default function CreateCampanha() {
           </InputLabel>
           <Paper
             sx={{
+              backgroundImage: `url(/wpp_background.png)`,
               p: 4,
+              px: 10,
               outline: `1px solid ${theme.palette.primary.main}`,
               whiteSpace: 'pre-wrap',
             }}
             variant={'outlined'}
           >
-            <p>{messagePreview}</p>
+            <Box
+              sx={{
+                background: 'white',
+                display: 'inline-block',
+                py: 0.5,
+                color: '#111b21',
+                px: 2,
+                borderRadius: 2,
+                maxWidth: '640px',
+                fontSize: '0.95rem',
+                boxShadow: '0px 0px 2px -0.5px rgba(0,0,0,0.5)',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+              }}
+            >
+              {messagePreview || 'Preview da mensagem...'}
+            </Box>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6}>

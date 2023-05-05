@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { TablePagination } from '@mui/material';
+import { Box, Switch, TablePagination, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { getFormattedMessage } from '../../utils/variablesUtils';
@@ -19,11 +19,15 @@ export default function TableContactsFromApi({
   message: string;
 }) {
   const [page, setPage] = useState(0);
+  // const [showDeleted, setShowDeleted] = useState(false);
+  const [showFinished, setShowFinished] = useState(false);
 
   const { data } = useQuery(
-    ['contacts-by-id', id, page],
+    ['contacts-by-id', id, page, showFinished],
     async () => {
-      return await api.get(`/contacts/${id}?page=${page}`);
+      return await api.get(
+        `/contacts/${id}?page=${page}&list_finished=${showFinished}`
+      );
     },
     { staleTime: 1000 * 60 } //60 seconds
   );
@@ -34,6 +38,23 @@ export default function TableContactsFromApi({
 
   return (
     <TableContainer component={Paper}>
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: '1rem',
+            py: 2,
+          }}
+        >
+          <Typography>Mostrar contatos já enviados</Typography>
+          <Switch
+            value={showFinished}
+            onChange={() => setShowFinished(!showFinished)}
+          />
+        </Box>
+      </Box>
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -59,7 +80,7 @@ export default function TableContactsFromApi({
       <TablePagination
         rowsPerPageOptions={[]}
         component="div"
-        count={data?.data.total || 6}
+        count={data?.data.total || 0}
         rowsPerPage={5}
         showFirstButton
         showLastButton

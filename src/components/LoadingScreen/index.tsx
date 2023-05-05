@@ -11,6 +11,7 @@ export default function LoadingScreen() {
         display: 'grid',
         placeContent: 'center',
         background: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 9999,
       }}
     >
       <CircularProgress size="lg" variant='solid'/>

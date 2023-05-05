@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import LoadingScreen from '../components/LoadingScreen';
 import { All_PATHS, PATHS } from '../utils/constants';
+import { useToast } from './ToastContext';
 
 interface User {
   id: string;
@@ -13,6 +14,9 @@ interface User {
   token: string;
   isAdmin: boolean;
   companyId: string;
+  company?: {
+    name: string;
+  };
 }
 
 interface UserLogin {
@@ -28,7 +32,7 @@ interface UserRegister {
 
 interface AuthContextProps {
   user: User | null;
-  login: (user: UserLogin) => void;
+  login: (user: UserLogin) => Promise<void>;
   logout: () => void;
   isLogging: boolean;
   register: (user: UserRegister) => void;
@@ -46,29 +50,32 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLogging, setIsLogging] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   useEffect(() => {
     async function revalidate() {
       setIsLogging(true);
       try {
-        const { data } = await api.post<LoginResponse>(
-          '/auth/revalidate',
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem('@campaign:user') || ''
-              )}`,
-            },
-          }
-        );
+        const { data } = await api.post<LoginResponse>('/auth/revalidate');
         setUser(data.user);
-        navigate(All_PATHS.CAMPAIGNS);
+        localStorage.setItem('@campaign:token', data.token);
+
+        console.log(data);
+
+        if (
+          '/login' === location.pathname ||
+          '/register' === location.pathname
+        ) {
+          navigate(All_PATHS.CAMPAIGNS);
+        }
+        // TODO - add verification to see if is network error or token error
+        // if it is token error, redirect to login, else redirect to network error page
       } catch (error) {
         if (!location.pathname.includes('register')) {
           navigate(All_PATHS.LOGIN);
+          return;
         }
-        // TODO - add toats to show error
+        toast.error('Sessão expirada, faça login novamente');
       } finally {
         setIsLogging(false);
       }
@@ -83,9 +90,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { data } = await api.post<LoginResponse>('auth/login', user);
 
       setUser(data.user);
-      localStorage.setItem('@campaign:user', JSON.stringify(data.token));
+      localStorage.setItem('@campaign:token', data.token);
       navigate(All_PATHS.CAMPAIGNS);
     } catch (error) {
+      throw error;
     } finally {
       setIsLogging(false);
     }
@@ -93,7 +101,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('@campaign:user');
+    localStorage.removeItem('@campaign:token');
     navigate(All_PATHS.LOGIN);
   };
 
@@ -102,10 +110,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLogging(true);
       await api.post<LoginResponse>('auth/register', user);
 
-      // TODO - add toats to show succes message
+      toast.success('Usuário criado com sucesso');
 
       navigate(All_PATHS.LOGIN);
     } catch (error) {
+      throw error;
     } finally {
       setIsLogging(false);
     }
