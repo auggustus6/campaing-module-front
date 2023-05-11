@@ -99,7 +99,6 @@ export default function CreateCampanha() {
 
   const [company, setCompany] = useState<Company>();
 
-  
   useEffect(() => {
     async function getCompany() {
       const { data } = await api.get<Company>('/companies');
@@ -107,9 +106,13 @@ export default function CreateCampanha() {
     }
     getCompany();
   }, []);
-  
+
   const { user } = useAuth();
-  const shouldDisable = user?.company?.isActive || true;
+  const shouldDisable = !user?.company?.isActive ?? true;
+
+  console.log(user, 'createcampanha');
+
+  console.log({ shouldDisable });
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
 

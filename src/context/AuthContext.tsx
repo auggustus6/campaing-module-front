@@ -131,7 +131,9 @@ export default function AuthProvider({
     <AuthContext.Provider value={{ user, login, logout, isLogging, register }}>
       {children}
       {isLogging && <LoadingScreen />}
-      {!isOnLoginOrRegister && <NotActivatedAlert />}
+      {!isOnLoginOrRegister && !user?.company?.isActive && !isLogging && (
+        <NotActivatedAlert />
+      )}
     </AuthContext.Provider>
   );
 }

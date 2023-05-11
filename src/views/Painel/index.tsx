@@ -101,7 +101,7 @@ function Painel() {
     resolver: zodResolver(companySchema),
   });
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLogging } = useAuth();
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [twoLetters, setTwoLetters] = useState('');
@@ -135,6 +135,8 @@ function Painel() {
   }
 
   async function getNumberStatus() {
+    console.log('getNumberStatus()');
+
     if (!user?.company?.isActive) {
       return;
     }
@@ -148,7 +150,7 @@ function Painel() {
 
   useEffect(() => {
     getNumberStatus();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let timer: any;
@@ -349,7 +351,7 @@ function Painel() {
                   icon={<CircleIcon sx={{ fontSize: '1.4rem' }} />}
                 />
                 <ShowWhenAdmin>
-                  {!isNumberActive && getValues('channelNumber') && (
+                  {!isNumberActive && data?.channelNumber && (
                     <Button
                       variant="outlined"
                       onClick={handleOpenModal}
