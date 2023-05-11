@@ -31,6 +31,9 @@ import { useNavigate } from 'react-router-dom';
 import { CANAL } from '../../utils/constants';
 import { Box, Divider } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
+import { Image } from '@mui/icons-material';
+import useBase64 from '../../hooks/useBase64';
+import PreviewWppMessage from '../../components/PreviewWppMessage';
 
 interface Company {
   id: string;
@@ -60,6 +63,7 @@ const campaignSchema = z.object({
   variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
   contacts: z.any().array().min(1, 'Arquivo vazio.'),
   fileName: z.string().optional(),
+  imageName: z.string().optional(),
   sendDelay: z
     .string()
     .transform((delay) => Number(delay))
@@ -98,6 +102,7 @@ export default function CreateCampanha() {
   });
 
   const [company, setCompany] = useState<Company>();
+  const { base64: imageBase64, getBase64 } = useBase64();
 
   useEffect(() => {
     async function getCompany() {
@@ -110,9 +115,9 @@ export default function CreateCampanha() {
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
 
-  console.log(user, 'createcampanha');
+  
 
-  console.log({ shouldDisable });
+  
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
 
@@ -151,6 +156,12 @@ export default function CreateCampanha() {
     e.target.value = '';
   }
 
+  async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
+    getBase64(e.target.files?.[0]);
+    setValue('imageName', e.target.files?.[0].name);
+    e.target.value = '';
+  }
+
   function handleSelectOption(e: SelectChangeEvent<string>) {
     setValue('message', getValues('message') + `{{${e.target.value}}}`);
   }
@@ -170,6 +181,7 @@ export default function CreateCampanha() {
         contacts: values.contacts,
         sendDelay: values.sendDelay,
         session: values.session.split(' ').pop(),
+        image: imageBase64,
       });
 
       navigate('/campanhas');
@@ -262,6 +274,36 @@ export default function CreateCampanha() {
             fullWidth
           />
         </Grid>
+        <Grid item xs={3}>
+          <MaterialButton
+            sx={{
+              height: '3.5rem',
+              maxWidth: '300px',
+              overflow: 'hidden',
+              textAlign: 'start',
+              '&:hover': {
+                // background: '#595959',
+              },
+            }}
+            disabled={isLoading || shouldDisable}
+            color={errors.variables ? 'error' : 'primary'}
+            // fullWidth
+            variant={errors.variables ? 'outlined' : 'outlined'}
+            component="label"
+          >
+            <Image />
+            {getValues('imageName')
+              ? getValues('imageName')
+              : 'Selecionar Imagem'}
+            <input
+              id="fileSelect"
+              type="file"
+              hidden
+              accept="image/png, image/gif, image/jpeg"
+              onChange={handleUploadImage}
+            />
+          </MaterialButton>
+        </Grid>
         <Grid item xs={12}>
           <InputLabel error={!!errors.message}>Mensagem:</InputLabel>
           <TextArea
@@ -274,34 +316,10 @@ export default function CreateCampanha() {
           <InputLabel sx={{ color: theme.palette.primary.main }}>
             Preview da mensagem:
           </InputLabel>
-          <Paper
-            sx={{
-              backgroundImage: `url(/wpp_background.png)`,
-              p: 4,
-              px: 10,
-              outline: `1px solid ${theme.palette.primary.main}`,
-              whiteSpace: 'pre-wrap',
-            }}
-            variant={'outlined'}
-          >
-            <Box
-              sx={{
-                background: 'white',
-                display: 'inline-block',
-                py: 0.5,
-                color: '#111b21',
-                px: 2,
-                borderRadius: 2,
-                maxWidth: '640px',
-                fontSize: '0.95rem',
-                boxShadow: '0px 0px 2px -0.5px rgba(0,0,0,0.5)',
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
-              }}
-            >
-              {messagePreview || 'Preview da mensagem...'}
-            </Box>
-          </Paper>
+          <PreviewWppMessage
+            imgSrc={imageBase64}
+            messagePreview={messagePreview}
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>

@@ -70,7 +70,7 @@ export default function Header() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar component="nav" sx={{ background: '#2069ca' }}>
+      <AppBar component="nav" sx={{ background: '#232323' }}>
         <Toolbar>
           <IconButton
             color="inherit"

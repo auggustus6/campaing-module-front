@@ -22,12 +22,20 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import moment from 'moment';
 import { CANAL } from '../../utils/constants';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
+import { Preview } from '@mui/icons-material';
+import PreviewWppMessage from '../../components/PreviewWppMessage';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
   const [data, setData] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const enc = new TextDecoder('utf-8');
+  const imgBufferArray = new Uint8Array(data?.data?.image.data);
+
+  const imgSrc = enc.decode(imgBufferArray);
+
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
@@ -233,6 +241,10 @@ export default function DetailsCampanha() {
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
           <TextArea value={data?.data.message} disabled />
+        </Grid>
+        <Grid item xs={12} pb={8}>
+          <InputLabel>Preview da mensagem</InputLabel>
+          <PreviewWppMessage messagePreview={data?.data.message} imgSrc={imgSrc}/>
         </Grid>
         {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (
           <ShowWhenAdmin>

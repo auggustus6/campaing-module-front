@@ -20,7 +20,7 @@ const AdminRoute = lazy(() => import('./components/AdminRoute'));
 
 const AuthProvider = lazy(() => import('./context/AuthContext'));
 
-// import Campanhas from './views/Campanhas';
+import Campanhas from './views/Campanhas';
 // import CreateCampanha from './views/CreateCampanha';
 // import DetailsCampanha from './views/DetailsCampanha';
 // import EditCampanha from './views/EditCampanha';
@@ -29,7 +29,7 @@ const AuthProvider = lazy(() => import('./context/AuthContext'));
 // import Painel from './views/Painel';
 // import UserModal from './views/Painel/modals/UserModal';
 
-const Campanhas = lazy(() => import('./views/Campanhas'));
+// const Campanhas = lazy(() => import('./views/Campanhas'));
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
 const EditCampanha = lazy(() => import('./views/EditCampanha'));

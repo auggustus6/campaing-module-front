@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
 import api from '../../services/api';
@@ -28,12 +28,17 @@ import moment from 'moment';
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { CANAL } from '../../utils/constants';
+import { theme } from '../../styles/theme';
+import PreviewWppMessage from '../../components/PreviewWppMessage';
 
 interface Company {
   id: string;
   name: string;
   channelNick: string;
   channelNumber: string;
+  image: {
+    data: any;
+  };
 }
 
 const editCampaignSchema = z.object({
@@ -87,6 +92,7 @@ export default function EditCampanha() {
   });
   const status = watch('status');
   const session = watch('session');
+  const message = watch('message');
 
   const [statusState, setStatusState] = useState('');
   useEffect(() => {
@@ -94,20 +100,30 @@ export default function EditCampanha() {
   }, [status]);
 
   const [company, setCompany] = useState<Company>();
-
-  useEffect(() => {
-    async function getCompany() {
-      const { data } = await api.get<Company>('/companies');
-      setCompany(data);
-    }
-    getCompany();
-  }, []);
+  const [imgSrc, setImgSrc] = useState<any>();
 
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+
+  useEffect(() => {
+    async function getCompany() {
+      const { data } = await api.get(`/campaign/${id}`);
+      setCompany(data);
+
+      console.log(data);
+
+      const enc = new TextDecoder('utf-8');
+      const imgBufferArray = new Uint8Array(data?.image.data);
+
+      setImgSrc(enc.decode(imgBufferArray));
+
+      //
+    }
+    getCompany();
+  }, []);
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -295,6 +311,12 @@ export default function EditCampanha() {
             disabled={isLoading}
             error={errors.message}
           />
+        </Grid>
+        <Grid item xs={12} sx={{ marginBottom: 2 }}>
+          <InputLabel sx={{ color: theme.palette.primary.main }}>
+            Preview da mensagem:
+          </InputLabel>
+          <PreviewWppMessage imgSrc={imgSrc} messagePreview={message} />
         </Grid>
       </Grid>
       <TableContactsFromApi id={id} message={getValues('id')} />

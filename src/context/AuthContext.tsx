@@ -104,7 +104,7 @@ export default function AuthProvider({
     }
   };
 
-  console.log(user, 'user');
+  
 
   const logout = () => {
     setUser(null);

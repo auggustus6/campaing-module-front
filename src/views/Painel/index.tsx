@@ -19,8 +19,6 @@ import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import AddIcon from '@mui/icons-material/Add';
-import Modal from '@mui/material/Modal';
-import Countdown from 'react-countdown';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +30,8 @@ import QrCode2Icon from '@mui/icons-material/QrCode2';
 
 import InputMask from 'react-input-mask';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import CountdownWpp from './components/Countdown';
+import QrCodeModal from './modals/QrCodeModal';
 
 interface User {
   id: string;
@@ -63,12 +63,18 @@ const phoneRegex = new RegExp(/(55 [1-9]{2} 9 [1-9]{4}-[1-9]{4})/g);
 
 const companySchema = z.object({
   name: z
-    .string({ required_error: 'Campo obrigatório!' })
+    .string({
+      required_error: 'Campo obrigatório!',
+      invalid_type_error: 'Campo obrigatório!',
+    })
     .trim()
     .min(3, 'Muito curto!')
     .max(30, 'Muito extenso!'),
   channelNick: z
-    .string({ required_error: 'Campo obrigatório!' })
+    .string({
+      required_error: 'Campo obrigatório!',
+      invalid_type_error: 'Campo obrigatório!',
+    })
     .trim()
     .min(3, 'Muito curto!')
     .max(30, 'Muito extenso!')
@@ -130,13 +136,10 @@ function Painel() {
 
   async function getQRCode() {
     const response = await api.post('/companies/get_qr_code');
-
     setQrCode(response.data);
   }
 
   async function getNumberStatus() {
-    console.log('getNumberStatus()');
-
     if (!user?.company?.isActive) {
       return;
     }
@@ -149,22 +152,25 @@ function Painel() {
   }
 
   useEffect(() => {
+    if (!user) return;
+    fetchData();
     getNumberStatus();
-  }, [user]);
+  }, [user, location]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchData();
+  }, [user, location]);
 
   useEffect(() => {
     let timer: any;
 
-    console.log({ isModalOpen });
-
     if (isModalOpen && !isNumberActive && !timer && !!qrCode) {
       timer = setInterval(() => {
         getNumberStatus();
-        console.log('getNumberStatus()');
       }, 2000);
     } else {
       if (timer) {
-        console.log('clear');
         clearInterval(timer);
       }
     }
@@ -173,11 +179,6 @@ function Painel() {
       clearInterval(timer);
     };
   }, [isModalOpen, isNumberActive, qrCode]);
-
-  useEffect(() => {
-    if (!user) return;
-    fetchData();
-  }, [user, location]);
 
   function handleCreateNewUser() {
     navigate('create-user');
@@ -204,6 +205,7 @@ function Painel() {
       toast.success('Empresa editada com sucesso!');
     } catch (error) {
       toast.error('Erro ao editar empresa!');
+      return;
     }
 
     if (getValues('channelNumber') !== data?.channelNumber) {
@@ -241,26 +243,29 @@ function Painel() {
                 <Box display={'flex'} gap={2} flexWrap={'wrap'}>
                   <Button
                     color="success"
-                    variant="contained"
+                    variant="outlined"
                     disabled={isLoading}
                     type="submit"
                   >
-                    <SaveIcon />
+                    <SaveIcon sx={{ marginRight: 1 }} />
+                    Salvar
                   </Button>
                   <Button
                     color="error"
-                    variant="contained"
+                    variant="outlined"
                     onClick={handleCancel}
                     disabled={isLoading}
                   >
-                    <Close />
+                    <Close sx={{ marginRight: 1 }} />
+                    Cancelar
                   </Button>
                 </Box>
               ) : (
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => setIsEditing(true)}
                   disabled={isLoading}
+                  // sx={{borderRadius: '10px'}}
                 >
                   <EditIcon sx={{ marginRight: 1 }} />
                   Editar
@@ -379,7 +384,7 @@ function Painel() {
           <Typography variant="h5">Usuários</Typography>
           <ShowWhenAdmin>
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={handleCreateNewUser}
               disabled={isLoading}
             >
@@ -394,74 +399,11 @@ function Painel() {
           refetch={fetchData}
         />
       </Container>
-      <Modal open={isModalOpen} onClose={onCloseModal}>
-        <Box
-          p={4}
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            maxWidth: 600,
-            width: '100%',
-            padding: 2,
-          }}
-        >
-          <Stack
-            alignItems="center"
-            p={4}
-            gap={2}
-            bgcolor={'white'}
-            borderRadius={2}
-          >
-            {!qrCode ? (
-              <Box
-                sx={{
-                  maxWidth: 500,
-                  width: '100%',
-                  aspectRatio: '1/1',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                }}
-              >
-                <CircularProgress size="lg" variant="solid" />
-                {/* <QrCode2Icon
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    maxWidth: 500,
-                    width: '100%',
-                    aspectRatio: '1/1',
-                    opacity: 0.2,
-                    fontSize: '40rem',
-                  }}
-                /> */}
-              </Box>
-            ) : (
-              <img style={{ maxWidth: 500, width: '100%' }} src={qrCode} />
-            )}
-
-            {!!qrCode && (
-              <Countdown
-                date={Date.now() + 60000}
-                renderer={(props) => (
-                  <Box>
-                    <Typography variant="h6" align="center">
-                      Escaneie o código no Whatsapp para continuar
-                    </Typography>
-                    <Typography variant="body1" align="center">
-                      Em {props.seconds || '60'} segundos o código irá expirar
-                    </Typography>
-                  </Box>
-                )}
-                onComplete={onCloseModal}
-              />
-            )}
-          </Stack>
-        </Box>
-      </Modal>
+      <QrCodeModal
+        isModalOpen={isModalOpen}
+        onCloseModal={onCloseModal}
+        qrCode={qrCode}
+      />
       <Outlet />
     </>
   );
