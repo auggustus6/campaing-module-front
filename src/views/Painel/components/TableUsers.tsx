@@ -52,7 +52,9 @@ export default function TableUsers({
 
   async function handleDisable(id: string, isActive: boolean) {
     const option = await Swal.fire({
-      title: `Tem certeza que deseja ${isActive ? "desativar" : "ativar"} esse usuário?`,
+      title: `Tem certeza que deseja ${
+        isActive ? 'desativar' : 'ativar'
+      } esse usuário?`,
       showCancelButton: true,
       confirmButtonText: 'Sim',
       cancelButtonText: 'Não',
@@ -111,6 +113,7 @@ export default function TableUsers({
                         onClick={() => handleEdit(row)}
                         variant="contained"
                         sx={{ marginRight: 2 }}
+                        title="Editar"
                       >
                         <EditIcon />
                       </Button>
@@ -119,8 +122,9 @@ export default function TableUsers({
                       onClick={() => handleDisable(row.id, row.isActive)}
                       variant={row.isActive ? 'contained' : 'outlined'}
                       color={row.isActive ? 'error' : 'secondary'}
+                      title={row.isActive ? 'Desativar' : 'Ativar'}
                     >
-                      {row.isActive ?  <PersonOffOutlined /> : <HowToReg />}
+                      {row.isActive ? <PersonOffOutlined /> : <HowToReg />}
                     </Button>
                   </Box>
                 </TableCell>

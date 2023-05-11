@@ -99,6 +99,7 @@ export default function CreateCampanha() {
 
   const [company, setCompany] = useState<Company>();
 
+  
   useEffect(() => {
     async function getCompany() {
       const { data } = await api.get<Company>('/companies');
@@ -106,8 +107,9 @@ export default function CreateCampanha() {
     }
     getCompany();
   }, []);
-
+  
   const { user } = useAuth();
+  const shouldDisable = user?.company?.isActive || true;
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
 
@@ -189,7 +191,7 @@ export default function CreateCampanha() {
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.title}>Titulo da Campanha</InputLabel>
           <Input
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             {...register('title')}
             error={!!errors.title}
             helperText={errors.title?.message}
@@ -203,7 +205,7 @@ export default function CreateCampanha() {
             <Select
               {...register('session')}
               error={!!errors.session}
-              disabled={isLoading}
+              disabled={isLoading || shouldDisable}
               value={session || 'select'}
               onChange={handleCanalSelect}
             >
@@ -235,7 +237,7 @@ export default function CreateCampanha() {
             Data para disparo:
           </InputLabel>
           <Input
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             type="datetime-local"
             {...register('scheduleDate')}
             error={!!errors.scheduleDate}
@@ -248,7 +250,7 @@ export default function CreateCampanha() {
             Delay entre cada mensagem:
           </InputLabel>
           <Input
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             type="number"
             {...register('sendDelay')}
             defaultValue={120}
@@ -261,7 +263,7 @@ export default function CreateCampanha() {
           <InputLabel error={!!errors.message}>Mensagem:</InputLabel>
           <TextArea
             {...register('message')}
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             error={errors.message}
           />
         </Grid>
@@ -305,7 +307,7 @@ export default function CreateCampanha() {
               label="Variáveis"
               onChange={handleSelectOption}
               value="0"
-              disabled={isLoading}
+              disabled={isLoading || shouldDisable}
             >
               <MenuItem value={'0'}>Selecione uma variável</MenuItem>
               {variables.map((option) => (
@@ -326,7 +328,7 @@ export default function CreateCampanha() {
                 background: '#595959',
               },
             }}
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             color={errors.variables ? 'error' : 'secondary'}
             fullWidth
             variant={errors.variables ? 'outlined' : 'contained'}
@@ -350,7 +352,7 @@ export default function CreateCampanha() {
           <Button
             sx={{ height: '3.5rem', textTransform: 'uppercase' }}
             fullWidth
-            disabled={isLoading}
+            disabled={isLoading || shouldDisable}
             loading={isLoading}
             onClick={handleSubmit(handleCreateCampaign)}
           >
@@ -364,7 +366,7 @@ export default function CreateCampanha() {
               variant="outlined"
               sx={{ height: '3.5rem', textTransform: 'uppercase' }}
               fullWidth
-              disabled={isLoading}
+              disabled={isLoading || shouldDisable}
             >
               <DownloadIcon />
               Baixar template do excel

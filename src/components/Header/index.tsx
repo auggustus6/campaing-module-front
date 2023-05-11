@@ -18,6 +18,7 @@ import { PATHS } from '../../utils/constants';
 import { Link } from 'react-router-dom';
 import Stack from '@mui/system/Stack';
 import { useAuth } from '../../context/AuthContext';
+import { useLayoutEffect, useState } from 'react';
 
 const drawerWidth = 240;
 

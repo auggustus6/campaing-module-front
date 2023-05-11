@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { All_PATHS } from '../../utils/constants';
 import { useToast } from '../../context/ToastContext';
+import { AxiosError } from 'axios';
 
 const registerSchema = z
   .object({
@@ -25,6 +26,10 @@ const registerSchema = z
       .boolean()
       .default(false)
       .refine((v) => v, { message: 'Aceite os termos' }),
+    companyName: z
+      .string()
+      .min(3, 'Nome deve ter no mínimo 3 caracteres')
+      .max(30, 'Nome pode ter no máximo 30 caracteres'),
   })
   .refine((data) => data.password === data.confirm, {
     message: 'Senhas não conferem',
@@ -51,12 +56,19 @@ export default function Register() {
 
   const handleSubmitRegister = async (values: RegisterSchemaSchemaType) => {
     try {
-      signup({
+      await signup({
         email: values.email,
         name: values.name,
         password: values.password,
+        companyName: values.companyName,
       });
     } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 403) {
+          toast.error('Email já cadastrado');
+          return;
+        }
+      }
       toast.error('Erro ao criar conta, tente novamente mais tarde');
     }
   };
@@ -82,6 +94,13 @@ export default function Register() {
             {...register('email')}
             error={!!errors.email}
             helperText={errors.email?.message}
+          />
+          <TextField
+            label="Nome da empresa"
+            margin="normal"
+            {...register('companyName')}
+            error={!!errors.companyName}
+            helperText={errors.companyName?.message}
           />
 
           <TextField

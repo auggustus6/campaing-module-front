@@ -6,6 +6,7 @@ import api from '../services/api';
 import LoadingScreen from '../components/LoadingScreen';
 import { All_PATHS, PATHS } from '../utils/constants';
 import { useToast } from './ToastContext';
+import NotActivatedAlert from '../components/NotActivatedAlert';
 
 interface User {
   id: string;
@@ -16,6 +17,7 @@ interface User {
   companyId: string;
   company?: {
     name: string;
+    isActive: boolean;
   };
 }
 
@@ -28,6 +30,7 @@ interface UserRegister {
   name: string;
   email: string;
   password: string;
+  companyName: string;
 }
 
 interface AuthContextProps {
@@ -45,37 +48,39 @@ interface LoginResponse {
 
 const AuthContext = createContext<AuthContextProps>({} as AuthContextProps);
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export default function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<User | null>(null);
   const [isLogging, setIsLogging] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
 
+  const currentPath = location.pathname.split('/')[1];
+  const isOnLoginOrRegister = [All_PATHS.LOGIN, All_PATHS.REGISTER]
+    .map((p) => p.slice(1))
+    .includes(currentPath);
+
   useEffect(() => {
     async function revalidate() {
       setIsLogging(true);
+
       try {
         const { data } = await api.post<LoginResponse>('/auth/revalidate');
         setUser(data.user);
         localStorage.setItem('@campaign:token', data.token);
 
-        console.log(data);
-
-        if (
-          '/login' === location.pathname ||
-          '/register' === location.pathname
-        ) {
+        if (isOnLoginOrRegister) {
           navigate(All_PATHS.CAMPAIGNS);
         }
-        // TODO - add verification to see if is network error or token error
-        // if it is token error, redirect to login, else redirect to network error page
       } catch (error) {
-        if (!location.pathname.includes('register')) {
-          navigate(All_PATHS.LOGIN);
-          return;
+        if (!isOnLoginOrRegister) {
+          toast.error('Sessão expirada, faça login novamente');
+          return navigate(All_PATHS.LOGIN);
         }
-        toast.error('Sessão expirada, faça login novamente');
       } finally {
         setIsLogging(false);
       }
@@ -98,6 +103,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLogging(false);
     }
   };
+
+  console.log(user, 'user');
 
   const logout = () => {
     setUser(null);
@@ -124,12 +131,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider value={{ user, login, logout, isLogging, register }}>
       {children}
       {isLogging && <LoadingScreen />}
+      {!isOnLoginOrRegister && <NotActivatedAlert />}
     </AuthContext.Provider>
   );
-};
+}
 
 const useAuth = () => {
   return useContext(AuthContext);
 };
 
-export { AuthProvider, useAuth };
+export { useAuth };
