@@ -31,14 +31,27 @@ import { CANAL } from '../../utils/constants';
 import { theme } from '../../styles/theme';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
+interface Campaign {
+  id: string;
+  companyId: string;
+  endDate: string;
+  isDeleted: boolean;
+  message: string;
+  scheduleDate: string;
+  sentContactsCount: number;
+  session: string;
+  startDate: string;
+  title: string;
+  image: {
+    data: any;
+  };
+}
+
 interface Company {
   id: string;
   name: string;
   channelNick: string;
   channelNumber: string;
-  image: {
-    data: any;
-  };
 }
 
 const editCampaignSchema = z.object({
@@ -99,6 +112,7 @@ export default function EditCampanha() {
     setStatusState(status);
   }, [status]);
 
+  const [campaign, setCampaign] = useState<Campaign>();
   const [company, setCompany] = useState<Company>();
   const [imgSrc, setImgSrc] = useState<any>();
 
@@ -107,23 +121,6 @@ export default function EditCampanha() {
   const navigate = useNavigate();
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
-
-  useEffect(() => {
-    async function getCompany() {
-      const { data } = await api.get(`/campaign/${id}`);
-      setCompany(data);
-
-      console.log(data);
-
-      const enc = new TextDecoder('utf-8');
-      const imgBufferArray = new Uint8Array(data?.image.data);
-
-      setImgSrc(enc.decode(imgBufferArray));
-
-      //
-    }
-    getCompany();
-  }, []);
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -174,7 +171,17 @@ export default function EditCampanha() {
             sendDelay: String(data.sendDelay) as any,
             session: data.session,
           });
+        } else {
+          navigate('/campanhas');
         }
+
+        const { data: companyData } = await api.get(`/companies`);
+        setCompany(companyData);
+        console.log(companyData);
+        const enc = new TextDecoder('utf-8');
+        const imgBufferArray = new Uint8Array(data?.image.data);
+
+        setImgSrc(enc.decode(imgBufferArray));
       } catch (error) {
         navigate('/campanhas');
       }
@@ -249,7 +256,7 @@ export default function EditCampanha() {
                   {option[0]}
                 </MenuItem>
               ))} */}
-              <MenuItem value={company?.channelNumber}>
+              <MenuItem value={campaign?.session}>
                 {company?.channelNick}
               </MenuItem>
             </Select>

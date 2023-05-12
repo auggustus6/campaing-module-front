@@ -15,7 +15,7 @@ export default function QrCodeModal({
   qrCode,
 }: QrCodeModalProps) {
   return (
-    <Modal open={isModalOpen} onClose={onCloseModal}>
+    <Modal open={isModalOpen}>
       <Box
         p={4}
         sx={{

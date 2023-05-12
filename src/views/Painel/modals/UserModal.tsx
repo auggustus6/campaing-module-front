@@ -16,7 +16,7 @@ import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useQuery, useQueryClient } from 'react-query';
 import { useEffect } from 'react';
-import { Info } from '@mui/icons-material';
+import { Close, Info } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
 
 type UserSchemaSchemaType = z.infer<typeof userSchema>;
@@ -134,9 +134,16 @@ export default function UserModal() {
           bgcolor: 'white',
         }}
       >
-        <Typography variant="h5">
-          {location.state ? 'Editando' : 'Criando novo'} usuário
-        </Typography>
+        <Box
+          display={'flex'}
+          justifyContent={'space-between'}
+          alignItems={'center'}
+        >
+          <Typography variant="h5">
+            {location.state ? 'Editando' : 'Criando novo'} usuário
+          </Typography>
+          <Close onClick={handleOnClose} sx={{ cursor: 'pointer' }} />
+        </Box>
         <Grid container spacing={2} pt={4}>
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.name}>Nome</InputLabel>

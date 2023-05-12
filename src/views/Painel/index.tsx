@@ -135,8 +135,15 @@ function Painel() {
   }
 
   async function getQRCode() {
-    const response = await api.post('/companies/get_qr_code');
-    setQrCode(response.data);
+    try {
+      const response = await api.post('/companies/get_qr_code');
+      setQrCode(response.data);
+    } catch (error) {
+      toast.error(
+        'Erro ao gerar QR Code, por favor tente novamente mais tarde.'
+      );
+      onCloseModal();
+    }
   }
 
   async function getNumberStatus() {
@@ -349,12 +356,14 @@ function Painel() {
                   right: '1rem',
                 }}
               >
-                <Chip
-                  label={isNumberActive ? 'Ativo' : 'Inativo'}
-                  color={isNumberActive ? 'success' : 'error'}
-                  variant="outlined"
-                  icon={<CircleIcon sx={{ fontSize: '1.4rem' }} />}
-                />
+                {user && (
+                  <Chip
+                    label={isNumberActive ? 'Ativo' : 'Inativo'}
+                    color={isNumberActive ? 'success' : 'error'}
+                    variant="outlined"
+                    icon={<CircleIcon sx={{ fontSize: '1.4rem' }} />}
+                  />
+                )}
                 <ShowWhenAdmin>
                   {!isNumberActive && data?.channelNumber && (
                     <Button
