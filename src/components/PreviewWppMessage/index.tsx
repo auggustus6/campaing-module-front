@@ -12,10 +12,25 @@ export default function PreviewWppMessage({
   messagePreview,
   imgSrc,
 }: PreviewWppMessageProps) {
-  const imgRef = useRef<HTMLImageElement>(null);
   const [maxWidth, setMaxWidth] = useState(0);
 
-  // const maxWidth = imgRef.current?.clientWidth;
+  const maxContainerWidth = 340;
+  const maxContainerHeight = 300;
+
+  useEffect(() => {
+    if (!!imgSrc) {
+      const img = new Image();
+      img.src = imgSrc;
+      img.onload = function () {
+        const aspectRatio = img.width / img.height;
+        let h = img.height;
+        if (h > maxContainerHeight) {
+          h = maxContainerHeight;
+        }
+        setMaxWidth(h * aspectRatio);
+      };
+    }
+  }, [imgSrc]);
 
   return (
     <Paper
@@ -45,19 +60,20 @@ export default function PreviewWppMessage({
       >
         {imgSrc && (
           <img
-            ref={imgRef}
             src={imgSrc}
             style={{
               borderRadius: '8px',
-              // width: '100%',
-              maxHeight: '300px',
-              maxWidth: '340px',
+              width: '100%',
+              maxHeight: maxContainerHeight,
+              // maxWidth: maxContainerWidth,
               objectFit: 'contain',
               objectPosition: 'center',
             }}
           />
         )}
-        <Box width={"340px"}>
+        <Box
+          width={maxWidth > maxContainerWidth ? maxWidth : maxContainerWidth}
+        >
           <Typography sx={{ fontSize: '0.95rem', marginX: '0.5rem' }}>
             {messagePreview || 'Preview da mensagem...'}
           </Typography>
