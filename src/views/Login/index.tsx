@@ -76,9 +76,9 @@ export default function Login() {
             helperText={errors.password?.message}
           />
 
-          <Styles.SubField>
+          {/* <Styles.SubField>
             <Link to={'/forgot-password'}>Esqueceu a senha?</Link>
-          </Styles.SubField>
+          </Styles.SubField> */}
 
           <ButtonLoading
             loading={isLogging}
