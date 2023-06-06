@@ -10,11 +10,11 @@ export default function LoadingScreen() {
         height: '100vh',
         display: 'grid',
         placeContent: 'center',
-        background: 'rgba(0, 0, 0, 0.5)',
+        background: 'rgba(0, 0, 0, 0.4)',
         zIndex: 9999,
       }}
     >
-      <CircularProgress size="lg" variant='solid'/>
+      <CircularProgress size="lg" variant="solid" />
     </Container>
   );
 }

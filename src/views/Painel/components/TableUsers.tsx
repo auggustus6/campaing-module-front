@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, Button, TablePagination } from '@mui/material';
+import { Box, Button, TablePagination, Typography } from '@mui/material';
 import { useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,7 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
-import { HowToReg, PersonOffOutlined } from '@mui/icons-material';
+import { HowToReg, Person, PersonOffOutlined } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
 
 type User = {
   id: string;
@@ -27,6 +28,7 @@ type User = {
 interface TableUsersProps {
   users: User[] | undefined;
   usersLength: number | undefined;
+  isLoading: boolean;
   refetch: () => void;
 }
 
@@ -34,6 +36,7 @@ export default function TableUsers({
   users = [],
   usersLength = 0,
   refetch,
+  isLoading,
 }: TableUsersProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
@@ -50,6 +53,11 @@ export default function TableUsers({
     setPage(newPage);
   };
 
+  function handleCreateNewUser() {
+    navigate('create-user');
+  }
+
+  // TODO - this function doest not work because the endpoint is only to remove
   async function handleDisable(id: string, isActive: boolean) {
     const option = await Swal.fire({
       title: `Tem certeza que deseja ${
@@ -84,6 +92,21 @@ export default function TableUsers({
 
   return (
     <TableContainer component={Paper}>
+      <Box display={'flex'} justifyContent={'space-between'} flexWrap={'wrap'}>
+        <Typography variant="h5" display={'flex'} alignItems={'center'} gap={1}>
+          <Person /> Usuários
+        </Typography>
+        <ShowWhenAdmin>
+          <Button
+            variant="outlined"
+            onClick={handleCreateNewUser}
+            disabled={isLoading}
+          >
+            <AddIcon sx={{ marginRight: 1 }} />
+            Adicionar usuário
+          </Button>
+        </ShowWhenAdmin>
+      </Box>
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>

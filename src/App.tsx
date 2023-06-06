@@ -21,6 +21,7 @@ const AdminRoute = lazy(() => import('./components/AdminRoute'));
 const AuthProvider = lazy(() => import('./context/AuthContext'));
 
 import Campanhas from './views/Campanhas';
+import ChannelModal from './views/Painel/modals/ChannelModal';
 // import CreateCampanha from './views/CreateCampanha';
 // import DetailsCampanha from './views/DetailsCampanha';
 // import EditCampanha from './views/EditCampanha';
@@ -38,6 +39,7 @@ const Register = lazy(() => import('./views/Register'));
 const Painel = lazy(() => import('./views/Painel'));
 const UserModal = lazy(() => import('./views/Painel/modals/UserModal'));
 
+// TODO - type routes
 function App() {
   return (
     <BrowserRouter>
@@ -62,6 +64,14 @@ function App() {
               <Route
                 path="edit-user"
                 element={<AdminRoute e={<UserModal />} />}
+              />
+              <Route
+                path="create-channel"
+                element={<AdminRoute e={<ChannelModal />} />}
+              />
+              <Route
+                path="edit-channel"
+                element={<AdminRoute e={<ChannelModal />} />}
               />
             </Route>
             <Route path="/*" element={<Navigate to="/campanhas" replace />} />

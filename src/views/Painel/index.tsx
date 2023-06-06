@@ -18,7 +18,6 @@ import { AddBox, Close } from '@mui/icons-material';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import AddIcon from '@mui/icons-material/Add';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +31,8 @@ import InputMask from 'react-input-mask';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import CountdownWpp from './components/Countdown';
 import QrCodeModal from './modals/QrCodeModal';
+import TableChannels, { Channel } from './components/TableChannels';
+import { ChannelSchemaSchemaType } from './modals/ChannelModal';
 
 interface User {
   id: string;
@@ -109,21 +110,24 @@ function Painel() {
   const navigate = useNavigate();
   const { user, isLogging } = useAuth();
   const location = useLocation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [twoLetters, setTwoLetters] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState<Company>();
+  const [channels, setChannels] = useState<Channel[]>();
 
   const [qrCode, setQrCode] = useState('');
-  const [isNumberActive, setIsNumberActive] = useState(false);
 
   const toast = useToast();
 
   async function fetchData() {
     setIsLoading(true);
     const response = await api.get<Company>('/companies');
+    const responseChannels = await api.get<Channel[]>('/channels');
+    console.log(responseChannels.data);
+
     setData(response.data);
+    setChannels(responseChannels.data);
     setTwoLetters(getTwoFirstLetters(response.data.name));
     reset({
       name: response.data.name,
@@ -134,72 +138,68 @@ function Painel() {
     setIsLoading(false);
   }
 
-  async function getQRCode() {
-    try {
-      const response = await api.post('/companies/get_qr_code');
-      setQrCode(response.data);
-    } catch (error) {
-      toast.error(
-        'Erro ao gerar QR Code, por favor tente novamente mais tarde.'
-      );
-      onCloseModal();
-    }
-  }
+  // async function getQRCode() {
+  //   try {
+  //     const response = await api.post('/companies/get_qr_code');
+  //     setQrCode(response.data);
+  //   } catch (error) {
+  //     toast.error(
+  //       'Erro ao gerar QR Code, por favor tente novamente mais tarde.'
+  //     );
+  //     onCloseModal();
+  //   }
+  // }
 
-  async function getNumberStatus() {
-    if (!user?.company?.isActive) {
-      return;
-    }
-    const response = await api.get('/companies/status_number');
+  // async function getNumberStatus() {
+  //   if (!user?.company?.isActive) {
+  //     return;
+  //   }
+  //   const response = await api.get('/companies/status_number');
 
-    if (response.data === 'CONNECTED') {
-      setIsNumberActive(true);
-      setIsModalOpen(false);
-    }
-  }
+  //   if (response.data === 'CONNECTED') {
+  //     setIsNumberActive(true);
+  //     setIsModalOpen(false);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   if (!user) return;
+  //   fetchData();
+  //   getNumberStatus();
+  // }, [user, location]);
+
+  // useEffect(() => {
+  //   let timer: any;
+
+  //   if (isModalOpen && !isNumberActive && !timer && !!qrCode) {
+  //     timer = setInterval(() => {
+  //       getNumberStatus();
+  //     }, 2000);
+  //   } else {
+  //     if (timer) {
+  //       clearInterval(timer);
+  //     }
+  //   }
+
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, [isModalOpen, isNumberActive, qrCode]);
 
   useEffect(() => {
     if (!user) return;
     fetchData();
-    getNumberStatus();
   }, [user, location]);
 
-  useEffect(() => {
-    if (!user) return;
-    fetchData();
-  }, [user, location]);
+  // function onCloseModal() {
+  //   setIsModalOpen(false);
+  //   setQrCode('');
+  // }
 
-  useEffect(() => {
-    let timer: any;
-
-    if (isModalOpen && !isNumberActive && !timer && !!qrCode) {
-      timer = setInterval(() => {
-        getNumberStatus();
-      }, 2000);
-    } else {
-      if (timer) {
-        clearInterval(timer);
-      }
-    }
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [isModalOpen, isNumberActive, qrCode]);
-
-  function handleCreateNewUser() {
-    navigate('create-user');
-  }
-
-  function onCloseModal() {
-    setIsModalOpen(false);
-    setQrCode('');
-  }
-
-  function handleOpenModal() {
-    setIsModalOpen(true);
-    getQRCode();
-  }
+  // function handleOpenModal() {
+  //   setIsModalOpen(true);
+  //   getQRCode();
+  // }
 
   async function handleSaveEdition(values: CompanySchemaSchemaType) {
     try {
@@ -215,10 +215,10 @@ function Painel() {
       return;
     }
 
-    if (getValues('channelNumber') !== data?.channelNumber) {
-      setIsModalOpen(() => true);
-      getQRCode();
-    }
+    // if (getValues('channelNumber') !== data?.channelNumber) {
+    //   setIsModalOpen(() => true);
+    //   // getQRCode();
+    // }
   }
 
   function handleCancel() {
@@ -317,7 +317,7 @@ function Painel() {
               disabled
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          {/* <Grid item xs={12} sm={6} md={4}>
             <InputLabel error={!!errors.channelNick}>
               Apelido do canal
             </InputLabel>
@@ -328,8 +328,8 @@ function Painel() {
               fullWidth
               disabled={!isEditing}
             />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          </Grid> */}
+          {/* <Grid item xs={12} sm={6} md={4}>
             <InputLabel error={!!errors.channelNumber}>Número</InputLabel>
             <Box sx={{ position: 'relative' }}>
               <InputMask
@@ -382,37 +382,29 @@ function Painel() {
                 </ShowWhenAdmin>
               </Box>
             </Box>
-          </Grid>
+          </Grid> */}
         </Grid>
         <Box marginTop={8} />
-        <Box
-          display={'flex'}
-          justifyContent={'space-between'}
-          flexWrap={'wrap'}
-        >
-          <Typography variant="h5">Usuários</Typography>
-          <ShowWhenAdmin>
-            <Button
-              variant="outlined"
-              onClick={handleCreateNewUser}
-              disabled={isLoading}
-            >
-              <AddIcon sx={{ marginRight: 1 }} />
-              Adicionar usuário
-            </Button>
-          </ShowWhenAdmin>
-        </Box>
+
+        <TableChannels
+          channels={channels || []}
+          channelsLength={data?._count.users}
+          refetch={() => {}}
+          isLoading={isLoading}
+        />
+        <Box marginTop={8} />
         <TableUsers
           users={data?.users}
           usersLength={data?._count.users}
           refetch={fetchData}
+          isLoading={isLoading}
         />
       </Container>
-      <QrCodeModal
+      {/* <QrCodeModal
         isModalOpen={isModalOpen}
         onCloseModal={onCloseModal}
         qrCode={qrCode}
-      />
+      /> */}
       <Outlet />
     </>
   );
