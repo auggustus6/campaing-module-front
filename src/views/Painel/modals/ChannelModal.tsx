@@ -26,10 +26,7 @@ const channelSchema = z.object({
     .string()
     .min(3, 'Nome deve ter no mínimo 3 caracteres')
     .max(50, 'Nome pode ter no máximo 50 caracteres'),
-  phoneNumber: z
-    .string({ required_error: 'Campo obrigatório!' })
-    .trim()
-    .regex(phoneRegex, 'Número inválido!'),
+  phoneNumber: z.string({ required_error: 'Campo obrigatório!' }).trim(),
   phoneNumberId: z.string({
     required_error: 'Campo obrigatório!',
     invalid_type_error: 'Campo obrigatório!',
@@ -139,7 +136,7 @@ export default function ChannelModal() {
           alignItems={'center'}
         >
           <Typography variant="h5">
-            {location.state ? 'Editando' : 'Criando novo'} canal
+            {location.state ? 'Editar' : 'Criar novo'} canal
           </Typography>
           <Close onClick={handleOnClose} sx={{ cursor: 'pointer' }} />
         </Box>
@@ -149,6 +146,7 @@ export default function ChannelModal() {
               Apelido do canal
             </InputLabel>
             <TextField
+              placeholder="Ex: Nome do seu canal personalizado"
               {...register('channelNick')}
               error={!!errors.channelNick}
               helperText={errors.channelNick?.message}
@@ -157,9 +155,10 @@ export default function ChannelModal() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.phoneNumber}>
-              Número de telefone WhatsApp
+              Número do WhatsApp
             </InputLabel>
             <TextField
+              placeholder="Ex: 5517991821933"
               {...register('phoneNumber')}
               error={!!errors.phoneNumber}
               helperText={errors.phoneNumber?.message}
@@ -170,10 +169,11 @@ export default function ChannelModal() {
           {/* TODO - ADD MASK */}
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.phoneNumberId}>
-              phoneNumberId
+              Id do Número de telefone (phoneNumberId)
             </InputLabel>
             <TextField
               {...register('phoneNumberId')}
+              placeholder="Ex: Código identificador do número do whatsapp na Meta"
               error={!!errors.phoneNumberId}
               helperText={errors.phoneNumberId?.message}
               fullWidth
@@ -181,10 +181,11 @@ export default function ChannelModal() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.whatsAppBusinessId}>
-              whatsAppBusinessId
+              Id Conta do Aplicativo (whatsAppBusinessId)
             </InputLabel>
             <TextField
               {...register('whatsAppBusinessId')}
+              placeholder="Ex: Código identificador na api do número na Meta"
               error={!!errors.whatsAppBusinessId}
               helperText={errors.whatsAppBusinessId?.message}
               fullWidth
@@ -192,18 +193,22 @@ export default function ChannelModal() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.whatsAppAccountBusinessId}>
-              whatsAppAccountBusinessId
+              Id Conta do WhatsApp (whatsAppAccountBusinessId)
             </InputLabel>
             <TextField
               {...register('whatsAppAccountBusinessId')}
+              placeholder="Ex: Código identificador do aplicativo da Meta"
               error={!!errors.whatsAppAccountBusinessId}
               helperText={errors.whatsAppAccountBusinessId?.message}
               fullWidth
             />
           </Grid>
           <Grid item xs={12}>
-            <InputLabel error={!!errors.tokenAccess}>tokenAccess</InputLabel>
+            <InputLabel error={!!errors.tokenAccess}>
+              Token de Acesso
+            </InputLabel>
             <TextField
+              placeholder="Ex: Token de acesso eterno para envio e recebimento de mensagens"
               {...register('tokenAccess')}
               error={!!errors.tokenAccess}
               helperText={errors.tokenAccess?.message}

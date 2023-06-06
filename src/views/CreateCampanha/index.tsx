@@ -39,6 +39,7 @@ interface Company {
   id: string;
   name: string;
   channelNick: string;
+  Channel: any[];
   channelNumber: string;
 }
 
@@ -115,10 +116,6 @@ export default function CreateCampanha() {
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
 
-  
-
-  
-
   const [contactsObject, setContactsObject] = useState<[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -180,7 +177,7 @@ export default function CreateCampanha() {
         scheduleDate: (values.scheduleDate as Date) || undefined,
         contacts: values.contacts,
         sendDelay: values.sendDelay,
-        session: values.session.split(' ').pop(),
+        chanel_id: values.session,
         image: imageBase64,
       });
 
@@ -228,11 +225,11 @@ export default function CreateCampanha() {
               <MenuItem value={company?.channelNumber}>
                 {company?.channelNick}
               </MenuItem>
-              {/* {CANAL.map((option) => (
-                <MenuItem value={option[1]} key={option[1]}>
-                  {option[0]}
+              {company?.Channel.map((option, index) => (
+                <MenuItem value={option.id} key={index}>
+                  {option.channelNick}
                 </MenuItem>
-              ))} */}
+              ))}
             </Select>
           </FormControl>
           <Typography
@@ -274,7 +271,7 @@ export default function CreateCampanha() {
             fullWidth
           />
         </Grid>
-        <Grid item xs={3}>
+        {/* <Grid item xs={3}>
           <MaterialButton
             sx={{
               height: '3.5rem',
@@ -303,7 +300,7 @@ export default function CreateCampanha() {
               onChange={handleUploadImage}
             />
           </MaterialButton>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           <InputLabel error={!!errors.message}>Mensagem:</InputLabel>
           <TextArea
