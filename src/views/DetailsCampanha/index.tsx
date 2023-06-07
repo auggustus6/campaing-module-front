@@ -32,10 +32,9 @@ export default function DetailsCampanha() {
   const navigate = useNavigate();
 
   const enc = new TextDecoder('utf-8');
-  const imgBufferArray = new Uint8Array(data?.data?.image.data);
+  const imgBufferArray = new Uint8Array(data?.data?.image?.data);
 
   const imgSrc = enc.decode(imgBufferArray);
-
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
@@ -244,7 +243,10 @@ export default function DetailsCampanha() {
         </Grid>
         <Grid item xs={12} pb={8}>
           <InputLabel>Preview da mensagem</InputLabel>
-          <PreviewWppMessage messagePreview={data?.data.message} imgSrc={imgSrc}/>
+          <PreviewWppMessage
+            messagePreview={data?.data.message}
+            imgSrc={imgSrc}
+          />
         </Grid>
         {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (
           <ShowWhenAdmin>
