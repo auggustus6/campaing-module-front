@@ -265,7 +265,7 @@ export default function CreateCampanha() {
             fullWidth
           />
         </Grid>
-        <Grid item xs={3}>
+        {/* <Grid item xs={3}>
           <MaterialButton
             sx={{
               height: '3.5rem',
@@ -294,7 +294,7 @@ export default function CreateCampanha() {
               onChange={handleUploadImage}
             />
           </MaterialButton>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           <InputLabel error={!!errors.message}>Mensagem:</InputLabel>
           <TextArea
