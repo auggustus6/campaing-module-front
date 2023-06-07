@@ -12,10 +12,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import api from '../../../services/api';
-import { useAuth } from '../../../context/AuthContext';
 import { useEffect } from 'react';
 import { Close } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
+import ReactInputMask from 'react-input-mask';
 
 const phoneRegex = new RegExp(/(55 [1-9]{2} 9 [1-9]{4}-[1-9]{4})/g);
 
@@ -156,18 +156,24 @@ export default function ChannelModal() {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <InputLabel error={!!errors.phoneNumber}>
+            <InputLabel error={!!errors.channelNick}>
               Número de telefone WhatsApp
             </InputLabel>
-            <TextField
-              {...register('phoneNumber')}
-              error={!!errors.phoneNumber}
-              helperText={errors.phoneNumber?.message}
-              fullWidth
-            />
+            <ReactInputMask
+              mask={'55 99 9 9999-9999'}
+              onChange={register('phoneNumber').onChange}
+              onBlur={register('phoneNumber').onBlur}
+            >
+              <TextField
+                {...register('phoneNumber')}
+                placeholder="55 99 9 9999-9999"
+                error={!!errors.phoneNumber}
+                helperText={errors.phoneNumber?.message}
+                fullWidth
+              />
+            </ReactInputMask>
           </Grid>
 
-          {/* TODO - ADD MASK */}
           <Grid item xs={12} sm={6}>
             <InputLabel error={!!errors.phoneNumberId}>
               phoneNumberId

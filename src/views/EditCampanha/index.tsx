@@ -86,7 +86,7 @@ const editCampaignSchema = z.object({
       },
       { message: 'O tempo mínimo é de 10 segundos.' }
     ),
-  session: z.string().nonempty('Selecione uma opção!'),
+  channel_id: z.string().nonempty('Selecione uma opção!'),
 });
 
 type EditCampaignSchemaType = z.infer<typeof editCampaignSchema>;
@@ -104,7 +104,7 @@ export default function EditCampanha() {
     resolver: zodResolver(editCampaignSchema),
   });
   const status = watch('status');
-  const session = watch('session');
+  const channel_id = watch('channel_id');
   const message = watch('message');
 
   const [statusState, setStatusState] = useState('');
@@ -131,7 +131,7 @@ export default function EditCampanha() {
         scheduleDate: values.scheduleDate || undefined,
         status: values.status,
         sendDelay: values.sendDelay,
-        session: values.session.split(' ').pop(),
+        channel_id: values.channel_id.split(' ').pop(),
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('./..');
@@ -151,7 +151,7 @@ export default function EditCampanha() {
   }
 
   function handleCanalSelect(e: SelectChangeEvent<string>) {
-    setValue('session', e.target.value);
+    setValue('channel_id', e.target.value);
   }
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export default function EditCampanha() {
             startDate: formatDate(data.startDate) as any,
             endDate: formatDate(data.endDate) as any,
             sendDelay: String(data.sendDelay) as any,
-            session: data.session,
+            channel_id: data.channel_id,
           });
         } else {
           navigate('/campanhas');
@@ -242,13 +242,13 @@ export default function EditCampanha() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.session}>Canal</InputLabel>
+          <InputLabel error={!!errors.channel_id}>Canal</InputLabel>
           <FormControl fullWidth>
             <Select
-              {...register('session')}
-              error={!!errors.session}
+              {...register('channel_id')}
+              error={!!errors.channel_id}
               disabled={isLoading}
-              value={session || ''}
+              value={channel_id || ''}
               onChange={handleCanalSelect}
             >
               {/* {CANAL.map((option) => (

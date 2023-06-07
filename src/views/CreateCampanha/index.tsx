@@ -5,7 +5,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import Input from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
 
 import MaterialButton from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -28,8 +27,6 @@ import { getFormattedMessage } from '../../utils/variablesUtils';
 import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
-import { CANAL } from '../../utils/constants';
-import { Box, Divider } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
 import { Image } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
@@ -38,8 +35,10 @@ import PreviewWppMessage from '../../components/PreviewWppMessage';
 interface Company {
   id: string;
   name: string;
-  channelNick: string;
-  channelNumber: string;
+  Channel: {
+    id: string;
+    channelNick: string;
+  }[];
 }
 
 const campaignSchema = z.object({
@@ -77,8 +76,6 @@ const campaignSchema = z.object({
   session: z.string().min(10, 'Selecione uma opção!'),
 });
 
-// TODO - VOLTAR COM O SELECT DOS CANAIS.
-
 type CampaignSchemaType = z.infer<typeof campaignSchema>;
 
 export default function CreateCampanha() {
@@ -114,10 +111,6 @@ export default function CreateCampanha() {
 
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
-
-  
-
-  
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
 
@@ -180,7 +173,7 @@ export default function CreateCampanha() {
         scheduleDate: (values.scheduleDate as Date) || undefined,
         contacts: values.contacts,
         sendDelay: values.sendDelay,
-        session: values.session.split(' ').pop(),
+        channel_id: values.session.split(' ').pop(),
         image: imageBase64,
       });
 
@@ -225,14 +218,12 @@ export default function CreateCampanha() {
               onChange={handleCanalSelect}
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
-              <MenuItem value={company?.channelNumber}>
-                {company?.channelNick}
-              </MenuItem>
-              {/* {CANAL.map((option) => (
-                <MenuItem value={option[1]} key={option[1]}>
-                  {option[0]}
+
+              {company?.Channel.map((option) => (
+                <MenuItem value={option.id} key={option.id}>
+                  {option.channelNick}
                 </MenuItem>
-              ))} */}
+              ))}
             </Select>
           </FormControl>
           <Typography

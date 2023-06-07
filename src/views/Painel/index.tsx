@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  Chip,
   Container,
   Grid,
   InputLabel,
@@ -14,25 +13,17 @@ import TableUsers from './components/TableUsers';
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
-import { AddBox, Close } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useToast } from '../../context/ToastContext';
-import CircleIcon from '@mui/icons-material/Circle';
-import { CircularProgress } from '@mui/joy';
-import QrCode2Icon from '@mui/icons-material/QrCode2';
 
-import InputMask from 'react-input-mask';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import CountdownWpp from './components/Countdown';
-import QrCodeModal from './modals/QrCodeModal';
 import TableChannels, { Channel } from './components/TableChannels';
-import { ChannelSchemaSchemaType } from './modals/ChannelModal';
 
 interface User {
   id: string;
@@ -47,7 +38,6 @@ interface Company {
   name: string;
   channelNick: string;
   channelNumber: string;
-  // ownerId: string;
   owner: User;
   users: User[];
   _count: {
@@ -55,12 +45,7 @@ interface Company {
     Campaign: number;
   };
 }
-// regex valid 55 11 9 9999-9999
 const phoneRegex = new RegExp(/(55 [1-9]{2} 9 [1-9]{4}-[1-9]{4})/g);
-
-// const phoneRegex = new RegExp(
-//   /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
-// );
 
 const companySchema = z.object({
   name: z
@@ -107,16 +92,13 @@ function Painel() {
   } = useForm<CompanySchemaSchemaType>({
     resolver: zodResolver(companySchema),
   });
-  const navigate = useNavigate();
-  const { user, isLogging } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const [twoLetters, setTwoLetters] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState<Company>();
   const [channels, setChannels] = useState<Channel[]>();
-
-  const [qrCode, setQrCode] = useState('');
 
   const toast = useToast();
 
@@ -138,68 +120,10 @@ function Painel() {
     setIsLoading(false);
   }
 
-  // async function getQRCode() {
-  //   try {
-  //     const response = await api.post('/companies/get_qr_code');
-  //     setQrCode(response.data);
-  //   } catch (error) {
-  //     toast.error(
-  //       'Erro ao gerar QR Code, por favor tente novamente mais tarde.'
-  //     );
-  //     onCloseModal();
-  //   }
-  // }
-
-  // async function getNumberStatus() {
-  //   if (!user?.company?.isActive) {
-  //     return;
-  //   }
-  //   const response = await api.get('/companies/status_number');
-
-  //   if (response.data === 'CONNECTED') {
-  //     setIsNumberActive(true);
-  //     setIsModalOpen(false);
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   if (!user) return;
-  //   fetchData();
-  //   getNumberStatus();
-  // }, [user, location]);
-
-  // useEffect(() => {
-  //   let timer: any;
-
-  //   if (isModalOpen && !isNumberActive && !timer && !!qrCode) {
-  //     timer = setInterval(() => {
-  //       getNumberStatus();
-  //     }, 2000);
-  //   } else {
-  //     if (timer) {
-  //       clearInterval(timer);
-  //     }
-  //   }
-
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, [isModalOpen, isNumberActive, qrCode]);
-
   useEffect(() => {
     if (!user) return;
     fetchData();
   }, [user, location]);
-
-  // function onCloseModal() {
-  //   setIsModalOpen(false);
-  //   setQrCode('');
-  // }
-
-  // function handleOpenModal() {
-  //   setIsModalOpen(true);
-  //   getQRCode();
-  // }
 
   async function handleSaveEdition(values: CompanySchemaSchemaType) {
     try {
