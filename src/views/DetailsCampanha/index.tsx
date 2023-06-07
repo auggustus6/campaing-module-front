@@ -41,11 +41,8 @@ export default function DetailsCampanha() {
   async function getData() {
     try {
       const result = await api.get(`/campaign/${id}`);
-      // const selectedSession = CANAL.find((c) =>
-      //   c[1].includes(result.data.session)
-      // );
 
-      // result.data.session = selectedSession?.[0];
+      console.log(result);
 
       setData(result);
     } catch (error) {
@@ -175,7 +172,7 @@ export default function DetailsCampanha() {
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.data.Company.channelNick}
+            value={data?.data.Channel.channelNick}
             disabled
             fullWidth
           />

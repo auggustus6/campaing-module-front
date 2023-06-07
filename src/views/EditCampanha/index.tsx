@@ -50,8 +50,10 @@ interface Campaign {
 interface Company {
   id: string;
   name: string;
-  channelNick: string;
-  channelNumber: string;
+  Channel: {
+    id: string;
+    channelNick: string;
+  }[];
 }
 
 const editCampaignSchema = z.object({
@@ -124,6 +126,8 @@ export default function EditCampanha() {
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
+    console.log(values);
+
     try {
       await api.patch(`/campaign/${id}`, {
         title: values.title,
@@ -131,7 +135,7 @@ export default function EditCampanha() {
         scheduleDate: values.scheduleDate || undefined,
         status: values.status,
         sendDelay: values.sendDelay,
-        channel_id: values.channel_id.split(' ').pop(),
+        channel_id: values.channel_id,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('./..');
@@ -159,29 +163,32 @@ export default function EditCampanha() {
       try {
         const { data } = await api.get(`/campaign/${id}`);
 
-        if (data) {
-          reset({
-            id: data.id,
-            title: data.title,
-            message: data.message,
-            scheduleDate: formatDate(data.scheduleDate) as any,
-            status: data.status,
-            startDate: formatDate(data.startDate) as any,
-            endDate: formatDate(data.endDate) as any,
-            sendDelay: String(data.sendDelay) as any,
-            channel_id: data.channel_id,
-          });
-        } else {
+        if (!data) {
           navigate('/campanhas');
         }
 
+        reset({
+          id: data.id,
+          title: data.title,
+          message: data.message,
+          scheduleDate: formatDate(data.scheduleDate) as any,
+          status: data.status,
+          startDate: formatDate(data.startDate) as any,
+          endDate: formatDate(data.endDate) as any,
+          sendDelay: String(data.sendDelay) as any,
+          channel_id: data.channel_id,
+        });
+
         const { data: companyData } = await api.get(`/companies`);
         setCompany(companyData);
-        console.log(companyData);
-        const enc = new TextDecoder('utf-8');
-        const imgBufferArray = new Uint8Array(data?.image.data);
 
-        setImgSrc(enc.decode(imgBufferArray));
+        if (data.image) {
+          console.log(data);
+
+          const enc = new TextDecoder('utf-8');
+          const imgBufferArray = new Uint8Array(data?.image.data);
+          setImgSrc(enc.decode(imgBufferArray));
+        }
       } catch (error) {
         navigate('/campanhas');
       }
@@ -251,14 +258,11 @@ export default function EditCampanha() {
               value={channel_id || ''}
               onChange={handleCanalSelect}
             >
-              {/* {CANAL.map((option) => (
-                <MenuItem value={option[1]} key={option[1]}>
-                  {option[0]}
+              {company?.Channel.map((option) => (
+                <MenuItem value={option.id} key={option.id}>
+                  {option.channelNick}
                 </MenuItem>
-              ))} */}
-              <MenuItem value={campaign?.session}>
-                {company?.channelNick}
-              </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>

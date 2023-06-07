@@ -17,7 +17,6 @@ import { useToast } from '../../../context/ToastContext';
 import { HowToReg, PersonOffOutlined, WhatsApp } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 
-
 // TODO - move model type to a dto file in a folder
 export type Channel = {
   id: string;
@@ -27,6 +26,7 @@ export type Channel = {
   whatsAppBusinessId: string;
   whatsAppAccountBusinessId: string;
   tokenAccess: string;
+  webHookToken: string;
 };
 
 interface TableChannelsProps {
@@ -65,6 +65,23 @@ export default function TableChannels({
     navigate('edit-channel', {
       state: channel,
     });
+  }
+
+  async function handleRemove(id: string) {
+    const { isConfirmed } = await Swal.fire({
+      title: 'Você tem certeza?',
+      text: 'Você não poderá reverter isso!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+      // reverseButtons: true,
+    });
+
+    if (!isConfirmed) return;
+
+    await api.delete(`/channels/${id}`);
+    refetch();
   }
 
   return (
@@ -108,7 +125,19 @@ export default function TableChannels({
                 <TableCell>{row.whatsAppAccountBusinessId}</TableCell>
                 <TableCell>{row.whatsAppBusinessId}</TableCell>
                 <TableCell>
-                  <Button variant="outlined" color="error">
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleEdit(row)}
+                    sx={{ marginRight: 1 }}
+                  >
+                    <EditIcon />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleRemove(row.id)}
+                  >
                     <DeleteIcon />
                   </Button>
                 </TableCell>

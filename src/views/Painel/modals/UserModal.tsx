@@ -99,6 +99,9 @@ export default function UserModal() {
           });
           return;
         }
+
+        console.log(payload);
+
         await api.post('/auth/create-user', payload);
         toast.success('Usuário criado com sucesso!');
       }
@@ -129,7 +132,7 @@ export default function UserModal() {
           transform: 'translate(-50%, -50%)',
           maxWidth: '50rem',
           borderRadius: 1,
-          width: '100%',
+          width: '96%',
           padding: 4,
           bgcolor: 'white',
         }}
@@ -206,15 +209,6 @@ export default function UserModal() {
                 type="checkbox"
                 {...register('isAdmin')}
               />
-              {/* <Checkbox
-                label={''}
-                {...register('isAdmin')}
-                onChange={() => {
-                  setValue('isAdmin', !checkbox);
-                }}
-                error={!!errors.isAdmin}
-                value={checkbox}
-              /> */}
             </InputLabel>
           </Grid>
 
@@ -229,17 +223,6 @@ export default function UserModal() {
               Salvar
             </Button>
           </Grid>
-          {/* <Grid item xs={12}>
-            <Button
-              variant="contained"
-              fullWidth
-              color="error"
-              sx={{ height: '3.5rem' }}
-              onClick={handleOnClose}
-            >
-              Cancelar
-            </Button>
-          </Grid> */}
         </Grid>
       </Box>
     </Modal>

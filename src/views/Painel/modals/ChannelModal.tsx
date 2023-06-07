@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import api from '../../../services/api';
 import { useEffect } from 'react';
-import { Close } from '@mui/icons-material';
+import { Close, Refresh } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
 import ReactInputMask from 'react-input-mask';
 
@@ -39,10 +39,19 @@ const channelSchema = z.object({
     required_error: 'Campo obrigatório!',
     invalid_type_error: 'Campo obrigatório!',
   }),
-  tokenAccess: z.string({
-    required_error: 'Campo obrigatório!',
-    invalid_type_error: 'Campo obrigatório!',
-  }),
+  tokenAccess: z
+    .string({
+      required_error: 'Campo obrigatório!',
+      invalid_type_error: 'Campo obrigatório!',
+    })
+    .min(3, 'Campo deve ter no mínimo 3 caracteres')
+    .max(1000, 'Campo pode ter no máximo 1000 caracteres'),
+  webHookToken: z
+    .string({
+      required_error: 'Campo obrigatório!',
+      invalid_type_error: 'Campo obrigatório!',
+    })
+    .uuid(),
 });
 
 export default function ChannelModal() {
@@ -53,21 +62,20 @@ export default function ChannelModal() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<ChannelSchemaSchemaType>({
     resolver: zodResolver(channelSchema),
   });
   const toast = useToast();
 
-  console.log(errors);
-
   useEffect(() => {
     const channelFromLocation = location.state;
 
     if (!channelFromLocation && location.pathname.includes('edit')) {
-      navigate('..');
+      return navigate('..');
     }
     if (channelFromLocation) {
-      reset({
+      return reset({
         id: channelFromLocation.id,
         channelNick: channelFromLocation.channelNick,
         phoneNumber: channelFromLocation.phoneNumber,
@@ -75,8 +83,14 @@ export default function ChannelModal() {
         whatsAppAccountBusinessId:
           channelFromLocation.whatsAppAccountBusinessId,
         whatsAppBusinessId: channelFromLocation.whatsAppBusinessId,
+        tokenAccess: channelFromLocation.tokenAccess,
+        webHookToken: channelFromLocation.webHookToken,
       });
     }
+
+    reset({
+      webHookToken: crypto.randomUUID(),
+    });
   }, []);
 
   const handleSubmitChannel = async (values: ChannelSchemaSchemaType) => {
@@ -88,13 +102,12 @@ export default function ChannelModal() {
         whatsAppAccountBusinessId: values.whatsAppAccountBusinessId,
         whatsAppBusinessId: values.whatsAppBusinessId,
         tokenAccess: values.tokenAccess,
+        webHookToken: values.webHookToken,
       };
       if (values.id) {
-        // await api.patch('/auth/update-channel', { ...payload, id: values.id });
+        await api.patch(`/channels/${values.id}`, payload);
         toast.success('Canal editado com sucesso!');
       } else {
-        console.log('payload: ', payload);
-
         await api.post('/channels', payload);
         toast.success('Canal criado com sucesso!');
       }
@@ -112,6 +125,10 @@ export default function ChannelModal() {
     navigate('..');
   }
 
+  function handleRefreshWebHookToken() {
+    setValue('webHookToken', crypto.randomUUID());
+  }
+
   return (
     <Modal open={true} onClose={handleOnClose}>
       <Box
@@ -125,8 +142,9 @@ export default function ChannelModal() {
           transform: 'translate(-50%, -50%)',
           maxWidth: '50rem',
           borderRadius: 1,
-          width: '100%',
+          width: '96%',
           padding: 4,
+
           bgcolor: 'white',
         }}
       >
@@ -219,6 +237,33 @@ export default function ChannelModal() {
               helperText={errors.tokenAccess?.message}
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12} position={'relative'}>
+            <InputLabel error={!!errors.webHookToken}>
+              Token do WebHook
+            </InputLabel>
+            <TextField
+              placeholder="Ex: Token para confirmar identidade do webhook na api da Meta"
+              {...register('webHookToken')}
+              sx={{ fontFamily: 'monospace' }}
+              error={!!errors.webHookToken}
+              helperText={errors.webHookToken?.message}
+              disabled
+              contentEditable={false}
+              fullWidth
+            />
+            <Button
+              variant="outlined"
+              onClick={handleRefreshWebHookToken}
+              sx={{
+                position: 'absolute',
+                top: '3rem',
+                right: '1rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Refresh />
+            </Button>
           </Grid>
 
           <Grid item xs={12} mt={4}>

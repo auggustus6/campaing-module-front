@@ -86,9 +86,7 @@ function Painel() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     reset,
-    getValues,
   } = useForm<CompanySchemaSchemaType>({
     resolver: zodResolver(companySchema),
   });
@@ -106,7 +104,6 @@ function Painel() {
     setIsLoading(true);
     const response = await api.get<Company>('/companies');
     const responseChannels = await api.get<Channel[]>('/channels');
-    console.log(responseChannels.data);
 
     setData(response.data);
     setChannels(responseChannels.data);
@@ -138,11 +135,6 @@ function Painel() {
       toast.error('Erro ao editar empresa!');
       return;
     }
-
-    // if (getValues('channelNumber') !== data?.channelNumber) {
-    //   setIsModalOpen(() => true);
-    //   // getQRCode();
-    // }
   }
 
   function handleCancel() {
@@ -196,7 +188,6 @@ function Painel() {
                   variant="outlined"
                   onClick={() => setIsEditing(true)}
                   disabled={isLoading}
-                  // sx={{borderRadius: '10px'}}
                 >
                   <EditIcon sx={{ marginRight: 1 }} />
                   Editar
@@ -241,79 +232,13 @@ function Painel() {
               disabled
             />
           </Grid>
-          {/* <Grid item xs={12} sm={6} md={4}>
-            <InputLabel error={!!errors.channelNick}>
-              Apelido do canal
-            </InputLabel>
-            <TextField
-              {...register('channelNick')}
-              error={!!errors.channelNick}
-              helperText={errors.channelNick?.message}
-              fullWidth
-              disabled={!isEditing}
-            />
-          </Grid> */}
-          {/* <Grid item xs={12} sm={6} md={4}>
-            <InputLabel error={!!errors.channelNumber}>Número</InputLabel>
-            <Box sx={{ position: 'relative' }}>
-              <InputMask
-                mask={'55 99 9 9999-9999'}
-                onChange={register('channelNumber').onChange}
-                onBlur={register('channelNumber').onBlur}
-                disabled={!isEditing}
-              >
-                <TextField
-                  {...register('channelNumber')}
-                  placeholder="55 99 9 9999-9999"
-                  error={!!errors.channelNumber}
-                  helperText={errors.channelNumber?.message}
-                  fullWidth
-                />
-              </InputMask>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  position: 'absolute',
-                  top: '0.8rem',
-                  right: '1rem',
-                }}
-              >
-                {user && (
-                  <Chip
-                    label={isNumberActive ? 'Ativo' : 'Inativo'}
-                    color={isNumberActive ? 'success' : 'error'}
-                    variant="outlined"
-                    icon={<CircleIcon sx={{ fontSize: '1.4rem' }} />}
-                  />
-                )}
-                <ShowWhenAdmin>
-                  {!isNumberActive && data?.channelNumber && (
-                    <Button
-                      variant="outlined"
-                      onClick={handleOpenModal}
-                      sx={{
-                        borderRadius: 15,
-                        padding: 0.5,
-                        margin: 0,
-                        minWidth: 'unset',
-                      }}
-                    >
-                      <RestartAltIcon />
-                    </Button>
-                  )}
-                </ShowWhenAdmin>
-              </Box>
-            </Box>
-          </Grid> */}
         </Grid>
         <Box marginTop={8} />
 
         <TableChannels
           channels={channels || []}
           channelsLength={data?._count.users}
-          refetch={() => {}}
+          refetch={fetchData}
           isLoading={isLoading}
         />
         <Box marginTop={8} />
@@ -324,11 +249,6 @@ function Painel() {
           isLoading={isLoading}
         />
       </Container>
-      {/* <QrCodeModal
-        isModalOpen={isModalOpen}
-        onCloseModal={onCloseModal}
-        qrCode={qrCode}
-      /> */}
       <Outlet />
     </>
   );

@@ -57,7 +57,6 @@ export default function TableUsers({
     navigate('create-user');
   }
 
-  // TODO - this function doest not work because the endpoint is only to remove
   async function handleDisable(id: string, isActive: boolean) {
     const option = await Swal.fire({
       title: `Tem certeza que deseja ${
