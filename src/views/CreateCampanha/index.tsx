@@ -173,7 +173,7 @@ export default function CreateCampanha() {
         scheduleDate: (values.scheduleDate as Date) || undefined,
         contacts: values.contacts,
         sendDelay: values.sendDelay,
-        channel_id: values.session.split(' ').pop(),
+        channel_id: values.session,
         image: imageBase64,
       });
 
