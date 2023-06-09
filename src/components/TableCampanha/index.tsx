@@ -28,6 +28,9 @@ export interface Data {
   sendDelay: string;
   sentContactsCount: number;
   isDeleted: boolean;
+  _count: {
+    contacts: number;
+  };
 }
 
 export default function TableCampaign() {
@@ -43,6 +46,7 @@ export default function TableCampaign() {
       const result = await api.get(
         `/campaign?page=${page}&list_deleted=${showDeleted}`
       );
+
       if (lengthItems === 0 && result.data.result.length > 0) {
         setLengthItems(result.data.result.length);
       }
@@ -51,15 +55,7 @@ export default function TableCampaign() {
     { staleTime: 1000 * 4 } //60 seconds
   );
 
-  // const itemsLength: number = React.useMemo(() => {
-  //   if (!itemsLength && data?.data?.result?.length) {
-  //     return data?.data?.result?.length;
-  //   }
-  //   return itemsLength;
-  // }, []);
-
   const formatDate = (date?: string) => {
-    
     if (date) return moment(date).format('DD/MM/YYYY - HH:mm');
     else return '- - - - - - - - - - - - - -';
   };
@@ -104,6 +100,10 @@ export default function TableCampaign() {
     setPage(newPage);
   };
 
+  const clearSelected = () => {
+    setSelected([]);
+  };
+
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
@@ -113,10 +113,10 @@ export default function TableCampaign() {
           numSelected={selected.length}
           selectedItem={selected}
           setSelectedItem={setSelected}
-          page={page}
           showDeleted={showDeleted}
           setShowDeleted={setShowDeleted}
           campaign={selectedCampaign}
+          clearSelected={clearSelected}
         />
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
@@ -172,7 +172,12 @@ export default function TableCampaign() {
                       {formatDate(row.endDate)}
                     </TableCell>
                     <TableCell>{row.sendDelay}</TableCell>
-                    <TableCell>{row.sentContactsCount}</TableCell>
+                    <TableCell>
+                      <span style={{ color: 'green', fontWeight: 600 }}>
+                        {row.sentContactsCount}
+                      </span>{' '}
+                      / <span>{row._count.contacts}</span>
+                    </TableCell>
                     <TableCell align="left">
                       <StatusLabel status={row.status} />
                     </TableCell>

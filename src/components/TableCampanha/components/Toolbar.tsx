@@ -17,7 +17,7 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
   setSelectedItem: (value: []) => void;
-  page: number;
+  clearSelected: () => void;
   showDeleted: boolean;
   setShowDeleted: (option: boolean) => void;
   campaign: Data[];
@@ -26,8 +26,8 @@ interface EnhancedTableToolbarProps {
 export function EnhancedTableToolbar({
   numSelected,
   selectedItem,
-  page,
   setSelectedItem,
+  clearSelected,
   showDeleted,
   setShowDeleted,
   campaign,
@@ -47,6 +47,7 @@ export function EnhancedTableToolbar({
       await api.post(`/campaign/start`, selectedItem);
       await queryClient.invalidateQueries('campaign');
       Swal.fire('Sucesso', 'Campanha iniciada com sucesso!', 'success');
+      clearSelected();
     } catch (error) {
       Swal.fire(
         'Erro',
@@ -63,6 +64,7 @@ export function EnhancedTableToolbar({
       await api.post(`/campaign/finish`, selectedItem);
       await queryClient.invalidateQueries('campaign');
       Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
+      clearSelected();
     } catch (error) {
       Swal.fire(
         'Erro',
@@ -79,6 +81,7 @@ export function EnhancedTableToolbar({
       await api.post(`/campaign/pause`, selectedItem);
       await queryClient.invalidateQueries('campaign');
       Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
+      clearSelected();
     } catch (error) {
       Swal.fire(
         'Erro',
@@ -93,8 +96,8 @@ export function EnhancedTableToolbar({
     try {
       await api.post(`/campaign/delete`, selectedItem);
       await queryClient.invalidateQueries('campaign');
-      setSelectedItem([]);
       Swal.fire('Sucesso', 'Campanha removida com sucesso!', 'success');
+      setSelectedItem([]);
     } catch (error) {
       Swal.fire(
         'Erro',

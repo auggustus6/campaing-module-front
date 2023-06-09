@@ -42,7 +42,7 @@ interface Company {
   users: User[];
   _count: {
     users: number;
-    Campaign: number;
+    campaign: number;
   };
 }
 const phoneRegex = new RegExp(/(55 [1-9]{2} 9 [1-9]{4}-[1-9]{4})/g);
@@ -56,19 +56,6 @@ const companySchema = z.object({
     .trim()
     .min(3, 'Muito curto!')
     .max(30, 'Muito extenso!'),
-  channelNick: z
-    .string({
-      required_error: 'Campo obrigatório!',
-      invalid_type_error: 'Campo obrigatório!',
-    })
-    .trim()
-    .min(3, 'Muito curto!')
-    .max(30, 'Muito extenso!')
-    .nonempty('Campo obrigatório.'),
-  channelNumber: z
-    .string({ required_error: 'Campo obrigatório!' })
-    .trim()
-    .regex(phoneRegex, 'Número inválido!'),
 });
 
 type CompanySchemaSchemaType = z.infer<typeof companySchema>;
@@ -110,8 +97,6 @@ function Painel() {
     setTwoLetters(getTwoFirstLetters(response.data.name));
     reset({
       name: response.data.name,
-      channelNick: response.data.channelNick,
-      channelNumber: response.data.channelNumber,
     });
 
     setIsLoading(false);
@@ -126,6 +111,7 @@ function Painel() {
     try {
       setIsLoading(true);
       setIsEditing(false);
+
       await api.patch('/companies', values);
       setTwoLetters(getTwoFirstLetters(values.name));
       setIsLoading(false);
@@ -140,8 +126,6 @@ function Painel() {
   function handleCancel() {
     reset({
       name: data?.name,
-      channelNick: data?.channelNick,
-      channelNumber: data?.channelNumber,
     });
     setIsEditing(false);
   }
@@ -228,7 +212,7 @@ function Painel() {
             <InputLabel>Campanhas criadas</InputLabel>
             <TextField
               fullWidth
-              value={(data?._count.Campaign || 0) + ' Campanhas criadas'}
+              value={(data?._count.campaign || 0) + ' Campanhas criadas'}
               disabled
             />
           </Grid>

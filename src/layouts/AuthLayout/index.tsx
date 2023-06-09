@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import * as Styles from './styles';
+import LoadingScreen from '../../components/LoadingScreen';
+import {   } from 'react';
 
 export default function AuthLayout() {
   return (

@@ -13,9 +13,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import api from '../../../services/api';
 import { useEffect } from 'react';
-import { Close, Refresh } from '@mui/icons-material';
+import { Close, ContentCopy, CopyAll, Refresh } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
 import ReactInputMask from 'react-input-mask';
+import { copyToClipboard } from '../../../utils/copyToClipboard';
 
 const phoneRegex = new RegExp(/(55 [1-9]{2} 9 [1-9]{4}-[1-9]{4})/g);
 
@@ -63,49 +64,34 @@ export default function ChannelModal() {
     formState: { errors },
     reset,
     setValue,
+    getValues,
   } = useForm<ChannelSchemaSchemaType>({
     resolver: zodResolver(channelSchema),
   });
   const toast = useToast();
 
+  function handleRefreshWebHookToken() {
+    setValue('webHookToken', crypto.randomUUID());
+  }
+
   useEffect(() => {
-    const channelFromLocation = location.state;
+    const channelFromLocation: ChannelSchemaSchemaType = location.state;
 
     if (!channelFromLocation && location.pathname.includes('edit')) {
       return navigate('..');
     }
     if (channelFromLocation) {
-      return reset({
-        id: channelFromLocation.id,
-        channelNick: channelFromLocation.channelNick,
-        phoneNumber: channelFromLocation.phoneNumber,
-        phoneNumberId: channelFromLocation.phoneNumberId,
-        whatsAppAccountBusinessId:
-          channelFromLocation.whatsAppAccountBusinessId,
-        whatsAppBusinessId: channelFromLocation.whatsAppBusinessId,
-        tokenAccess: channelFromLocation.tokenAccess,
-        webHookToken: channelFromLocation.webHookToken,
-      });
+      return reset(channelFromLocation);
     }
 
-    reset({
-      webHookToken: crypto.randomUUID(),
-    });
+    handleRefreshWebHookToken();
   }, []);
 
   const handleSubmitChannel = async (values: ChannelSchemaSchemaType) => {
+    const { id, ...payload } = values;
     try {
-      const payload = {
-        channelNick: values.channelNick,
-        phoneNumber: values.phoneNumber,
-        phoneNumberId: values.phoneNumberId,
-        whatsAppAccountBusinessId: values.whatsAppAccountBusinessId,
-        whatsAppBusinessId: values.whatsAppBusinessId,
-        tokenAccess: values.tokenAccess,
-        webHookToken: values.webHookToken,
-      };
       if (values.id) {
-        await api.patch(`/channels/${values.id}`, payload);
+        await api.patch(`/channels/${id}`, payload);
         toast.success('Canal editado com sucesso!');
       } else {
         await api.post('/channels', payload);
@@ -113,7 +99,7 @@ export default function ChannelModal() {
       }
       navigate('..');
     } catch (error) {
-      if (values.id) {
+      if (id) {
         toast.error('Erro ao editar canal!');
         return;
       }
@@ -121,12 +107,13 @@ export default function ChannelModal() {
     }
   };
 
-  function handleOnClose() {
-    navigate('..');
+  function handleCopyToClipboard() {
+    copyToClipboard(getValues('webHookToken'));
+    toast.success('Token copiado com sucesso!');
   }
 
-  function handleRefreshWebHookToken() {
-    setValue('webHookToken', crypto.randomUUID());
+  function handleOnClose() {
+    navigate('..');
   }
 
   return (
@@ -252,18 +239,23 @@ export default function ChannelModal() {
               contentEditable={false}
               fullWidth
             />
-            <Button
-              variant="outlined"
-              onClick={handleRefreshWebHookToken}
+            <Box
               sx={{
+                display: 'flex',
                 position: 'absolute',
                 top: '3rem',
                 right: '1rem',
                 whiteSpace: 'nowrap',
+                gap: '0.5rem',
               }}
             >
-              <Refresh />
-            </Button>
+              <Button variant="outlined" onClick={handleCopyToClipboard}>
+                <ContentCopy />
+              </Button>
+              <Button variant="outlined" onClick={handleRefreshWebHookToken}>
+                <Refresh />
+              </Button>
+            </Box>
           </Grid>
 
           <Grid item xs={12} mt={4}>

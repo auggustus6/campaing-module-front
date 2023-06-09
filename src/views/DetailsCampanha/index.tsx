@@ -42,8 +42,6 @@ export default function DetailsCampanha() {
     try {
       const result = await api.get(`/campaign/${id}`);
 
-      console.log(result);
-
       setData(result);
     } catch (error) {
       navigate('/campanhas');
@@ -172,7 +170,7 @@ export default function DetailsCampanha() {
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.data.Channel.channelNick}
+            value={data?.data.channel.channelNick}
             disabled
             fullWidth
           />

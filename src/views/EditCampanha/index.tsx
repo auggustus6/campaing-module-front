@@ -50,7 +50,7 @@ interface Campaign {
 interface Company {
   id: string;
   name: string;
-  Channel: {
+  channel: {
     id: string;
     channelNick: string;
   }[];
@@ -126,7 +126,6 @@ export default function EditCampanha() {
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
-    console.log(values);
 
     try {
       await api.patch(`/campaign/${id}`, {
@@ -183,8 +182,6 @@ export default function EditCampanha() {
         setCompany(companyData);
 
         if (data.image) {
-          console.log(data);
-
           const enc = new TextDecoder('utf-8');
           const imgBufferArray = new Uint8Array(data?.image.data);
           setImgSrc(enc.decode(imgBufferArray));
@@ -258,7 +255,7 @@ export default function EditCampanha() {
               value={channel_id || ''}
               onChange={handleCanalSelect}
             >
-              {company?.Channel.map((option) => (
+              {company?.channel.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
                   {option.channelNick}
                 </MenuItem>

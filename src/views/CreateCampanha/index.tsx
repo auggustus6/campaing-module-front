@@ -35,7 +35,7 @@ import PreviewWppMessage from '../../components/PreviewWppMessage';
 interface Company {
   id: string;
   name: string;
-  Channel: {
+  channel: {
     id: string;
     channelNick: string;
   }[];
@@ -219,7 +219,7 @@ export default function CreateCampanha() {
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
 
-              {company?.Channel.map((option) => (
+              {company?.channel.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
                   {option.channelNick}
                 </MenuItem>

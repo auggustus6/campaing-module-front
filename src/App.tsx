@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy,   } from 'react';
 import {
   Route,
   BrowserRouter,
@@ -6,31 +6,16 @@ import {
   useNavigate,
   Navigate,
 } from 'react-router-dom';
-import NotActivatedAlert from './components/NotActivatedAlert';
-
-// import AuthLayout from './layouts/AuthLayout';
-// import MainLayout from './layouts/MainLayout';
-// import AdminRoute from './components/AdminRoute';
 
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
-const MainLayout = lazy(() => import('./layouts/MainLayout'));
+import MainLayout from './layouts/MainLayout';
 const AdminRoute = lazy(() => import('./components/AdminRoute'));
-
-// import { AuthProvider } from './context/AuthContext';
 
 const AuthProvider = lazy(() => import('./context/AuthContext'));
 
 import Campanhas from './views/Campanhas';
 import ChannelModal from './views/Painel/modals/ChannelModal';
-// import CreateCampanha from './views/CreateCampanha';
-// import DetailsCampanha from './views/DetailsCampanha';
-// import EditCampanha from './views/EditCampanha';
-// import Login from './views/Login';
-// import Register from './views/Register';
-// import Painel from './views/Painel';
-// import UserModal from './views/Painel/modals/UserModal';
 
-// const Campanhas = lazy(() => import('./views/Campanhas'));
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
 const EditCampanha = lazy(() => import('./views/EditCampanha'));

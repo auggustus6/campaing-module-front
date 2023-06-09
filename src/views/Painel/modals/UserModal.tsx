@@ -100,8 +100,6 @@ export default function UserModal() {
           return;
         }
 
-        console.log(payload);
-
         await api.post('/auth/create-user', payload);
         toast.success('Usuário criado com sucesso!');
       }

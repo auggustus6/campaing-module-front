@@ -8,7 +8,6 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { ToastProvider } from './context/ToastContext';
 
 import LoadingScreen from './components/LoadingScreen';
-import NotActivatedAlert from './components/NotActivatedAlert';
 
 export const queryClient = new QueryClient();
 

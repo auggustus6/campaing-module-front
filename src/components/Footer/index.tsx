@@ -7,17 +7,29 @@ import Logo from '../Logo';
 export default function Footer() {
   return (
     <>
-      <div style={{ paddingTop: '10rem' }}></div>
-      <Paper
+      <div style={{ paddingTop: '15rem' }}></div>
+      <Box
         sx={{
           position: 'absolute',
           bottom: 0,
           width: '100%',
+          background: 'none',
         }}
         component="footer"
-        square
-        variant="outlined"
       >
+        <img
+          src="/layered-waves.svg"
+          alt="footer"
+          style={{
+            position: 'absolute',
+            bottom: -1,
+            left: -1,
+            width: '100%',
+            overflow: 'hidden',
+            zIndex: -1,
+            userSelect: 'none',
+          }}
+        />
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -25,7 +37,7 @@ export default function Footer() {
               display: 'flex',
             }}
           >
-            <div>
+            <div style={{ color: 'white' }}>
               <Logo />
             </div>
           </Box>
@@ -38,12 +50,12 @@ export default function Footer() {
               mb: 2,
             }}
           >
-            <Typography variant="caption" color="initial">
+            <Typography variant="caption" color="white">
               Copyright ©2022. MSI Digital
             </Typography>
           </Box>
         </Container>
-      </Paper>
+      </Box>
     </>
   );
 }

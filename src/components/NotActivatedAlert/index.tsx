@@ -1,26 +1,10 @@
 import { Box, Link } from '@mui/joy';
-import { useEffect, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
 import { Typography } from '@mui/material';
 import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
 import { theme } from '../../styles/theme';
-import { useAuth } from '../../context/AuthContext';
 
 export default function NotActivatedAlert() {
-  const [isOpen, setIsOpen] = useState(true);
-  const { user } = useAuth();
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIsOpen(false);
-  //   }, 3000);
-  // }, []);
-
-  function handleCloseAlert() {
-    setIsOpen(false);
-  }
-
-  return isOpen ? (
+  return (
     <Box
       sx={{
         position: 'fixed',
@@ -48,5 +32,5 @@ export default function NotActivatedAlert() {
         e solicite ativação.
       </Typography>
     </Box>
-  ) : null;
+  );
 }

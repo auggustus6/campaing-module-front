@@ -2,6 +2,8 @@ import Box from '@mui/system/Box';
 import { Outlet } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import {   } from 'react';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function MainLayout() {
   return (
@@ -9,7 +11,7 @@ export default function MainLayout() {
       <Header />
       <Box pt={8} />
       <Box sx={{ p: { xs: 2, md: 4 } }}>
-        <Outlet />
+          <Outlet />
       </Box>
       <Footer />
     </div>
