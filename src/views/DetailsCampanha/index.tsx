@@ -20,9 +20,7 @@ import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import moment from 'moment';
-import { CANAL } from '../../utils/constants';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
-import { Preview } from '@mui/icons-material';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
 export default function DetailsCampanha() {
@@ -32,9 +30,11 @@ export default function DetailsCampanha() {
   const navigate = useNavigate();
 
   const enc = new TextDecoder('utf-8');
-  const imgBufferArray = new Uint8Array(data?.data?.image?.data);
+  const imgBufferArray = new Uint8Array(data?.data?.midia?.data);
 
-  const imgSrc = enc.decode(imgBufferArray);
+  const midiaSrc = enc.decode(imgBufferArray);
+
+  const isImage = midiaSrc.substring(0, 100)?.includes('data:image');
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
@@ -170,7 +170,7 @@ export default function DetailsCampanha() {
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.data.channel.channelNick}
+            value={data?.data.channel.instanceName}
             disabled
             fullWidth
           />
@@ -240,7 +240,7 @@ export default function DetailsCampanha() {
           <InputLabel>Preview da mensagem</InputLabel>
           <PreviewWppMessage
             messagePreview={data?.data.message}
-            imgSrc={imgSrc}
+            imgSrc={isImage ? midiaSrc : undefined}
           />
         </Grid>
         {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (

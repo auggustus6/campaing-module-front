@@ -52,7 +52,7 @@ interface Company {
   name: string;
   channel: {
     id: string;
-    channelNick: string;
+    instanceName: string;
   }[];
 }
 
@@ -114,15 +114,16 @@ export default function EditCampanha() {
     setStatusState(status);
   }, [status]);
 
-  const [campaign, setCampaign] = useState<Campaign>();
   const [company, setCompany] = useState<Company>();
-  const [imgSrc, setImgSrc] = useState<any>();
+  const [midiaSrc, setMidiaSrcSrc] = useState<any>();
 
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+
+  const isImage = midiaSrc.substring(0, 100)?.includes('data:image');
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -184,7 +185,7 @@ export default function EditCampanha() {
         if (data.image) {
           const enc = new TextDecoder('utf-8');
           const imgBufferArray = new Uint8Array(data?.image.data);
-          setImgSrc(enc.decode(imgBufferArray));
+          setMidiaSrcSrc(enc.decode(imgBufferArray));
         }
       } catch (error) {
         navigate('/campanhas');
@@ -257,7 +258,7 @@ export default function EditCampanha() {
             >
               {company?.channel.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
-                  {option.channelNick}
+                  {option.instanceName}
                 </MenuItem>
               ))}
             </Select>
@@ -324,7 +325,10 @@ export default function EditCampanha() {
           <InputLabel sx={{ color: theme.palette.primary.main }}>
             Preview da mensagem:
           </InputLabel>
-          <PreviewWppMessage imgSrc={imgSrc} messagePreview={message} />
+          <PreviewWppMessage
+            imgSrc={isImage ? midiaSrc : undefined}
+            messagePreview={message}
+          />
         </Grid>
       </Grid>
       <TableContactsFromApi id={id} message={getValues('id')} />

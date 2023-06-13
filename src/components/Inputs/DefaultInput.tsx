@@ -23,7 +23,6 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
     const error = !!errorMessage;
 
     function onCopy() {
-      console.log(ref);
 
       // TODO - fix copyToClipboard
       // copyToClipboard(ref?);
@@ -60,7 +59,6 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
           error={error}
           helperText={errorMessage}
           fullWidth
-          prefix="asas"
           {...rest}
         />
       </Grid>
