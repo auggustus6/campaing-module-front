@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, Button, TablePagination, Typography } from '@mui/material';
+import { Box, Button, Stack, TablePagination, Typography } from '@mui/material';
 import { useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,20 +14,12 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
-import { HowToReg, PersonOffOutlined, WhatsApp } from '@mui/icons-material';
+import { WhatsApp } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
+import { ChannelSchemaSchemaType } from '../modals/ChannelModal';
 
 // TODO - move model type to a dto file in a folder
-export type Channel = {
-  id: string;
-  channelNick: string;
-  phoneNumber: string;
-  phoneNumberId: string;
-  whatsAppBusinessId: string;
-  whatsAppAccountBusinessId: string;
-  tokenAccess: string;
-  webHookToken: string;
-};
+export interface Channel extends ChannelSchemaSchemaType {}
 
 interface TableChannelsProps {
   channels: Channel[] | undefined;
@@ -75,7 +67,6 @@ export default function TableChannels({
       showCancelButton: true,
       confirmButtonText: 'Sim',
       cancelButtonText: 'Não',
-      // reverseButtons: true,
     });
 
     if (!isConfirmed) return;
@@ -104,27 +95,25 @@ export default function TableChannels({
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell>Key</TableCell>
             <TableCell>Apelido</TableCell>
-            <TableCell>Número</TableCell>
-            <ShowWhenAdmin>
-              <TableCell>ID Número</TableCell>
-              <TableCell>ID Conta Whatsapp</TableCell>
-              <TableCell>ID Conta Negócio Whatsapp</TableCell>
-              <TableCell>Ações</TableCell>
-            </ShowWhenAdmin>
+            <TableCell>Login</TableCell>
+            <TableCell>URL</TableCell>
+            <TableCell>Webhook</TableCell>
+            <TableCell>Ações</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {channelsToShow.map((row) => (
             <TableRow key={row.id}>
               {/* <TableCell>{row.id}</TableCell> */}
-              <TableCell>{row.channelNick}</TableCell>
-              <TableCell>{row.phoneNumber}</TableCell>
-              <ShowWhenAdmin>
-                <TableCell>{row.phoneNumberId}</TableCell>
-                <TableCell>{row.whatsAppAccountBusinessId}</TableCell>
-                <TableCell>{row.whatsAppBusinessId}</TableCell>
-                <TableCell>
+              <TableCell>{row.key}</TableCell>
+              <TableCell>{row.instanceName}</TableCell>
+              <TableCell>{row.login}</TableCell>
+              <TableCell>{row.url}</TableCell>
+              <TableCell>{row.webhook}</TableCell>
+              <TableCell>
+                <Stack direction={'row'}>
                   <Button
                     variant="outlined"
                     color="secondary"
@@ -136,12 +125,12 @@ export default function TableChannels({
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => handleRemove(row.id)}
+                    onClick={() => handleRemove(row.id!)}
                   >
                     <DeleteIcon />
                   </Button>
-                </TableCell>
-              </ShowWhenAdmin>
+                </Stack>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
