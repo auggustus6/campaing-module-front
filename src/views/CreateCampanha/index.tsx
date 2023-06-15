@@ -28,7 +28,7 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Image } from '@mui/icons-material';
+import { FlakySharp, Image, Science } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
@@ -184,6 +184,51 @@ export default function CreateCampanha() {
 
       navigate('/campanhas');
       Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
+    } catch (error) {
+      console.error(error);
+      Swal.fire(
+        'Erro',
+        'Erro ao criar campanha, por favor tente novamente.',
+        'error'
+      );
+    }
+    setIsLoading(false);
+  }
+
+  async function handleTestMessage(values: CampaignSchemaType) {
+    setIsLoading(true);
+
+    // TODO - change to react portals and react components
+    try {
+      const value = await Swal.fire({
+        text: 'Digite o número para o qual deseja enviar a mensagem',
+        input: 'text',
+        inputAttributes: {
+          inputmode: 'numeric',
+          pattern: '[0-9]*',
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar',
+        showLoaderOnConfirm: true,
+        preConfirm: async (number) => {
+          try {
+            await api.post('/campaign/send-message-test-campaign', {
+              text: messagePreview,
+              to: number,
+              midia: midiaBase64,
+              instanceId: values.session,
+            });
+            Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
+          } catch (error) {
+            Swal.fire(
+              'Erro',
+              'Erro ao enviar mensagem, por favor tente novamente.',
+              'error'
+            );
+          }
+        },
+      });
     } catch (error) {
       console.error(error);
       Swal.fire(
@@ -383,6 +428,18 @@ export default function CreateCampanha() {
               Baixar template do excel
             </Button>
           </a>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Button
+            sx={{ height: '3.5rem', textTransform: 'uppercase' }}
+            fullWidth
+            disabled={isLoading || shouldDisable}
+            loading={isLoading}
+            onClick={handleSubmit(handleTestMessage)}
+          >
+            <Science />
+            Testar mensagem
+          </Button>
         </Grid>
       </Grid>
 
