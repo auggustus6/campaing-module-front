@@ -3,8 +3,8 @@ import axios from 'axios';
 const api = axios.create({
   baseURL:
     import.meta.env.MODE === 'development'
-      ? 'http://localhost:3333/'
-      : 'https://api-campaign-module.azurewebsites.net/',
+      ? 'http://134.209.78.36/'
+      : 'http://134.209.78.36/',
 });
 
 api.interceptors.request.use(

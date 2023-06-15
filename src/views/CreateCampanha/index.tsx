@@ -47,7 +47,7 @@ const campaignSchema = z.object({
     .min(6, 'Muito curto!')
     .max(70, 'Muito extenso!')
     .nonempty('Campo obrigatório.'),
-  message: z.string().min(6, 'Muito curto!').max(200, 'Muito extenso!'),
+  message: z.string().min(6, 'Muito curto!').max(5000, 'Muito extenso!'),
   scheduleDate: z
     .string()
     .transform((date) => (date ? new Date(date) : ''))
