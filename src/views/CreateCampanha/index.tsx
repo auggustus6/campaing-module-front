@@ -28,7 +28,7 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Image } from '@mui/icons-material';
+import { FlakySharp, Image, Science } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
@@ -37,7 +37,7 @@ interface Company {
   name: string;
   channel: {
     id: string;
-    channelNick: string;
+    instanceName: string;
   }[];
 }
 
@@ -62,7 +62,7 @@ const campaignSchema = z.object({
   variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
   contacts: z.any().array().min(1, 'Arquivo vazio.'),
   fileName: z.string().optional(),
-  imageName: z.string().optional(),
+  midiaName: z.string().optional(),
   sendDelay: z
     .string()
     .transform((delay) => Number(delay))
@@ -99,7 +99,12 @@ export default function CreateCampanha() {
   });
 
   const [company, setCompany] = useState<Company>();
-  const { base64: imageBase64, getBase64 } = useBase64();
+  const { base64: midiaBase64, getBase64 } = useBase64();
+
+  const isImage = getValues('midiaName')
+    ?.split('.')
+    .slice(-1)[0]
+    ?.match(/.(jpg|jpeg|png|gif)$/i);
 
   useEffect(() => {
     async function getCompany() {
@@ -151,7 +156,7 @@ export default function CreateCampanha() {
 
   async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
     getBase64(e.target.files?.[0]);
-    setValue('imageName', e.target.files?.[0].name);
+    setValue('midiaName', e.target.files?.[0].name);
     e.target.value = '';
   }
 
@@ -174,11 +179,56 @@ export default function CreateCampanha() {
         contacts: values.contacts,
         sendDelay: values.sendDelay,
         channel_id: values.session,
-        image: imageBase64,
+        midia: midiaBase64,
       });
 
       navigate('/campanhas');
       Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
+    } catch (error) {
+      console.error(error);
+      Swal.fire(
+        'Erro',
+        'Erro ao criar campanha, por favor tente novamente.',
+        'error'
+      );
+    }
+    setIsLoading(false);
+  }
+
+  async function handleTestMessage(values: CampaignSchemaType) {
+    setIsLoading(true);
+
+    // TODO - change to react portals and react components
+    try {
+      const value = await Swal.fire({
+        text: 'Digite o número para o qual deseja enviar a mensagem',
+        input: 'text',
+        inputAttributes: {
+          inputmode: 'numeric',
+          pattern: '[0-9]*',
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar',
+        showLoaderOnConfirm: true,
+        preConfirm: async (number) => {
+          try {
+            await api.post('/campaign/send-message-test-campaign', {
+              text: messagePreview,
+              to: number,
+              midia: midiaBase64,
+              instanceId: values.session,
+            });
+            Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
+          } catch (error) {
+            Swal.fire(
+              'Erro',
+              'Erro ao enviar mensagem, por favor tente novamente.',
+              'error'
+            );
+          }
+        },
+      });
     } catch (error) {
       console.error(error);
       Swal.fire(
@@ -218,10 +268,9 @@ export default function CreateCampanha() {
               onChange={handleCanalSelect}
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
-
               {company?.channel.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
-                  {option.channelNick}
+                  {option.instanceName}
                 </MenuItem>
               ))}
             </Select>
@@ -269,28 +318,23 @@ export default function CreateCampanha() {
           <MaterialButton
             sx={{
               height: '3.5rem',
-              maxWidth: '300px',
+              maxWidth: '500px',
               overflow: 'hidden',
               textAlign: 'start',
-              '&:hover': {
-                // background: '#595959',
-              },
             }}
             disabled={isLoading || shouldDisable}
-            color={errors.variables ? 'error' : 'primary'}
-            // fullWidth
             variant={errors.variables ? 'outlined' : 'outlined'}
             component="label"
           >
             <Image />
-            {getValues('imageName')
-              ? getValues('imageName')
-              : 'Selecionar Imagem'}
+            {getValues('midiaName')
+              ? getValues('midiaName')
+              : 'Selecione audio ou foto'}
             <input
               id="fileSelect"
               type="file"
               hidden
-              accept="image/png, image/gif, image/jpeg"
+              accept="image/png, image/gif, image/jpeg, audio/*"
               onChange={handleUploadImage}
             />
           </MaterialButton>
@@ -308,7 +352,7 @@ export default function CreateCampanha() {
             Preview da mensagem:
           </InputLabel>
           <PreviewWppMessage
-            imgSrc={imageBase64}
+            imgSrc={isImage ? midiaBase64 : undefined}
             messagePreview={messagePreview}
           />
         </Grid>
@@ -384,6 +428,18 @@ export default function CreateCampanha() {
               Baixar template do excel
             </Button>
           </a>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Button
+            sx={{ height: '3.5rem', textTransform: 'uppercase' }}
+            fullWidth
+            disabled={isLoading || shouldDisable}
+            loading={isLoading}
+            onClick={handleSubmit(handleTestMessage)}
+          >
+            <Science />
+            Testar mensagem
+          </Button>
         </Grid>
       </Grid>
 
