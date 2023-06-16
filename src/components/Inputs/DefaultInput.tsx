@@ -7,8 +7,9 @@ import {
   InputLabel,
   TextField,
 } from '@mui/material';
-import React from 'react';
+import React, { useImperativeHandle } from 'react';
 import { copyToClipboard } from '../../utils/copyToClipboard';
+import { useToast } from '../../context/ToastContext';
 
 type DefaultInputProps = React.ComponentProps<typeof TextField> & {
   label?: string;
@@ -21,11 +22,20 @@ type DefaultInputProps = React.ComponentProps<typeof TextField> & {
 const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
   ({ label, xs = 12, sm = 6, errorMessage, copy, ...rest }, ref) => {
     const error = !!errorMessage;
+    const otherRef = React.useRef<HTMLInputElement>(null);
+    const toast = useToast();
+
+    useImperativeHandle(
+      ref,
+      () => {
+        return otherRef.current!;
+      },
+      []
+    );
 
     function onCopy() {
-
-      // TODO - fix copyToClipboard
-      // copyToClipboard(ref?);
+      copyToClipboard(otherRef.current?.value!);
+      toast.success('Copiado para a área de transferência!');
     }
 
     if (copy)
@@ -36,7 +46,7 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
             error={error}
             helperText={errorMessage}
             fullWidth
-            inputRef={ref}
+            inputRef={otherRef}
             InputProps={{
               endAdornment: (
                 <>

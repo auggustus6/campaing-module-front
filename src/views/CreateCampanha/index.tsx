@@ -28,7 +28,7 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FlakySharp, Image, Science } from '@mui/icons-material';
+import { FlakySharp, Image, Science, UploadFile } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
@@ -101,10 +101,9 @@ export default function CreateCampanha() {
   const [company, setCompany] = useState<Company>();
   const { base64: midiaBase64, getBase64 } = useBase64();
 
-  const isImage = getValues('midiaName')
-    ?.split('.')
-    .slice(-1)[0]
-    ?.match(/.(jpg|jpeg|png|gif)$/i);
+  // TODO - make a hook for this
+  const isImage =
+    midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1] === 'image';
 
   useEffect(() => {
     async function getCompany() {
@@ -171,6 +170,11 @@ export default function CreateCampanha() {
   async function handleCreateCampaign(values: CampaignSchemaType) {
     setIsLoading(true);
 
+    const midiaType = midiaBase64
+      ?.substring(0, 16)
+      ?.split('/')[0]
+      ?.split(':')[1];
+
     try {
       await api.post('/campaign', {
         title: values.title,
@@ -180,6 +184,7 @@ export default function CreateCampanha() {
         sendDelay: values.sendDelay,
         channel_id: values.session,
         midia: midiaBase64,
+        midiaType: midiaType,
       });
 
       navigate('/campanhas');
@@ -326,7 +331,7 @@ export default function CreateCampanha() {
             variant={errors.variables ? 'outlined' : 'outlined'}
             component="label"
           >
-            <Image />
+            <UploadFile />
             {getValues('midiaName')
               ? getValues('midiaName')
               : 'Selecione audio ou foto'}

@@ -51,6 +51,10 @@ export default function ChannelModal() {
   });
   const toast = useToast();
 
+  const isDisabled = true;
+
+  const isChannelActive = false;
+
   useEffect(() => {
     const channelFromLocation: ChannelSchemaSchemaType = location.state;
 
@@ -96,7 +100,7 @@ export default function ChannelModal() {
           transform: 'translate(-50%, -50%)',
           maxWidth: '80rem',
           borderRadius: 1,
-          width: '96%',
+          width: isChannelActive ? 'auto' : '96%',
         }}
       >
         <Box
@@ -105,7 +109,7 @@ export default function ChannelModal() {
             justifyContent: 'space-between',
             flexDirection: { xs: 'column', md: 'row' },
             gap: 4,
-            padding: 2,
+            padding: 4,
             bgcolor: 'white',
             maxHeight: '90vh',
             overflow: 'auto',
@@ -135,14 +139,15 @@ export default function ChannelModal() {
               Escaneie o Codigo
             </Typography>
           </Box>
-          <Box sx={{ width: '100%', flex: 1.5 }}>
+          <Box sx={{ width: '100%', flex: 1.5, maxWidth: '46rem' }}>
             <Box
               display={'flex'}
               justifyContent={'space-between'}
               alignItems={'center'}
             >
               <Typography variant="h5">
-                {location.state ? 'Editar' : 'Criar novo'} canal
+                {/* {location.state ? 'Editar' : 'Criar novo'} canal */}
+                Canal
               </Typography>
               <Close onClick={handleOnClose} sx={{ cursor: 'pointer' }} />
             </Box>
@@ -159,45 +164,52 @@ export default function ChannelModal() {
                 {...register('url')}
                 sm={12}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 label={'Webhook url da instância'}
                 errorMessage={errors.webhook?.message}
                 {...register('webhook')}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 errorMessage={errors.instanceName?.message}
                 label={'Apelido para o canal'}
                 {...register('instanceName')}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 errorMessage={errors.key?.message}
                 label={'KEY da instância'}
                 {...register('key')}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 label={'Token da instância'}
                 errorMessage={errors.token?.message}
                 {...register('token')}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 label={'Login da instância'}
                 errorMessage={errors.login?.message}
                 {...register('login')}
                 copy
+                disabled={isDisabled}
               />
               <DefaultInput
                 label={'ID de controle da instância'}
                 errorMessage={errors.controlId?.message}
                 {...register('controlId')}
                 copy
+                disabled={isDisabled}
               />
 
-              <Grid item sm={12} sx={{ width: '100%' }}>
+              {/* <Grid item sm={12} sx={{ width: '100%' }}>
                 <Button
                   variant="contained"
                   fullWidth
@@ -206,7 +218,7 @@ export default function ChannelModal() {
                 >
                   Salvar
                 </Button>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
         </Box>

@@ -50,12 +50,16 @@ function App() {
                 path="edit-user"
                 element={<AdminRoute e={<UserModal />} />}
               />
-              <Route
+              {/* <Route
                 path="create-channel"
                 element={<AdminRoute e={<ChannelModal />} />}
               />
               <Route
                 path="edit-channel"
+                element={<AdminRoute e={<ChannelModal />} />}
+              /> */}
+              <Route
+                path="details-channel"
                 element={<AdminRoute e={<ChannelModal />} />}
               />
             </Route>

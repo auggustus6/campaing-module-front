@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
-import { WhatsApp } from '@mui/icons-material';
+import { Details, Info, Preview, WhatsApp } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { ChannelSchemaSchemaType } from '../modals/ChannelModal';
 
@@ -53,27 +53,42 @@ export default function TableChannels({
     navigate('create-channel');
   }
 
-  function handleEdit(channel: Channel) {
-    navigate('edit-channel', {
+  function handleSeeDetails(channel: Channel) {
+    navigate('details-channel', {
       state: channel,
     });
   }
 
-  async function handleRemove(id: string) {
-    const { isConfirmed } = await Swal.fire({
-      title: 'Você tem certeza?',
-      text: 'Você não poderá reverter isso!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sim',
-      cancelButtonText: 'Não',
-    });
-
-    if (!isConfirmed) return;
-
-    await api.delete(`/channels/${id}`);
-    refetch();
+  async function handleCheckStatus(channel: Channel) {
+    try {
+      const result = await api.get(`/channels/getStatus/${channel.id}`);
+      console.log('status', result);
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  // function handleEdit(channel: Channel) {
+  //   navigate('edit-channel', {
+  //     state: channel,
+  //   });
+  // }
+
+  // async function handleRemove(id: string) {
+  //   const { isConfirmed } = await Swal.fire({
+  //     title: 'Você tem certeza?',
+  //     text: 'Você não poderá reverter isso!',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Sim',
+  //     cancelButtonText: 'Não',
+  //   });
+
+  //   if (!isConfirmed) return;
+
+  //   await api.delete(`/channels/${id}`);
+  //   refetch();
+  // }
 
   return (
     <TableContainer component={Paper}>
@@ -81,7 +96,7 @@ export default function TableChannels({
         <Typography variant="h5" display={'flex'} alignItems={'center'} gap={1}>
           <WhatsApp /> Canais
         </Typography>
-        <ShowWhenAdmin>
+        {/* <ShowWhenAdmin>
           <Button
             variant="outlined"
             onClick={handleCreateNewChannel}
@@ -90,7 +105,7 @@ export default function TableChannels({
             <AddIcon sx={{ marginRight: 1 }} />
             Adicionar canal
           </Button>
-        </ShowWhenAdmin>
+        </ShowWhenAdmin> */}
       </Box>
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
@@ -117,6 +132,22 @@ export default function TableChannels({
                   <Button
                     variant="outlined"
                     color="secondary"
+                    onClick={() => handleSeeDetails(row)}
+                    // sx={{ marginRight: 1 }}
+                  >
+                    <Preview /> Detalhes
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleCheckStatus(row)}
+                    // sx={{ marginRight: 1 }}
+                  >
+                    <Info /> Status
+                  </Button>
+                  {/* <Button
+                    variant="outlined"
+                    color="secondary"
                     onClick={() => handleEdit(row)}
                     sx={{ marginRight: 1 }}
                   >
@@ -128,7 +159,7 @@ export default function TableChannels({
                     onClick={() => handleRemove(row.id!)}
                   >
                     <DeleteIcon />
-                  </Button>
+                  </Button> */}
                 </Stack>
               </TableCell>
             </TableRow>
