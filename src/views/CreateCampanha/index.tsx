@@ -208,9 +208,10 @@ export default function CreateCampanha() {
       const value = await Swal.fire({
         text: 'Digite o número para o qual deseja enviar a mensagem',
         input: 'text',
+        inputPlaceholder: '55 11 9 9999-9999',
         inputAttributes: {
           inputmode: 'numeric',
-          pattern: '[0-9]*',
+          // pattern: '[0-9]*',
         },
         showCancelButton: true,
         confirmButtonText: 'Enviar',
@@ -218,14 +219,20 @@ export default function CreateCampanha() {
         showLoaderOnConfirm: true,
         preConfirm: async (number) => {
           try {
-            await api.post('/campaign/send-message-test-campaign', {
-              text: messagePreview,
-              to: number,
-              midia: midiaBase64,
-              instanceId: values.session,
-            });
+            const formattedNumber = number.replace(/\D/g, '');
+            const result = await api.post(
+              '/campaign/send-message-test-campaign',
+              {
+                text: messagePreview,
+                to: formattedNumber,
+                midia: midiaBase64 || undefined,
+                instanceId: values.session,
+              }
+            );
+
             Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
           } catch (error) {
+            console.log(error);
             Swal.fire(
               'Erro',
               'Erro ao enviar mensagem, por favor tente novamente.',

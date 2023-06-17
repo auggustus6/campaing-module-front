@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import { Close } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
 
 import DefaultInput from '../../../components/Inputs/DefaultInput';
+import QrCodeView from '../components/QrCodeView';
 
 const stringValidator = z
   .string({
@@ -28,8 +29,9 @@ const stringValidator = z
 
 export type ChannelSchemaSchemaType = z.infer<typeof channelSchema>;
 const channelSchema = z.object({
-  id: z.string().optional(),
+  id: stringValidator,
   instanceName: stringValidator,
+  instanceId: stringValidator,
   url: stringValidator.url('URL inválida!'),
   webhook: stringValidator.url('URL inválida!'),
   key: stringValidator,
@@ -45,46 +47,25 @@ export default function ChannelModal() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ChannelSchemaSchemaType>({
     resolver: zodResolver(channelSchema),
   });
-  const toast = useToast();
+
+  const { id } = useParams();
 
   const isDisabled = true;
-
-  const isChannelActive = false;
 
   useEffect(() => {
     const channelFromLocation: ChannelSchemaSchemaType = location.state;
 
-    if (!channelFromLocation && location.pathname.includes('edit')) {
-      return navigate('..');
-    }
-    if (channelFromLocation) {
-      return reset(channelFromLocation);
-    }
-  }, []);
-
-  const handleSubmitChannel = async (values: ChannelSchemaSchemaType) => {
-    const { id, ...payload } = values;
-    try {
-      if (values.id) {
-        await api.patch(`/channels/${id}`, payload);
-        toast.success('Canal editado com sucesso!');
-      } else {
-        await api.post('/channels', payload);
-        toast.success('Canal criado com sucesso!');
-      }
+    if (!channelFromLocation || !id) {
       navigate('..');
-    } catch (error) {
-      if (id) {
-        toast.error('Erro ao editar canal!');
-        return;
-      }
-      toast.error('Erro ao criar canal!');
     }
-  };
+
+    reset(channelFromLocation);
+  }, []);
 
   function handleOnClose() {
     navigate('..');
@@ -100,7 +81,7 @@ export default function ChannelModal() {
           transform: 'translate(-50%, -50%)',
           maxWidth: '80rem',
           borderRadius: 1,
-          width: isChannelActive ? 'auto' : '96%',
+          width: '96%',
         }}
       >
         <Box
@@ -115,30 +96,7 @@ export default function ChannelModal() {
             overflow: 'auto',
           }}
         >
-          <Box
-            sx={{
-              width: '100%',
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              flexWrap: 'nowrap',
-            }}
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Link_pra_pagina_principal_da_Wikipedia-PT_em_codigo_QR_b.svg/800px-Link_pra_pagina_principal_da_Wikipedia-PT_em_codigo_QR_b.svg.png"
-              style={{
-                width: '100%',
-                maxHeight: '30rem',
-                objectFit: 'contain',
-                aspectRatio: 1,
-              }}
-              height={'auto'}
-            />
-            <Typography textAlign={'center'} variant="h5">
-              Escaneie o Codigo
-            </Typography>
-          </Box>
+          <QrCodeView channelId={id!} />
           <Box sx={{ width: '100%', flex: 1.5, maxWidth: '46rem' }}>
             <Box
               display={'flex'}
@@ -151,13 +109,7 @@ export default function ChannelModal() {
               </Typography>
               <Close onClick={handleOnClose} sx={{ cursor: 'pointer' }} />
             </Box>
-            <Grid
-              container
-              spacing={2}
-              pt={4}
-              component={'form'}
-              onSubmit={handleSubmit(handleSubmitChannel)}
-            >
+            <Grid container spacing={2} pt={4}>
               <DefaultInput
                 label={'URL API da instância'}
                 errorMessage={errors.url?.message}
@@ -208,21 +160,9 @@ export default function ChannelModal() {
                 copy
                 disabled={isDisabled}
               />
-
-              {/* <Grid item sm={12} sx={{ width: '100%' }}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{ height: '3.5rem' }}
-                  type="submit"
-                >
-                  Salvar
-                </Button>
-              </Grid> */}
             </Grid>
           </Box>
         </Box>
-        {/* <Box sx={{width: "100%", flex: 1}}> */}
       </Box>
     </Modal>
   );

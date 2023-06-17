@@ -59,7 +59,7 @@ function App() {
                 element={<AdminRoute e={<ChannelModal />} />}
               /> */}
               <Route
-                path="details-channel"
+                path="details-channel/:id"
                 element={<AdminRoute e={<ChannelModal />} />}
               />
             </Route>

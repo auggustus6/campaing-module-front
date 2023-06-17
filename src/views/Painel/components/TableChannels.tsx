@@ -54,19 +54,12 @@ export default function TableChannels({
   }
 
   function handleSeeDetails(channel: Channel) {
-    navigate('details-channel', {
+    navigate(`details-channel/${channel.id}`, {
       state: channel,
     });
   }
 
-  async function handleCheckStatus(channel: Channel) {
-    try {
-      const result = await api.get(`/channels/getStatus/${channel.id}`);
-      console.log('status', result);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+
 
   // function handleEdit(channel: Channel) {
   //   navigate('edit-channel', {
@@ -137,14 +130,14 @@ export default function TableChannels({
                   >
                     <Preview /> Detalhes
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outlined"
                     color="secondary"
                     onClick={() => handleCheckStatus(row)}
                     // sx={{ marginRight: 1 }}
                   >
                     <Info /> Status
-                  </Button>
+                  </Button> */}
                   {/* <Button
                     variant="outlined"
                     color="secondary"
