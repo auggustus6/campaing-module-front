@@ -3,8 +3,8 @@ import axios from 'axios';
 const api = axios.create({
   baseURL:
     import.meta.env.MODE === 'development'
-      ? 'http://134.209.78.36/'
-      : 'http://134.209.78.36/',
+      ? 'https://134.209.78.36/'
+      : 'https://134.209.78.36/',
 });
 
 api.interceptors.request.use(
