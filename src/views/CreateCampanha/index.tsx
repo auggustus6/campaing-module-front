@@ -184,7 +184,7 @@ export default function CreateCampanha() {
         sendDelay: values.sendDelay,
         channel_id: values.session,
         midia: midiaBase64,
-        midiaType: midiaType,
+        midiaType: midiaType || 'TEXT',
       });
 
       navigate('/campanhas');
