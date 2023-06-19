@@ -109,13 +109,14 @@ export default function EditCampanha() {
   const channel_id = watch('channel_id');
   const message = watch('message');
 
+  const [data, setData] = useState<any>();
+
   const [statusState, setStatusState] = useState('');
   useEffect(() => {
     setStatusState(status);
   }, [status]);
 
   const [company, setCompany] = useState<Company>();
-  const [midiaSrc, setMidiaSrcSrc] = useState<any>();
 
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +124,8 @@ export default function EditCampanha() {
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
-  const isImage = midiaSrc.substring(0, 100)?.includes('data:image');
+  const midiaSrc = data?.midia;
+  const midiaType = data?.midiaType?.toLowerCase();
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -158,6 +160,8 @@ export default function EditCampanha() {
     setValue('channel_id', e.target.value);
   }
 
+  // return <div>teste</div>;
+
   useEffect(() => {
     async function getData() {
       try {
@@ -166,6 +170,8 @@ export default function EditCampanha() {
         if (!data) {
           navigate('/campanhas');
         }
+
+        console.log(data);
 
         reset({
           id: data.id,
@@ -181,12 +187,7 @@ export default function EditCampanha() {
 
         const { data: companyData } = await api.get(`/companies`);
         setCompany(companyData);
-
-        if (data.image) {
-          const enc = new TextDecoder('utf-8');
-          const imgBufferArray = new Uint8Array(data?.image.data);
-          setMidiaSrcSrc(enc.decode(imgBufferArray));
-        }
+        setData(data);
       } catch (error) {
         navigate('/campanhas');
       }
@@ -326,7 +327,7 @@ export default function EditCampanha() {
             Preview da mensagem:
           </InputLabel>
           <PreviewWppMessage
-            imgSrc={isImage ? midiaSrc : undefined}
+            imgSrc={midiaType === 'image' ? midiaSrc : undefined}
             messagePreview={message}
           />
         </Grid>
