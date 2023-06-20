@@ -29,8 +29,13 @@ export default function DetailsCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const midiaSrc = data?.midia;
-  const midiaType = data?.midiaType?.toLowerCase();
+  let midiaSrc = data?.midia;
+  if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
+
+  const midiaType = (data?.midiaType?.toLowerCase() as string)?.replace(
+    '_url',
+    ''
+  );
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 

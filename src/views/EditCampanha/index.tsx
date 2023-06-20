@@ -124,8 +124,13 @@ export default function EditCampanha() {
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
-  const midiaSrc = data?.midia;
-  const midiaType = data?.midiaType?.toLowerCase();
+  let midiaSrc = data?.midia;
+  if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
+
+  const midiaType = (data?.midiaType?.toLowerCase() as string)?.replace(
+    '_url',
+    ''
+  );
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -170,8 +175,6 @@ export default function EditCampanha() {
         if (!data) {
           navigate('/campanhas');
         }
-
-        console.log(data);
 
         reset({
           id: data.id,
