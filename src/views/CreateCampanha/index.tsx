@@ -63,6 +63,7 @@ const campaignSchema = z.object({
   contacts: z.any().array().min(1, 'Arquivo vazio.'),
   fileName: z.string().optional(),
   midiaName: z.string().optional(),
+  midiaUrl: z.string().url('Link inválido!').optional(),
   sendDelay: z
     .string()
     .transform((delay) => Number(delay))
@@ -170,10 +171,15 @@ export default function CreateCampanha() {
   async function handleCreateCampaign(values: CampaignSchemaType) {
     setIsLoading(true);
 
-    const midiaType = midiaBase64
-      ?.substring(0, 16)
-      ?.split('/')[0]
-      ?.split(':')[1];
+    let midiaType;
+
+    if (values.midiaUrl) {
+      midiaType = 'IMAGE_URL';
+    } else {
+      midiaType = midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1];
+    }
+
+    console.log(midiaType);
 
     try {
       await api.post('/campaign', {
@@ -184,6 +190,7 @@ export default function CreateCampanha() {
         sendDelay: values.sendDelay,
         channel_id: values.session,
         midia: midiaBase64,
+        midiaUrl: values.midiaUrl,
         midiaType: midiaType || 'TEXT',
       });
 
@@ -326,7 +333,20 @@ export default function CreateCampanha() {
             fullWidth
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={12} sm={6}>
+          <InputLabel error={!!errors.scheduleDate}>
+            Url da imagem ou audio:
+          </InputLabel>
+          <Input
+            disabled={isLoading || shouldDisable}
+            {...register('midiaUrl')}
+            error={!!errors.midiaUrl}
+            helperText={errors.midiaUrl?.message}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid item xs={12}>
           <MaterialButton
             sx={{
               height: '3.5rem',
@@ -334,7 +354,7 @@ export default function CreateCampanha() {
               overflow: 'hidden',
               textAlign: 'start',
             }}
-            disabled={isLoading || shouldDisable}
+            disabled={isLoading || shouldDisable || !!watch('midiaUrl')}
             variant={errors.variables ? 'outlined' : 'outlined'}
             component="label"
           >
@@ -364,7 +384,7 @@ export default function CreateCampanha() {
             Preview da mensagem:
           </InputLabel>
           <PreviewWppMessage
-            imgSrc={isImage ? midiaBase64 : undefined}
+            imgSrc={isImage ? midiaBase64 : undefined || watch('midiaUrl')}
             messagePreview={messagePreview}
           />
         </Grid>
@@ -386,6 +406,7 @@ export default function CreateCampanha() {
             </Select>
           </FormControl>
         </Grid>
+
         <Grid item xs={12} sm={6}>
           <MaterialButton
             sx={{

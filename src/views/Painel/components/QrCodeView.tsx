@@ -1,6 +1,7 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
+import { useToast } from '../../../context/ToastContext';
 
 interface QrCodeViewProps {
   channelId: string;
@@ -11,12 +12,16 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const toast = useToast();
+
   const qrCodeRefreshTime = 60 * 1000; // 40 seconds
   const statusRefreshTime = 10 * 1000; // 4 seconds
 
   useEffect(() => {
     let timer: number;
     let qrCodeTimer: number | undefined = undefined;
+
+    if (isConnected) return;
 
     async function getStatus() {
       const result = await api.get(`/channels/get-status/${channelId}`);
@@ -56,7 +61,19 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
       clearInterval(timer);
       clearInterval(qrCodeTimer);
     };
-  }, []);
+  }, [isConnected]);
+
+  async function handleDisconnect() {
+    try {
+      await api.get(`/channels/disconnect/${channelId}`);
+      console.log('desconectado');
+
+      setIsConnected(false);
+    } catch (error) {
+      console.log('desconectado');
+      toast.error('Erro ao desconectar instância');
+    }
+  }
 
   return (
     <Box
@@ -102,6 +119,14 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
             <Typography textAlign={'center'} variant="h5" color={'green'}>
               <b>Status: </b>
               Conectado!
+              <br />
+              <Button
+                color="error"
+                onClick={handleDisconnect}
+                variant="outlined"
+              >
+                Desconectar instância
+              </Button>
             </Typography>
           );
         }

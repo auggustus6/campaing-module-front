@@ -37,7 +37,6 @@ const channelSchema = z.object({
   key: stringValidator,
   token: stringValidator.uuid('Token inválido!'),
   login: stringValidator,
-  controlId: stringValidator,
 });
 
 export default function ChannelModal() {
@@ -45,9 +44,7 @@ export default function ChannelModal() {
   const navigate = useNavigate();
   const {
     register,
-    handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm<ChannelSchemaSchemaType>({
     resolver: zodResolver(channelSchema),
@@ -150,13 +147,6 @@ export default function ChannelModal() {
                 label={'Login da instância'}
                 errorMessage={errors.login?.message}
                 {...register('login')}
-                copy
-                disabled={isDisabled}
-              />
-              <DefaultInput
-                label={'ID de controle da instância'}
-                errorMessage={errors.controlId?.message}
-                {...register('controlId')}
                 copy
                 disabled={isDisabled}
               />

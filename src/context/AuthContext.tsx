@@ -78,7 +78,8 @@ export default function AuthProvider({
         }
       } catch (error) {
         if (!isOnLoginOrRegister) {
-          toast.error('Sessão expirada, faça login novamente');
+          toast.error('Acesso negado!');
+          localStorage.removeItem('@campaign:token');
           return navigate(All_PATHS.LOGIN);
         }
       } finally {
@@ -103,8 +104,6 @@ export default function AuthProvider({
       setIsLogging(false);
     }
   };
-
-  
 
   const logout = () => {
     setUser(null);

@@ -29,12 +29,13 @@ export default function DetailsCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const enc = new TextDecoder('utf-8');
-  const imgBufferArray = new Uint8Array(data?.data?.midia?.data);
+  let midiaSrc = data?.midia;
+  if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
 
-  const midiaSrc = enc.decode(imgBufferArray);
-
-  const isImage = midiaSrc.substring(0, 100)?.includes('data:image');
+  const midiaType = (data?.midiaType?.toLowerCase() as string)?.replace(
+    '_url',
+    ''
+  );
 
   const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
 
@@ -42,7 +43,7 @@ export default function DetailsCampanha() {
     try {
       const result = await api.get(`/campaign/${id}`);
 
-      setData(result);
+      setData(result.data);
     } catch (error) {
       navigate('/campanhas');
     }
@@ -159,37 +160,27 @@ export default function DetailsCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Titulo da Campanha</InputLabel>
-          <Input
-            variant="outlined"
-            value={data?.data.title}
-            disabled
-            fullWidth
-          />
+          <Input variant="outlined" value={data?.title} disabled fullWidth />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.data.channel.instanceName}
+            value={data?.channel.instanceName}
             disabled
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>
-          <Input
-            variant="outlined"
-            value={data?.data.status}
-            disabled
-            fullWidth
-          />
+          <Input variant="outlined" value={data?.status} disabled fullWidth />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Data para disparo:</InputLabel>
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.data?.scheduleDate)}
+            value={formatDate(data?.scheduleDate)}
             disabled
             type="datetime-local"
           />
@@ -199,7 +190,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.data?.startDate)}
+            value={formatDate(data?.startDate)}
             disabled
             type="datetime-local"
           />
@@ -209,7 +200,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.data?.endDate)}
+            value={formatDate(data?.endDate)}
             disabled
             type="datetime-local"
           />
@@ -219,7 +210,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={data?.data?.sendDelay}
+            value={data?.sendDelay}
             disabled
           />
         </Grid>
@@ -228,22 +219,22 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={data?.data?.sentContactsCount}
+            value={data?.sentContactsCount}
             disabled
           />
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
-          <TextArea value={data?.data.message} disabled />
+          <TextArea value={data?.message} disabled />
         </Grid>
         <Grid item xs={12} pb={8}>
           <InputLabel>Preview da mensagem</InputLabel>
           <PreviewWppMessage
-            messagePreview={data?.data.message}
-            imgSrc={isImage ? midiaSrc : undefined}
+            messagePreview={data?.message}
+            imgSrc={midiaType == 'image' ? midiaSrc : undefined}
           />
         </Grid>
-        {!['CANCELADO', 'CONCLUIDO'].includes(data?.data.status) && (
+        {!['CANCELADO', 'CONCLUIDO'].includes(data?.status) && (
           <ShowWhenAdmin>
             <Stack
               direction={'row'}
@@ -305,7 +296,7 @@ export default function DetailsCampanha() {
           </ShowWhenAdmin>
         )}
       </Grid>
-      <TableContactsFromApi id={id} message={data?.data.message} />
+      <TableContactsFromApi id={id} message={data?.message} />
     </Stack>
   );
 }
