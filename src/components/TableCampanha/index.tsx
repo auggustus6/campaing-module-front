@@ -47,9 +47,8 @@ export default function TableCampaign() {
         `/campaign?page=${page}&list_deleted=${showDeleted}`
       );
 
-      if (lengthItems === 0 && result.data.result.length > 0) {
-        setLengthItems(result.data.result.length);
-      }
+      setLengthItems(result.data.total || 0);
+
       return result;
     },
     { staleTime: 1000 * 4 } //60 seconds

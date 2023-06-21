@@ -12,15 +12,13 @@ import LoadingScreen from './components/LoadingScreen';
 export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <Suspense fallback={<LoadingScreen />}>
-      <ToastProvider>
-        <QueryClientProvider client={queryClient}>
-          <App />
-          <GlobalStyles styles={globalStyles} />
-          <ReactQueryDevtools />
-        </QueryClientProvider>
-      </ToastProvider>
-    </Suspense>
-  </React.StrictMode>
+  <Suspense fallback={<LoadingScreen />}>
+    <ToastProvider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <GlobalStyles styles={globalStyles} />
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </ToastProvider>
+  </Suspense>
 );

@@ -63,7 +63,11 @@ const campaignSchema = z.object({
   contacts: z.any().array().min(1, 'Arquivo vazio.'),
   fileName: z.string().optional(),
   midiaName: z.string().optional(),
-  midiaUrl: z.string().url('Link inválido!').optional(),
+  midiaUrl: z.string().refine((url) => {
+    if (!url) return true;
+    if (z.string().url().safeParse(url).success) return true;
+    return false;
+  }),
   sendDelay: z
     .string()
     .transform((delay) => Number(delay))
@@ -178,6 +182,8 @@ export default function CreateCampanha() {
     } else {
       midiaType = midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1];
     }
+
+    midiaType = midiaType?.toUpperCase();
 
     console.log(midiaType);
 
@@ -334,11 +340,9 @@ export default function CreateCampanha() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.scheduleDate}>
-            Url da imagem ou audio:
-          </InputLabel>
+          <InputLabel error={!!errors.midiaUrl}>Url da imagem:</InputLabel>
           <Input
-            disabled={isLoading || shouldDisable}
+            disabled={isLoading || shouldDisable || !!watch('midiaName')}
             {...register('midiaUrl')}
             error={!!errors.midiaUrl}
             helperText={errors.midiaUrl?.message}
