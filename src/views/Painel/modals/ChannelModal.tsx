@@ -30,6 +30,7 @@ const stringValidator = z
 export type ChannelSchemaSchemaType = z.infer<typeof channelSchema>;
 const channelSchema = z.object({
   id: stringValidator,
+  phoneNumber: stringValidator,
   instanceName: stringValidator,
   instanceId: stringValidator,
   url: stringValidator.url('URL inválida!'),
@@ -147,6 +148,13 @@ export default function ChannelModal() {
                 label={'Login da instância'}
                 errorMessage={errors.login?.message}
                 {...register('login')}
+                copy
+                disabled={isDisabled}
+              />
+              <DefaultInput
+                label={'Número do canal'}
+                errorMessage={errors.phoneNumber?.message}
+                {...register('phoneNumber')}
                 copy
                 disabled={isDisabled}
               />

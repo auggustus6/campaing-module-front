@@ -30,6 +30,7 @@ import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { CANAL } from '../../utils/constants';
 import { theme } from '../../styles/theme';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
+import { useToast } from '../../context/ToastContext';
 
 interface Campaign {
   id: string;
@@ -63,7 +64,7 @@ const editCampaignSchema = z.object({
     .min(6, 'Muito curto!')
     .max(70, 'Muito extenso!')
     .nonempty('Campo obrigatório.'),
-  message: z.string().min(6, 'Muito curto!').max(200, 'Muito extenso!'),
+  message: z.string().min(6, 'Muito curto!'),
   scheduleDate: z
     .string()
     .transform((date) => (date ? new Date(date) : ''))
@@ -108,6 +109,8 @@ export default function EditCampanha() {
   const status = watch('status');
   const channel_id = watch('channel_id');
   const message = watch('message');
+
+  const toast = useToast();
 
   const [data, setData] = useState<any>();
 
@@ -189,6 +192,16 @@ export default function EditCampanha() {
         });
 
         const { data: companyData } = await api.get(`/companies`);
+
+        if (companyData.channel?.length === 0) {
+          toast.error(
+            'Nenhum canal ativo no momento. Ative ao menos um canal para editar a campanha.'
+          );
+          navigate('./..');
+        }
+
+        console.log(companyData);
+
         setCompany(companyData);
         setData(data);
       } catch (error) {

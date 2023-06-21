@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL:
     import.meta.env.MODE === 'development'
-      ? 'http://localhost:3333/'
+      ? 'http://localhost:3000/'
       : 'http://134.209.78.36/',
 });
 
