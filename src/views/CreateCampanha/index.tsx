@@ -28,7 +28,7 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FlakySharp, Image, Science, UploadFile } from '@mui/icons-material';
+import { Science, UploadFile } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
@@ -41,45 +41,77 @@ interface Company {
   }[];
 }
 
-const campaignSchema = z.object({
-  title: z
-    .string()
-    .min(6, 'Muito curto!')
-    .max(70, 'Muito extenso!')
-    .nonempty('Campo obrigatório.'),
-  message: z.string().min(6, 'Muito curto!'),
-  scheduleDate: z
-    .string()
-    .transform((date) => (date ? new Date(date) : ''))
-    .refine(
-      (date) => {
-        if (!date) return false;
-        return new Date(date) > new Date();
+const campaignSchema = z
+  .object({
+    title: z
+      .string()
+      .min(6, 'Muito curto!')
+      .max(70, 'Muito extenso!')
+      .nonempty('Campo obrigatório.'),
+    message: z
+      .string({
+        required_error: 'Campo obrigatório.',
+      })
+      .min(6, 'Muito curto!'),
+    scheduleDate: z
+      .string()
+      .transform((date) => (date ? new Date(date) : ''))
+      .refine(
+        (date) => {
+          if (!date) return false;
+          return new Date(date) > new Date();
+        },
+        { message: 'Escolha uma data no futuro!' }
+      ),
+    startTime: z
+      .string({
+        invalid_type_error: 'Horário inválido.',
+        required_error: 'Campo obrigatório.',
+      })
+      .transform((time) => {
+        const [hours, minutes] = time.split(':');
+        return Number(hours) * 60 + Number(minutes);
+      }),
+    endTime: z
+      .string({
+        invalid_type_error: 'Horário inválido.',
+        required_error: 'Campo obrigatório.',
+      })
+      .transform((time) => {
+        const [hours, minutes] = time.split(':');
+        return Number(hours) * 60 + Number(minutes);
+      }),
+    variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
+    contacts: z.any().array().min(1, 'Arquivo vazio.'),
+    fileName: z.string().optional(),
+    midiaName: z.string().optional(),
+    midiaUrl: z.string().refine(
+      (url) => {
+        if (!url) return true;
+        if (z.string().url().safeParse(url).success) return true;
+        return false;
       },
-      { message: 'Escolha uma data no futuro!' }
-    )
-    .optional(),
-  variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
-  contacts: z.any().array().min(1, 'Arquivo vazio.'),
-  fileName: z.string().optional(),
-  midiaName: z.string().optional(),
-  midiaUrl: z.string().refine((url) => {
-    if (!url) return true;
-    if (z.string().url().safeParse(url).success) return true;
-    return false;
-  }),
-  sendDelay: z
-    .string()
-    .transform((delay) => Number(delay))
-    .refine(
-      (delay) => {
-        if (delay < 10) return false;
-        return true;
-      },
-      { message: 'O tempo mínimo é de 10 segundos.' }
+      {
+        message: 'URL inválida.',
+      }
     ),
-  session: z.string().min(10, 'Selecione uma opção!'),
-});
+    sendDelay: z
+      .string()
+      .default('120')
+      .transform((delay) => Number(delay))
+      .refine(
+        (delay) => {
+          if (delay < 10) return false;
+          return true;
+        },
+        { message: 'O tempo mínimo é de 10 segundos.' }
+      ),
+    session: z.string().min(10, 'Selecione uma opção!'),
+  })
+  .refine((values) => values.startTime < values.endTime, {
+    message: 'O horário de início deve ser menor que o horário de término.',
+    path: ['startTime'],
+  });
 
 type CampaignSchemaType = z.infer<typeof campaignSchema>;
 
@@ -192,6 +224,8 @@ export default function CreateCampanha() {
         title: values.title,
         message: values.message,
         scheduleDate: (values.scheduleDate as Date) || undefined,
+        startTime: values.startTime,
+        endTime: values.endTime,
         contacts: values.contacts,
         sendDelay: values.sendDelay,
         channel_id: values.session,
@@ -264,6 +298,8 @@ export default function CreateCampanha() {
     }
     setIsLoading(false);
   }
+
+  console.log(errors);
 
   return (
     <Container sx={{ p: 0 }}>
@@ -346,6 +382,28 @@ export default function CreateCampanha() {
             {...register('midiaUrl')}
             error={!!errors.midiaUrl}
             helperText={errors.midiaUrl?.message}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <InputLabel error={!!errors.startTime}>De</InputLabel>
+          <Input
+            disabled={isLoading || shouldDisable}
+            type="time"
+            {...register('startTime')}
+            error={!!errors.startTime}
+            helperText={errors.startTime?.message}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <InputLabel error={!!errors.endTime}>Até</InputLabel>
+          <Input
+            disabled={isLoading || shouldDisable}
+            type="time"
+            {...register('endTime')}
+            error={!!errors.endTime}
+            helperText={errors.endTime?.message}
             fullWidth
           />
         </Grid>

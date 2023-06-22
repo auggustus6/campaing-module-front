@@ -1,9 +1,8 @@
-import { ContentCopy, CopyAll } from '@mui/icons-material';
+import { ContentCopy } from '@mui/icons-material';
 import {
   Divider,
   Grid,
   IconButton,
-  InputAdornment,
   InputLabel,
   TextField,
 } from '@mui/material';
@@ -33,7 +32,7 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
       []
     );
 
-    function onCopy() {
+    function handleCopy() {
       copyToClipboard(otherRef.current?.value!);
       toast.success('Copiado para a área de transferência!');
     }
@@ -51,7 +50,7 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
               endAdornment: (
                 <>
                   <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                  <IconButton onClick={onCopy}>
+                  <IconButton onClick={handleCopy}>
                     <ContentCopy />
                   </IconButton>
                 </>
@@ -77,55 +76,3 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
 );
 
 export default DefaultInput;
-
-// function DefaultInput({
-//   label,
-//   xs = 12,
-//   sm = 6,
-//   errorMessage,
-//   copy,
-//   ...rest
-// }: DefaultInputProps) {
-//   const error = !!errorMessage;
-
-//   function onCopy() {
-//     copyToClipboard(ref.current?.value || '');
-//   }
-
-//   if (copy)
-//     return (
-//       <Grid item xs={xs} sm={sm}>
-//         {label && <InputLabel error={error}>{label}</InputLabel>}
-//         <TextField
-//           error={error}
-//           helperText={errorMessage}
-//           fullWidth
-//           inputRef={ref}
-//           InputProps={{
-//             endAdornment: (
-//               <>
-//                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-//                 <IconButton onClick={onCopy}>
-//                   <ContentCopy />
-//                 </IconButton>
-//               </>
-//             ),
-//           }}
-//           {...rest}
-//         />
-//       </Grid>
-//     );
-
-//   return (
-//     <Grid item xs={xs} sm={sm}>
-//       {label && <InputLabel error={error}>{label}</InputLabel>}
-//       <TextField
-//         error={error}
-//         helperText={errorMessage}
-//         fullWidth
-//         prefix="asas"
-//         {...rest}
-//       />
-//     </Grid>
-//   );
-// }

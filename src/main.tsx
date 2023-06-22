@@ -8,6 +8,8 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { ToastProvider } from './context/ToastContext';
 
 import LoadingScreen from './components/LoadingScreen';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 export const queryClient = new QueryClient();
 
