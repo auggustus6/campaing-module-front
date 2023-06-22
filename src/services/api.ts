@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const ENV = 'development';
+
 const api = axios.create({
   baseURL:
-    import.meta.env.MODE === 'development'
+    import.meta.env.MODE === ENV
       ? 'http://localhost:3000/'
       : 'http://134.209.78.36/',
 });
