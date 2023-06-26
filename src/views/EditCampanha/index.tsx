@@ -57,40 +57,63 @@ interface Company {
   }[];
 }
 
-const editCampaignSchema = z.object({
-  id: z.string(),
-  title: z
-    .string()
-    .min(6, 'Muito curto!')
-    .max(70, 'Muito extenso!')
-    .nonempty('Campo obrigatório.'),
-  message: z.string().min(6, 'Muito curto!'),
-  scheduleDate: z
-    .string()
-    .transform((date) => (date ? new Date(date) : ''))
-    .refine(
-      (date) => {
-        if (!date) return false;
-        return new Date(date) > new Date();
-      },
-      { message: 'Escolha uma data no futuro!' }
-    )
-    .optional(),
-  status: z.string(),
-  startDate: z.string(),
-  endDate: z.string().optional(),
-  sendDelay: z
-    .string()
-    .transform((delay) => Number(delay))
-    .refine(
-      (delay) => {
-        if (delay < 10) return false;
-        return true;
-      },
-      { message: 'O tempo mínimo é de 10 segundos.' }
-    ),
-  channel_id: z.string().nonempty('Selecione uma opção!'),
-});
+const editCampaignSchema = z
+  .object({
+    id: z.string(),
+    title: z
+      .string()
+      .min(6, 'Muito curto!')
+      .max(70, 'Muito extenso!')
+      .nonempty('Campo obrigatório.'),
+    message: z.string().min(6, 'Muito curto!'),
+    scheduleDate: z
+      .string()
+      .transform((date) => (date ? new Date(date) : ''))
+      .refine(
+        (date) => {
+          if (!date) return false;
+          return new Date(date) > new Date();
+        },
+        { message: 'Escolha uma data no futuro!' }
+      )
+      .optional(),
+    startTime: z
+      .string({
+        invalid_type_error: 'Horário inválido.',
+        required_error: 'Campo obrigatório.',
+      })
+      .transform((time) => {
+        const [hours, minutes] = time.split(':');
+        return Number(hours) * 60 + Number(minutes);
+      }),
+    endTime: z
+      .string({
+        invalid_type_error: 'Horário inválido.',
+        required_error: 'Campo obrigatório.',
+      })
+      .transform((time) => {
+        const [hours, minutes] = time.split(':');
+        return Number(hours) * 60 + Number(minutes);
+      }),
+    status: z.string(),
+    startDate: z.string(),
+    endDate: z.string().optional(),
+    sendDelay: z
+      .string()
+      .transform((delay) => Number(delay))
+      .refine(
+        (delay) => {
+          if (delay < 10) return false;
+          return true;
+        },
+        { message: 'O tempo mínimo é de 10 segundos.' }
+      ),
+    channel_id: z.string().nonempty('Selecione uma opção!'),
+  })
+  .refine((values) => values.startTime < values.endTime, {
+    message: 'O horário de início deve ser menor que o horário de término.',
+    path: ['startTime'],
+  });
 
 type EditCampaignSchemaType = z.infer<typeof editCampaignSchema>;
 
@@ -138,11 +161,15 @@ export default function EditCampanha() {
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
 
+    console.log(values);
+
     try {
       await api.patch(`/campaign/${id}`, {
         title: values.title,
         message: values.message,
         scheduleDate: values.scheduleDate || undefined,
+        startTime: values.startTime,
+        endTime: values.endTime,
         status: values.status,
         sendDelay: values.sendDelay,
         channel_id: values.channel_id,
@@ -168,7 +195,9 @@ export default function EditCampanha() {
     setValue('channel_id', e.target.value);
   }
 
-  // return <div>teste</div>;
+  function formatTime(time: number) {
+    return String(Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2));
+  }
 
   useEffect(() => {
     async function getData() {
@@ -184,6 +213,8 @@ export default function EditCampanha() {
           title: data.title,
           message: data.message,
           scheduleDate: formatDate(data.scheduleDate) as any,
+          startTime: formatTime(data.startTime) as any,
+          endTime: formatTime(data.endTime) as any,
           status: data.status,
           startDate: formatDate(data.startDate) as any,
           endDate: formatDate(data.endDate) as any,
@@ -309,7 +340,7 @@ export default function EditCampanha() {
             {...register('scheduleDate')}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={6} sm={3}>
           <InputLabel>Data de inicio:</InputLabel>
           <Input
             variant="outlined"
@@ -319,7 +350,7 @@ export default function EditCampanha() {
             type="datetime-local"
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} sm={3}>
           <InputLabel>Delay</InputLabel>
           <Input
             variant="outlined"
@@ -328,6 +359,28 @@ export default function EditCampanha() {
             type="number"
             error={!!errors.sendDelay}
             helperText={errors.sendDelay?.message}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <InputLabel error={!!errors.startTime}>De</InputLabel>
+          <Input
+            disabled={isLoading}
+            type="time"
+            {...register('startTime')}
+            error={!!errors.startTime}
+            helperText={errors.startTime?.message}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <InputLabel error={!!errors.endTime}>Até</InputLabel>
+          <Input
+            disabled={isLoading}
+            type="time"
+            {...register('endTime')}
+            error={!!errors.endTime}
+            helperText={errors.endTime?.message}
+            fullWidth
           />
         </Grid>
         <Grid item xs={12}>
