@@ -124,6 +124,10 @@ export default function DetailsCampanha() {
     }
   }
 
+  function formatTime(time: number) {
+    return Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2);
+  }
+
   return (
     <Stack justifyContent="center">
       <Grid container spacing={2}>
@@ -205,7 +209,7 @@ export default function DetailsCampanha() {
             type="datetime-local"
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item md={3} xs={6}>
           <InputLabel>Delay</InputLabel>
           <Input
             variant="outlined"
@@ -214,12 +218,30 @@ export default function DetailsCampanha() {
             disabled
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item md={3} xs={6}>
           <InputLabel>Contatos enviados</InputLabel>
           <Input
             variant="outlined"
             fullWidth
             value={data?.sentContactsCount}
+            disabled
+          />
+        </Grid>
+        <Grid item md={3} xs={6}>
+          <InputLabel>De</InputLabel>
+          <Input
+            variant="outlined"
+            fullWidth
+            value={formatTime(data?.startTime || 0)}
+            disabled
+          />
+        </Grid>
+        <Grid item md={3} xs={6}>
+          <InputLabel>Até</InputLabel>
+          <Input
+            variant="outlined"
+            fullWidth
+            value={formatTime(data?.endTime || 0)}
             disabled
           />
         </Grid>
