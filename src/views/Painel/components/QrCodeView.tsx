@@ -66,11 +66,9 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
   async function handleDisconnect() {
     try {
       await api.get(`/channels/disconnect/${channelId}`);
-      console.log('desconectado');
 
       setIsConnected(false);
     } catch (error) {
-      console.log('desconectado');
       toast.error('Erro ao desconectar instância');
     }
   }

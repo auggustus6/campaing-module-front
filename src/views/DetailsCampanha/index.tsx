@@ -37,7 +37,8 @@ export default function DetailsCampanha() {
     ''
   );
 
-  const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+  const formatDateTime = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+  const formatDate = (date?: string) => moment.utc(date).format('YYYY-MM-DD');
 
   async function getData() {
     try {
@@ -186,7 +187,7 @@ export default function DetailsCampanha() {
             fullWidth
             value={formatDate(data?.scheduleDate)}
             disabled
-            type="datetime-local"
+            type="date"
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -194,7 +195,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.startDate)}
+            value={formatDateTime(data?.startDate)}
             disabled
             type="datetime-local"
           />
@@ -204,7 +205,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.endDate)}
+            value={formatDateTime(data?.endDate)}
             disabled
             type="datetime-local"
           />

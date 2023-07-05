@@ -72,7 +72,9 @@ const editCampaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          return new Date(date) > new Date();
+          const newDate = new Date(new Date().toISOString().split('T')[0]);
+
+          return date >= newDate;
         },
         { message: 'Escolha uma data no futuro!' }
       )
@@ -148,7 +150,9 @@ export default function EditCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const formatDate = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+  const formatDateTime = (date?: string) =>
+    moment(date).format('YYYY-MM-DDTHH:mm');
+  const formatDate = (date?: string) => moment.utc(date).format('YYYY-MM-DD');
 
   let midiaSrc = data?.midia;
   if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
@@ -160,8 +164,6 @@ export default function EditCampanha() {
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
-
-    console.log(values);
 
     try {
       await api.patch(`/campaign/${id}`, {
@@ -216,8 +218,8 @@ export default function EditCampanha() {
           startTime: formatTime(data.startTime) as any,
           endTime: formatTime(data.endTime) as any,
           status: data.status,
-          startDate: formatDate(data.startDate) as any,
-          endDate: formatDate(data.endDate) as any,
+          startDate: formatDateTime(data.startDate) as any,
+          endDate: formatDateTime(data.endDate) as any,
           sendDelay: String(data.sendDelay) as any,
           channel_id: data.channel_id,
         });
@@ -230,8 +232,6 @@ export default function EditCampanha() {
           );
           navigate('./..');
         }
-
-        console.log(companyData);
 
         setCompany(companyData);
         setData(data);
@@ -333,7 +333,7 @@ export default function EditCampanha() {
           <InputLabel>Data para disparo:</InputLabel>
           <Input
             disabled={isLoading}
-            type="datetime-local"
+            type="date"
             error={!!errors.scheduleDate}
             helperText={errors.scheduleDate?.message}
             fullWidth
