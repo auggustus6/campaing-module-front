@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 
 import Button from '@mui/joy/Button';
 import TableContactsFromApi from '../../components/TableContacts/TableContactsFromApi';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
@@ -22,10 +22,12 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import moment from 'moment';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
+import { ReplyAllSharp } from '@mui/icons-material';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
   const [data, setData] = useState<any>();
+  const [contactsWithError, setContactsWithError] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -37,12 +39,21 @@ export default function DetailsCampanha() {
     ''
   );
 
-  const formatDateTime = (date?: string) => moment(date).format('YYYY-MM-DDTHH:mm');
+  const formatDateTime = (date?: string) =>
+    moment(date).format('YYYY-MM-DDTHH:mm');
   const formatDate = (date?: string) => moment.utc(date).format('YYYY-MM-DD');
 
   async function getData() {
     try {
       const result = await api.get(`/campaign/${id}`);
+
+      if (result.data.status === 'CONCLUIDO') {
+        const contacts = await api.post(`/campaign/get-all-with-errors/${id}`);
+        if (contacts.data) {
+          setContactsWithError(contacts.data);
+          console.log('contacts error: ', contacts.data);
+        }
+      }
 
       setData(result.data);
     } catch (error) {
@@ -129,8 +140,15 @@ export default function DetailsCampanha() {
     return Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2);
   }
 
+  function handleNavigateResend() {
+    navigate(`reenviar`, {
+      state: contactsWithError,
+    });
+  }
+
   return (
     <Stack justifyContent="center">
+      <Outlet />
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Stack
@@ -142,6 +160,16 @@ export default function DetailsCampanha() {
             <Typography variant="h4">Detalhes da campanha</Typography>
             <Stack direction={'row'} gap={2}>
               <ShowWhenAdmin>
+                {contactsWithError.length > 0 && (
+                  <Button
+                    sx={{ textTransform: 'uppercase' }}
+                    color="info"
+                    onClick={handleNavigateResend}
+                  >
+                    <ReplyAllSharp fontSize="small" />
+                    Reenviar para contatos com erro
+                  </Button>
+                )}
                 <Link to={'editar'}>
                   <Button sx={{ textTransform: 'uppercase' }}>
                     <EditIcon fontSize="small" />

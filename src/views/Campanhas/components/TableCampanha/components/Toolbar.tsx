@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Data } from '..';
-import { queryClient } from '../../../main';
-import api from '../../../services/api';
+import { queryClient } from '../../../../../main';
+import api from '../../../../../services/api';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
@@ -12,7 +12,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PreviewIcon from '@mui/icons-material/Preview';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../../../context/AuthContext';
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
@@ -256,42 +256,6 @@ export function EnhancedTableToolbar({
           />
         </Box>
       )}
-
-      {/* MODAL */}
-      {/* <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: 'absolute' as 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '98vw',
-            // height: '100%',
-            overflow: 'auto',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            py: 8,
-          }}
-        >
-          <CloseIcon
-            sx={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              fontSize: 32,
-              cursor: 'pointer',
-            }}
-            onClick={handleClose}
-          />
-          <ContactsTable />
-        </Box>
-      </Modal> */}
     </Toolbar>
   );
 }

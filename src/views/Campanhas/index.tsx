@@ -1,5 +1,5 @@
 import Stack from '@mui/material/Stack';
-import TableCampaign from '../../components/TableCampanha';
+import TableCampaign from './components/TableCampanha';
 
 export default function Campanhas() {
   return (
