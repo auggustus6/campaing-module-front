@@ -11,7 +11,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { EnhancedTableHead } from './components/TableHead';
 import { EnhancedTableToolbar } from './components/Toolbar';
 import { useQuery } from 'react-query';
-import api from '../../services/api';
+import api from '../../../../services/api';
 import moment from 'moment';
 import { useState } from 'react';
 import StatusLabel from '../StatusLabel';

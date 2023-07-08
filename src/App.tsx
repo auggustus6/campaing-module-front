@@ -1,4 +1,4 @@
-import { lazy,   } from 'react';
+import { lazy } from 'react';
 import {
   Route,
   BrowserRouter,
@@ -15,6 +15,7 @@ const AuthProvider = lazy(() => import('./context/AuthContext'));
 
 import Campanhas from './views/Campanhas';
 import ChannelModal from './views/Painel/modals/ChannelModal';
+import ShowContactsErrorsModal from './views/DetailsCampanha/modals/ShowContactsErrorsModal';
 
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
@@ -36,7 +37,9 @@ function App() {
               path="campanhas/criar"
               element={<AdminRoute e={<CreateCampanha />} />}
             />
-            <Route path="campanhas/:id" element={<DetailsCampanha />} />
+            <Route path="campanhas/:id" element={<DetailsCampanha />}>
+              <Route path="reenviar" element={<ShowContactsErrorsModal />} />
+            </Route>
             <Route
               path="campanhas/:id/editar"
               element={<AdminRoute e={<EditCampanha />} />}

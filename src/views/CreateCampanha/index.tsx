@@ -59,7 +59,9 @@ const campaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          return new Date(date) > new Date();
+          const newDate = new Date(new Date().toISOString().split('T')[0]);
+
+          return date >= newDate;
         },
         { message: 'Escolha uma data no futuro!' }
       ),
@@ -217,8 +219,6 @@ export default function CreateCampanha() {
 
     midiaType = midiaType?.toUpperCase();
 
-    console.log(midiaType);
-
     try {
       await api.post('/campaign', {
         title: values.title,
@@ -258,7 +258,6 @@ export default function CreateCampanha() {
         inputPlaceholder: '55 11 9 9999-9999',
         inputAttributes: {
           inputmode: 'numeric',
-          // pattern: '[0-9]*',
         },
         showCancelButton: true,
         confirmButtonText: 'Enviar',
@@ -279,7 +278,7 @@ export default function CreateCampanha() {
 
             Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
           } catch (error) {
-            console.log(error);
+            console.error(error);
             Swal.fire(
               'Erro',
               'Erro ao enviar mensagem, por favor tente novamente.',
@@ -298,8 +297,6 @@ export default function CreateCampanha() {
     }
     setIsLoading(false);
   }
-
-  console.log(errors);
 
   return (
     <Container sx={{ p: 0 }}>
@@ -354,7 +351,7 @@ export default function CreateCampanha() {
           </InputLabel>
           <Input
             disabled={isLoading || shouldDisable}
-            type="datetime-local"
+            type="date"
             {...register('scheduleDate')}
             error={!!errors.scheduleDate}
             helperText={errors.scheduleDate?.message}
