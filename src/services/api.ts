@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL:
     import.meta.env.MODE === ENV
       ? 'http://localhost:3000/'
-      : 'http://134.209.78.36/',
+      : 'https://api.idwsolucoes.com.br/',
 });
 
 api.interceptors.request.use(
