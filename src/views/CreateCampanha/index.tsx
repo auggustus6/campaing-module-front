@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import Input from '@mui/material/TextField';
+import moment from 'moment';
 
 import MaterialButton from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -59,7 +60,9 @@ const campaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          const newDate = new Date(new Date().toISOString().split('T')[0]);
+          const newDate = new Date(moment().format('YYYY-MM-DD'));
+
+          console.log(newDate);
 
           return date >= newDate;
         },
