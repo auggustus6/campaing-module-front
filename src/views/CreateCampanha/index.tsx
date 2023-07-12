@@ -32,6 +32,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Science, UploadFile } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
+import { getMinutesFromTime, getNowOnlyDate } from '../../utils/dateAndTimeUtils';
 
 interface Company {
   id: string;
@@ -60,11 +61,7 @@ const campaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          const newDate = new Date(moment().format('YYYY-MM-DD'));
-
-          console.log(newDate);
-
-          return date >= newDate;
+          return date >= getNowOnlyDate();
         },
         { message: 'Escolha uma data no futuro!' }
       ),
@@ -74,8 +71,7 @@ const campaignSchema = z
         required_error: 'Campo obrigatório.',
       })
       .transform((time) => {
-        const [hours, minutes] = time.split(':');
-        return Number(hours) * 60 + Number(minutes);
+        return getMinutesFromTime(time);
       }),
     endTime: z
       .string({
@@ -83,8 +79,7 @@ const campaignSchema = z
         required_error: 'Campo obrigatório.',
       })
       .transform((time) => {
-        const [hours, minutes] = time.split(':');
-        return Number(hours) * 60 + Number(minutes);
+        return getMinutesFromTime(time);
       }),
     variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
     contacts: z.any().array().min(1, 'Arquivo vazio.'),

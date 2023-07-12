@@ -15,6 +15,7 @@ import api from '../../../../services/api';
 import moment from 'moment';
 import { useState } from 'react';
 import StatusLabel from '../StatusLabel';
+import { formatDateTime, getTimeFromMinutes, tableFormatDate, tableFormatDateTime } from '../../../../utils/dateAndTimeUtils';
 
 export type Order = 'asc' | 'desc';
 
@@ -23,6 +24,8 @@ export interface Data {
   title: string;
   startDate: string;
   endDate: string;
+  startTime: number;
+  endTime: number;
   scheduleDate: string;
   status: string;
   sendDelay: string;
@@ -53,11 +56,6 @@ export default function TableCampaign() {
     },
     { staleTime: 1000 * 4 } //60 seconds
   );
-
-  const formatDate = (date?: string) => {
-    if (date) return moment(date).format('DD/MM/YYYY - HH:mm');
-    else return '- - - - - - - - - - - - - -';
-  };
 
   const selectedCampaign = data?.data?.result?.filter(
     (item: any) => item.id === selected[0]
@@ -162,13 +160,16 @@ export default function TableCampaign() {
                     </TableCell>
                     <TableCell align="left">{row.title}</TableCell>
                     <TableCell align="left">
-                      {formatDate(row.scheduleDate)}
+                      {tableFormatDate(row.scheduleDate)}
                     </TableCell>
                     <TableCell align="left">
-                      {formatDate(row.startDate)}
+                      {getTimeFromMinutes(row.startTime)}
                     </TableCell>
                     <TableCell align="left">
-                      {formatDate(row.endDate)}
+                      {getTimeFromMinutes(row.endTime)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {tableFormatDateTime(row.endDate)}
                     </TableCell>
                     <TableCell>{row.sendDelay}</TableCell>
                     <TableCell>

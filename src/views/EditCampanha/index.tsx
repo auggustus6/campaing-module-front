@@ -31,6 +31,12 @@ import { CANAL } from '../../utils/constants';
 import { theme } from '../../styles/theme';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { useToast } from '../../context/ToastContext';
+import {
+  formatDate,
+  formatDateTime,
+  getMinutesFromTime,
+  getNowOnlyDate,
+} from '../../utils/dateAndTimeUtils';
 
 interface Campaign {
   id: string;
@@ -72,9 +78,8 @@ const editCampaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          const newDate = new Date(new Date().toISOString().split('T')[0]);
 
-          return date >= newDate;
+          return date >= getNowOnlyDate();
         },
         { message: 'Escolha uma data no futuro!' }
       )
@@ -85,8 +90,7 @@ const editCampaignSchema = z
         required_error: 'Campo obrigatório.',
       })
       .transform((time) => {
-        const [hours, minutes] = time.split(':');
-        return Number(hours) * 60 + Number(minutes);
+        return getMinutesFromTime(time);
       }),
     endTime: z
       .string({
@@ -94,8 +98,7 @@ const editCampaignSchema = z
         required_error: 'Campo obrigatório.',
       })
       .transform((time) => {
-        const [hours, minutes] = time.split(':');
-        return Number(hours) * 60 + Number(minutes);
+        return getMinutesFromTime(time);
       }),
     status: z.string(),
     startDate: z.string(),
@@ -149,10 +152,6 @@ export default function EditCampanha() {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  const formatDateTime = (date?: string) =>
-    moment(date).format('YYYY-MM-DDTHH:mm');
-  const formatDate = (date?: string) => moment.utc(date).format('YYYY-MM-DD');
 
   let midiaSrc = data?.midia;
   if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
@@ -340,7 +339,7 @@ export default function EditCampanha() {
             {...register('scheduleDate')}
           />
         </Grid>
-        <Grid item xs={6} sm={3}>
+        {/* <Grid item xs={6} sm={3}>
           <InputLabel>Data de inicio:</InputLabel>
           <Input
             variant="outlined"
@@ -349,8 +348,8 @@ export default function EditCampanha() {
             disabled
             type="datetime-local"
           />
-        </Grid>
-        <Grid item xs={6} sm={3}>
+        </Grid> */}
+        <Grid item xs={6} sm={6}>
           <InputLabel>Delay</InputLabel>
           <Input
             variant="outlined"

@@ -12,6 +12,7 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import InfoIcon from '@mui/icons-material/Info';
 
 import { Typography } from '@mui/joy';
+import { AlarmOff } from '@mui/icons-material';
 
 const headCells = [
   {
@@ -36,11 +37,18 @@ const headCells = [
     Icon: CalendarMonthIcon,
   },
   {
-    id: 'start-date',
+    id: 'start-time',
     numeric: false,
     disablePadding: false,
-    label: 'Data de Início',
+    label: 'Horas de Início',
     Icon: AlarmAddIcon,
+  },
+  {
+    id: 'end-time',
+    numeric: false,
+    disablePadding: false,
+    label: 'Horas de Término',
+    Icon: AlarmOff,
   },
   {
     id: 'end-date',

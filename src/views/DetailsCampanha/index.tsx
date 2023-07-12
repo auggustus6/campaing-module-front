@@ -23,6 +23,7 @@ import moment from 'moment';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { ReplyAllSharp } from '@mui/icons-material';
+import { formatDate, formatDateTime, getTimeFromMinutes } from '../../utils/dateAndTimeUtils';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
@@ -39,9 +40,6 @@ export default function DetailsCampanha() {
     ''
   );
 
-  const formatDateTime = (date?: string) =>
-    moment(date).format('YYYY-MM-DDTHH:mm');
-  const formatDate = (date?: string) => moment.utc(date).format('YYYY-MM-DD');
 
   async function getData() {
     try {
@@ -136,9 +134,7 @@ export default function DetailsCampanha() {
     }
   }
 
-  function formatTime(time: number) {
-    return Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2);
-  }
+
 
   function handleNavigateResend() {
     navigate(`reenviar`, {
@@ -218,7 +214,7 @@ export default function DetailsCampanha() {
             type="date"
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        {/* <Grid item xs={12} sm={6}>
           <InputLabel>Data de inicio:</InputLabel>
           <Input
             variant="outlined"
@@ -227,7 +223,7 @@ export default function DetailsCampanha() {
             disabled
             type="datetime-local"
           />
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={6}>
           <InputLabel>Data de término:</InputLabel>
           <Input
@@ -261,7 +257,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatTime(data?.startTime || 0)}
+            value={getTimeFromMinutes(data?.startTime || 0)}
             disabled
           />
         </Grid>
@@ -270,7 +266,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatTime(data?.endTime || 0)}
+            value={getTimeFromMinutes(data?.endTime || 0)}
             disabled
           />
         </Grid>
