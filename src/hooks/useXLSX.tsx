@@ -13,7 +13,7 @@ export function useXLSX() {
 
       const xlData = XLSX.utils.sheet_to_json(
         workbook.Sheets[sheet_name_list[0]],
-        { defval: '', blankrows: true, raw: true }
+        { defval: '', blankrows: true, raw: true, rawNumbers: true }
       );
 
       let filteredData = xlData.map((item: any) => {

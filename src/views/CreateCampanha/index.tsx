@@ -29,10 +29,15 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Science, UploadFile } from '@mui/icons-material';
+import { Add, Science, UploadFile } from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
-import { getMinutesFromTime, getNowOnlyDate } from '../../utils/dateAndTimeUtils';
+import {
+  getMinutesFromTime,
+  getNowOnlyDate,
+} from '../../utils/dateAndTimeUtils';
+import AddMoreContactModal from './modals/AddMoreContactModal';
+import { Box, Stack } from '@mui/material';
 
 interface Company {
   id: string;
@@ -134,6 +139,8 @@ export default function CreateCampanha() {
     message,
     variables: getValues('contacts')?.[0]?.variables,
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [company, setCompany] = useState<Company>();
   const { base64: midiaBase64, getBase64 } = useBase64();
@@ -298,6 +305,18 @@ export default function CreateCampanha() {
 
   return (
     <Container sx={{ p: 0 }}>
+      <AddMoreContactModal
+        contacts={getValues('contacts')}
+        addContact={(contact) => {
+          setValue('contacts', [...getValues('contacts'), contact]);
+        }}
+        updateContactTable={(contact) => {
+          setContactsObject([...contactsObject, contact] as any);
+        }}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        fields={variables}
+      />
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">Criação de campanha</Typography>
@@ -506,6 +525,7 @@ export default function CreateCampanha() {
             Criar Campanha
           </Button>
         </Grid>
+
         <Grid item xs={12} sm={6}>
           <a href={'/modelo_planilha.xlsx'} target="_blank">
             <Button
@@ -535,7 +555,36 @@ export default function CreateCampanha() {
 
       {!!contactsObject.length && (
         <>
-          <InputLabel sx={{ marginTop: 4 }}>Valores da Planilha</InputLabel>
+          <Stack
+            direction={'row'}
+            justifyContent={'space-between'}
+            mt={8}
+            alignItems={'center'}
+            flexWrap={'wrap'}
+          >
+            <InputLabel
+              sx={{
+                fontSize: '1.5rem',
+              }}
+            >
+              Valores da Planilha
+            </InputLabel>
+            <MaterialButton
+              disabled={isLoading || shouldDisable}
+              sx={{
+                height: '3.5rem',
+                textTransform: 'uppercase',
+                maxWidth: '20rem',
+              }}
+              color={'primary'}
+              fullWidth
+              variant={'outlined'}
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Add />
+              Adicionar mais contatos
+            </MaterialButton>
+          </Stack>
           <TableContactsFromFile header={variables} contacts={contactsObject} />
         </>
       )}
