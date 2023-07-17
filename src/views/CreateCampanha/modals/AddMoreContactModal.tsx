@@ -3,6 +3,7 @@ import DefaultInput from '../../../components/Inputs/DefaultInput';
 import MaterialButton from '@mui/material/Button';
 import { Close } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
+import InputMask from 'react-input-mask';
 
 interface Props {
   isOpen: boolean;
@@ -26,6 +27,15 @@ export default function AddMoreContactModal({
 }: Props) {
   const toast = useToast();
 
+  const contactKey =
+    fields.find((key) => key.toLocaleLowerCase() === 'contato') || '';
+
+  const fieldsWithoutContact = fields.filter(
+    (key) => key.toLocaleLowerCase() !== 'contato'
+  );
+
+  // const [] = fields;
+
   const handleSubmitUser: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     try {
@@ -37,18 +47,22 @@ export default function AddMoreContactModal({
         const [key, value] = entry;
 
         if (!value) {
+          document.getElementById(key)?.focus();
           throw new Error(`O campo ${key} não pode estar vazio`);
         }
       });
 
       const rawObject = Object.fromEntries(formData.entries());
+      rawObject[contactKey] = rawObject[contactKey]
+        .toString()
+        .replace(/\D/g, '');
+
+      if (rawObject[contactKey].toString().length < 12) {
+        document.getElementById(contactKey)?.focus();
+        throw new Error('Telefone inválido');
+      }
 
       updateContactTable(JSON.parse(JSON.stringify(rawObject)));
-
-      const contactKey =
-        Object.keys(rawObject || {}).find(
-          (key) => key.toLocaleLowerCase() === 'contato'
-        ) || '';
 
       let newContact: any = {
         contact: rawObject[contactKey],
@@ -61,6 +75,8 @@ export default function AddMoreContactModal({
       addContact(newContact);
 
       toast.success('Contato adicionado com sucesso');
+
+      // console.log(newContact);
 
       onClose();
     } catch (error) {
@@ -90,19 +106,25 @@ export default function AddMoreContactModal({
           bgcolor: 'white',
         }}
       >
-        <Box
-          display={'flex'}
-          justifyContent={'space-between'}
-          alignItems={'center'}
-        >
-          <Typography variant="h5">
-            {/* {location.state ? 'Editar' : 'Criar novo'} canal */}
-            Canal
-          </Typography>
+        <Box display={'flex'} justifyContent={'space-between'}>
+          <Box>
+            <Typography variant="h5">Adicionar mais contatos</Typography>
+            <Typography variant="body1" color={'GrayText'}>
+              Adicione mais contatos e variaveis à sua campanha de forma manual.
+            </Typography>
+          </Box>
           <Close onClick={onClose} sx={{ cursor: 'pointer' }} />
         </Box>
         <Grid container spacing={2} pt={4}>
-          {fields.map((field) => (
+          <InputMask mask={'55 99 9 9999-9999'}>
+            <DefaultInput
+              placeholder="55 99 9 9999-9999"
+              label={contactKey}
+              id={contactKey}
+              name={contactKey}
+            />
+          </InputMask>
+          {fieldsWithoutContact.map((field) => (
             <DefaultInput label={field} id={field} name={field} key={field} />
           ))}
 

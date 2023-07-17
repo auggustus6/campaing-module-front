@@ -38,7 +38,7 @@ export default function TableContactsFromFile({
         <TableBody>
           {contacts?.slice(page * 5, page * 5 + 5).map((row: any, i) => (
             <TableRow key={i}>
-              {Object.keys(row)?.map((item, k) => (
+              {header.map((item, k) => (
                 <TableCell key={k}>{row[item]}</TableCell>
               ))}
             </TableRow>
