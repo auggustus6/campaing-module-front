@@ -502,7 +502,7 @@ export default function CreateCampanha() {
             <AttachFileIcon />
             {getValues('fileName')
               ? getValues('fileName')
-              : 'Enviar Arquivo do Excel'}
+              : 'Enviar Arquivo CSV'}
             <input
               id="fileSelect"
               type="file"
