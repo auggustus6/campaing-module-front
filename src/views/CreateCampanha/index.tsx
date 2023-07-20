@@ -381,7 +381,7 @@ export default function CreateCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.sendDelay}>
-            Delay entre cada mensagem:
+            Delay entre cada mensagem (em segundos):
           </InputLabel>
           <Input
             disabled={isLoading || shouldDisable}
