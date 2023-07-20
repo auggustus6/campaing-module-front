@@ -38,6 +38,7 @@ import {
 } from '../../utils/dateAndTimeUtils';
 import AddMoreContactModal from './modals/AddMoreContactModal';
 import { Box, Stack } from '@mui/material';
+import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 
 interface Company {
   id: string;
@@ -103,7 +104,7 @@ const campaignSchema = z
       {
         message: 'URL inválida.',
       }
-    ) ,
+    ),
     sendDelay: z
       .string()
       .default('120')
@@ -172,10 +173,11 @@ export default function CreateCampanha() {
 
   async function handleUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { data } = await excelToJson(e.target.files?.[0]);
-    const lowerVariables = Object.keys(data[0]).map((item) =>
-      item.toLowerCase()
+    const key = Object.keys(data[0]).find(
+      (item) => item.toLowerCase() === 'contato'
     );
-    if (!lowerVariables.includes('contato')) {
+
+    if (!key) {
       Swal.fire(
         'Erro',
         'A planilha deve ter ao menos uma coluna com o titulo "Contato"',
@@ -184,16 +186,27 @@ export default function CreateCampanha() {
       return;
     }
 
-    const key = Object.keys(data[0]).find(
-      (item) => item.toLowerCase() === 'contato'
-    );
+    const firstContact = data[0]?.[key!] as string;
+    if (!firstContact?.replace(/[^0-9]/g, '')) {
+      Swal.fire(
+        'Erro',
+        'A coluna "Contato" deve conter o número do telefone',
+        'warning'
+      );
+      return;
+    }
 
-    const formattedContacts = data.map((item: any) => ({
+    const formattedDate = data.map((item: any) => ({
+      ...item,
+      [key!]: addBrazilianCountryCode(item?.[key!]),
+    }));
+
+    const formattedContacts = formattedDate.map((item: any) => ({
       contact: item?.[key!],
       variables: JSON.stringify(item),
     }));
 
-    setContactsObject(data);
+    setContactsObject(formattedDate);
     setValue('contacts', formattedContacts as CampaignSchemaType['contacts']);
     setValue('variables', Object.keys(data[0]));
     setValue('fileName', e.target.files?.[0].name);

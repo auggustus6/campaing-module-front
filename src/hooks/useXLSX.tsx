@@ -13,7 +13,13 @@ export function useXLSX() {
 
       const xlData = XLSX.utils.sheet_to_json(
         workbook.Sheets[sheet_name_list[0]],
-        { defval: '', blankrows: true, raw: true, rawNumbers: true }
+        {
+          defval: '',
+          rawNumbers: true,
+          skipHidden: true,
+          blankrows: false,
+          raw: true,
+        }
       );
 
       let filteredData = xlData.map((item: any) => {
@@ -21,12 +27,22 @@ export function useXLSX() {
         return rest;
       });
 
-      filteredData = filteredData.filter((item: any) => {
-        if (Object.values(item).every((x) => x === null || x === '')) {
-          return false;
-        }
-        return true;
+      // convert all values to string
+
+      filteredData = filteredData.map((item: any) => {
+        const newItem: any = {};
+        Object.keys(item).forEach((key) => {
+          newItem[key] = String(item[key]);
+        });
+        return newItem;
       });
+
+      // filteredData = filteredData.filter((item: any) => {
+      //   if (Object.values(item).every((x) => x === null || x === '')) {
+      //     return false;
+      //   }
+      //   return true;
+      // });
 
       return { data: filteredData };
     } catch (error) {
