@@ -176,7 +176,7 @@ export default function EditCampanha() {
         channel_id: values.channel_id,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
-      navigate('./..');
+      navigate('campanhas');
     } catch (error) {
       console.error(error);
       Swal.fire(

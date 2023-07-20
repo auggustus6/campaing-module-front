@@ -29,7 +29,14 @@ import { theme } from '../../styles/theme';
 import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Add, Science, UploadFile } from '@mui/icons-material';
+import {
+  Add,
+  HelpOutline,
+  QuestionAnswer,
+  QuestionMark,
+  Science,
+  UploadFile,
+} from '@mui/icons-material';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import {
@@ -37,8 +44,9 @@ import {
   getNowOnlyDate,
 } from '../../utils/dateAndTimeUtils';
 import AddMoreContactModal from './modals/AddMoreContactModal';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
+import CustomTooltip from '../../components/CustomTooltip';
 
 interface Company {
   id: string;
@@ -423,6 +431,7 @@ export default function CreateCampanha() {
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.sendDelay}>
             Delay entre cada mensagem (em segundos):
+            <CustomTooltip title="O tempo mínimo é de 10 segundos" />
           </InputLabel>
           <Input
             disabled={isLoading || shouldDisable}
@@ -445,7 +454,10 @@ export default function CreateCampanha() {
           />
         </Grid>
         <Grid item xs={6} sm={3}>
-          <InputLabel error={!!errors.startTime}>De</InputLabel>
+          <InputLabel error={!!errors.startTime}>
+            De
+            <CustomTooltip title="O horário de inicio deve ser menor que o de término" />
+          </InputLabel>
           <Input
             disabled={isLoading || shouldDisable}
             type="time"
