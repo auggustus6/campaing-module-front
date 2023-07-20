@@ -80,7 +80,6 @@ export default function ShowContactsErrorsModal() {
 
   async function handleSendContacts() {
     try {
-      console.log(location);
       await api.post(`/campaign/resend`, {
         campaignId,
         contacts: selected,

@@ -21,7 +21,7 @@ import Swal from 'sweetalert2';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TextArea } from '../../components/TextArea';
 import api from '../../services/api';
 import { getFormattedMessage } from '../../utils/variablesUtils';
@@ -67,10 +67,6 @@ const campaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-          console.log('getNowOnlyDate()', getNowOnlyDate());
-          console.log('date', date);
-          console.log(date >= getNowOnlyDate());
-
           return date >= getNowOnlyDate();
         },
         { message: 'Escolha uma data no futuro!' }
@@ -147,6 +143,8 @@ export default function CreateCampanha() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [caretPosition, setCaretPosition] = useState(0);
+
   const [company, setCompany] = useState<Company>();
   const { base64: midiaBase64, getBase64 } = useBase64();
 
@@ -170,6 +168,24 @@ export default function CreateCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const { excelToJson } = useXLSX();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const messageInput = document.getElementById('messageTextArea');
+
+    function getCaretPosition(e: any) {
+      setCaretPosition(() => e.target?.selectionStart || 0);
+    }
+
+    messageInput?.addEventListener('click', getCaretPosition);
+    messageInput?.addEventListener('blur', getCaretPosition);
+    messageInput?.addEventListener('keyup', getCaretPosition);
+
+    return () => {
+      messageInput?.removeEventListener('click', getCaretPosition);
+      messageInput?.removeEventListener('blur', getCaretPosition);
+      messageInput?.removeEventListener('keyup', getCaretPosition);
+    };
+  }, []);
 
   async function handleUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { data } = await excelToJson(e.target.files?.[0]);
@@ -221,7 +237,19 @@ export default function CreateCampanha() {
   }
 
   function handleSelectOption(e: SelectChangeEvent<string>) {
-    setValue('message', getValues('message') + `{{${e.target.value}}}`);
+    const message = getValues('message') || '';
+    let messageFirstPart = message.substring(0, caretPosition);
+    let messageLastPart = message.substring(caretPosition);
+    if (messageFirstPart[messageFirstPart.length - 1] !== ' ') {
+      messageFirstPart = messageFirstPart + ' ';
+    }
+    if (messageLastPart[0] !== ' ') {
+      messageLastPart = ' ' + messageLastPart;
+    }
+    setValue(
+      'message',
+      messageFirstPart + `{{${e.target.value}}}` + messageLastPart
+    );
   }
 
   function handleCanalSelect(e: SelectChangeEvent<string>) {
@@ -469,7 +497,8 @@ export default function CreateCampanha() {
           <TextArea
             {...register('message')}
             disabled={isLoading || shouldDisable}
-            error={errors.message}
+            error={errors.message?.message}
+            id="messageTextArea"
           />
         </Grid>
         <Grid item xs={12} sx={{ marginBottom: 2 }}>

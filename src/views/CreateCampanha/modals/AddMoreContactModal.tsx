@@ -76,16 +76,10 @@ export default function AddMoreContactModal({
 
       toast.success('Contato adicionado com sucesso');
 
-      // console.log(newContact);
-
       onClose();
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
     }
-
-    // console.log(newContact);
-
-    // setContacts([...contacts, newContact]);
   };
 
   return (
