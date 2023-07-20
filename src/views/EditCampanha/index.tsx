@@ -263,6 +263,7 @@ export default function EditCampanha() {
                   color="success"
                   type="submit"
                   sx={{ textTransform: 'uppercase' }}
+                  disabled={isLoading}
                 >
                   <SaveIcon fontSize="small" />
                   Salvar
@@ -274,6 +275,7 @@ export default function EditCampanha() {
                   variant="outlined"
                   onClick={handleCancelButton}
                   sx={{ textTransform: 'uppercase', borderWidth: '2px' }}
+                  disabled={isLoading}
                 >
                   <DoDisturbIcon fontSize="small" />
                   Cancelar

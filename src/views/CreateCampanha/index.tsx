@@ -66,6 +66,10 @@ const campaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
+          console.log('getNowOnlyDate()', getNowOnlyDate());
+          console.log('date', date);
+          console.log(date >= getNowOnlyDate());
+
           return date >= getNowOnlyDate();
         },
         { message: 'Escolha uma data no futuro!' }
@@ -99,7 +103,7 @@ const campaignSchema = z
       {
         message: 'URL inválida.',
       }
-    ),
+    ) ,
     sendDelay: z
       .string()
       .default('120')

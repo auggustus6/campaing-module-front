@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export function getNowOnlyDate() {
-  const newDate = new Date(moment.utc().format('YYYY-MM-DD'));
+  const newDate = new Date(moment().format('YYYY-MM-DD'));
   return newDate;
 }
 
@@ -15,7 +15,7 @@ export function getTimeFromMinutes(time: number) {
 }
 
 export function formatDateTime(date?: string) {
-  return moment.utc(date).format('YYYY-MM-DDTHH:mm');
+  return moment(date).format('YYYY-MM-DDTHH:mm');
 }
 
 export function formatDate(date?: string) {
@@ -28,6 +28,6 @@ export function tableFormatDate(date?: string) {
 }
 
 export function tableFormatDateTime(date?: string) {
-  if (date) return moment.utc(date).format('DD/MM/YYYY - HH:mm');
+  if (date) return moment(date).format('DD/MM/YYYY - HH:mm');
   else return '- - - - - - - - - - - - - -';
 }
