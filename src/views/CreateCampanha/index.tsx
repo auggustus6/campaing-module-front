@@ -43,7 +43,7 @@ import {
   getMinutesFromTime,
   getNowOnlyDate,
 } from '../../utils/dateAndTimeUtils';
-import AddMoreContactModal from './modals/AddMoreContactModal';
+import AddMoreContactModal from '../../components/modals/AddMoreContactModal';
 import { Box, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
@@ -56,6 +56,8 @@ interface Company {
     instanceName: string;
   }[];
 }
+
+export const phoneRegex = new RegExp(/\b\d{8,14}\b/);
 
 const campaignSchema = z
   .object({
@@ -153,6 +155,8 @@ export default function CreateCampanha() {
 
   const [caretPosition, setCaretPosition] = useState(0);
 
+  const [contactKey, setContactKey] = useState('');
+
   const [company, setCompany] = useState<Company>();
   const { base64: midiaBase64, getBase64 } = useBase64();
 
@@ -197,24 +201,14 @@ export default function CreateCampanha() {
 
   async function handleUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { data } = await excelToJson(e.target.files?.[0]);
-    const key = Object.keys(data[0]).find(
-      (item) => item.toLowerCase() === 'contato'
-    );
+    const key = Object.keys(data[0]).find((item) => {
+      return phoneRegex.test(data[0][item].replace(/[^0-9]/gi, ''));
+    });
 
     if (!key) {
       Swal.fire(
         'Erro',
-        'A planilha deve ter ao menos uma coluna com o titulo "Contato"',
-        'warning'
-      );
-      return;
-    }
-
-    const firstContact = data[0]?.[key!] as string;
-    if (!firstContact?.replace(/[^0-9]/g, '')) {
-      Swal.fire(
-        'Erro',
-        'A coluna "Contato" deve conter o número do telefone',
+        'A planilha deve ter ao menos uma coluna que contenha números de telefone	válidos',
         'warning'
       );
       return;
@@ -231,6 +225,7 @@ export default function CreateCampanha() {
     }));
 
     setContactsObject(formattedDate);
+    setContactKey(key);
     setValue('contacts', formattedContacts as CampaignSchemaType['contacts']);
     setValue('variables', Object.keys(data[0]));
     setValue('fileName', e.target.files?.[0].name);
@@ -258,6 +253,16 @@ export default function CreateCampanha() {
       'message',
       messageFirstPart + `{{${e.target.value}}}` + messageLastPart
     );
+    const messageInput = document.getElementById(
+      'messageTextArea'
+    ) as HTMLTextAreaElement;
+
+    setTimeout(() => {
+      messageInput?.focus();
+      let pos = caretPosition + e.target.value.length + 6;
+
+      messageInput?.setSelectionRange(pos, pos);
+    }, 100);
   }
 
   function handleCanalSelect(e: SelectChangeEvent<string>) {
@@ -359,7 +364,6 @@ export default function CreateCampanha() {
   return (
     <Container sx={{ p: 0 }}>
       <AddMoreContactModal
-        contacts={getValues('contacts')}
         addContact={(contact) => {
           setValue('contacts', [...getValues('contacts'), contact]);
         }}
@@ -369,6 +373,7 @@ export default function CreateCampanha() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         fields={variables}
+        contactKey={contactKey}
       />
       <Grid container spacing={2}>
         <Grid item xs={12}>

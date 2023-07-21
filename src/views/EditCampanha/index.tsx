@@ -149,6 +149,8 @@ export default function EditCampanha() {
 
   const [company, setCompany] = useState<Company>();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -241,8 +243,22 @@ export default function EditCampanha() {
     getData();
   }, []);
 
+  function onSaveContact(contact: any) {}
+
   return (
     <Stack justifyContent="center">
+      {/* <AddMoreContactModal
+        addContact={(contact) => {
+          setValue('contacts', [...getValues('contacts'), contact]);
+        }}
+        updateContactTable={(contact) => {
+          setContactsObject([...contactsObject, contact] as any);
+        }}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        fields={variables}
+        contactKey={contactKey}
+      /> */}
       <Grid
         container
         spacing={2}

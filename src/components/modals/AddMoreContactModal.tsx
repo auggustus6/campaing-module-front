@@ -1,40 +1,31 @@
 import { Box, Grid, Modal, Typography } from '@mui/material';
-import DefaultInput from '../../../components/Inputs/DefaultInput';
 import MaterialButton from '@mui/material/Button';
 import { Close } from '@mui/icons-material';
-import { useToast } from '../../../context/ToastContext';
 import InputMask from 'react-input-mask';
+import { useToast } from '../../context/ToastContext';
+import { phoneRegex } from '../../views/CreateCampanha';
+import DefaultInput from '../Inputs/DefaultInput';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  contacts: {
-    contato?: string;
-    variables: any;
-  }[];
   addContact: (contact: any) => void;
   updateContactTable: (contact: any) => void;
   fields: string[];
+  contactKey: string;
 }
 
 export default function AddMoreContactModal({
   isOpen,
   onClose,
-  contacts,
   addContact,
   fields,
   updateContactTable,
+  contactKey,
 }: Props) {
   const toast = useToast();
 
-  const contactKey =
-    fields.find((key) => key.toLocaleLowerCase() === 'contato') || '';
-
-  const fieldsWithoutContact = fields.filter(
-    (key) => key.toLocaleLowerCase() !== 'contato'
-  );
-
-  // const [] = fields;
+  const fieldsWithoutContact = fields.filter((key) => key !== contactKey);
 
   const handleSubmitUser: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -57,7 +48,11 @@ export default function AddMoreContactModal({
         .toString()
         .replace(/\D/g, '');
 
-      if (rawObject[contactKey].toString().length < 12) {
+      if (
+        !phoneRegex.test(
+          rawObject[contactKey].toString().replace(/\D/g, '') || ''
+        )
+      ) {
         document.getElementById(contactKey)?.focus();
         throw new Error('Telefone inválido');
       }
