@@ -14,6 +14,7 @@ import api from '../../services/api';
 export default function TableContactsFromApi({
   id,
   message,
+
 }: {
   id?: string;
   message: string;

@@ -47,6 +47,7 @@ import AddMoreContactModal from '../../components/modals/AddMoreContactModal';
 import { Box, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
+import TableContacts from '../../components/TableContacts';
 
 interface Company {
   id: string;
@@ -176,6 +177,11 @@ export default function CreateCampanha() {
   const shouldDisable = !user?.company?.isActive ?? true;
 
   const [contactsObject, setContactsObject] = useState<[]>([]);
+  const [contactsTablePage, setContactsTablePage] = useState(0);
+  const contactsToShow = contactsObject.slice(
+    contactsTablePage * 5,
+    contactsTablePage * 5 + 5
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const { excelToJson } = useXLSX();
@@ -365,10 +371,10 @@ export default function CreateCampanha() {
     <Container sx={{ p: 0 }}>
       <AddMoreContactModal
         addContact={(contact) => {
-          setValue('contacts', [...getValues('contacts'), contact]);
+          setValue('contacts', [contact, ...getValues('contacts')]);
         }}
         updateContactTable={(contact) => {
-          setContactsObject([...contactsObject, contact] as any);
+          setContactsObject([contact, ...contactsObject] as any);
         }}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -616,40 +622,35 @@ export default function CreateCampanha() {
         </Grid>
       </Grid>
 
+      <Box mt={8} />
       {!!contactsObject.length && (
-        <>
-          <Stack
-            direction={'row'}
-            justifyContent={'space-between'}
-            mt={8}
-            alignItems={'center'}
-            flexWrap={'wrap'}
-          >
-            <InputLabel
-              sx={{
-                fontSize: '1.5rem',
-              }}
-            >
-              Valores da Planilha
-            </InputLabel>
-            <MaterialButton
-              disabled={isLoading || shouldDisable}
-              sx={{
-                height: '3.5rem',
-                textTransform: 'uppercase',
-                maxWidth: '20rem',
-              }}
-              color={'primary'}
-              fullWidth
-              variant={'outlined'}
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Add />
-              Adicionar mais contatos
-            </MaterialButton>
-          </Stack>
-          <TableContactsFromFile header={variables} contacts={contactsObject} />
-        </>
+        <TableContacts
+          allowEdit
+          headers={variables}
+          contacts={contactsToShow}
+          total={contactsObject.length}
+          onChangePage={setContactsTablePage}
+          title={
+            <>
+              <InputLabel
+                sx={{
+                  fontSize: '1.5rem',
+                }}
+              >
+                Valores da Planilha
+              </InputLabel>
+              <MaterialButton
+                disabled={isLoading || shouldDisable}
+                sx={{ height: '3.5rem', textTransform: 'uppercase' }}
+                variant={'outlined'}
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Add />
+                Adicionar mais contato
+              </MaterialButton>
+            </>
+          }
+        />
       )}
     </Container>
   );

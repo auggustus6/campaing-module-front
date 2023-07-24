@@ -15,7 +15,12 @@ import api from '../../../../services/api';
 import moment from 'moment';
 import { useState } from 'react';
 import StatusLabel from '../StatusLabel';
-import { formatDateTime, getTimeFromMinutes, tableFormatDate, tableFormatDateTime } from '../../../../utils/dateAndTimeUtils';
+import {
+  formatDateTime,
+  getTimeFromMinutes,
+  tableFormatDate,
+  tableFormatDateTime,
+} from '../../../../utils/dateAndTimeUtils';
 
 export type Order = 'asc' | 'desc';
 
@@ -194,6 +199,8 @@ export default function TableCampaign() {
           rowsPerPage={5}
           page={page}
           onPageChange={handleChangePage}
+          showFirstButton
+          showLastButton
         />
       </Paper>
     </Box>

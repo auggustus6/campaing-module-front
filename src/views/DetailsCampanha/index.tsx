@@ -23,7 +23,26 @@ import moment from 'moment';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { ReplyAllSharp } from '@mui/icons-material';
-import { formatDate, formatDateTime, getTimeFromMinutes } from '../../utils/dateAndTimeUtils';
+import {
+  formatDate,
+  formatDateTime,
+  getTimeFromMinutes,
+} from '../../utils/dateAndTimeUtils';
+import TableContacts from '../../components/TableContacts';
+import { useQuery } from 'react-query';
+
+interface DataContacts {
+  data: {
+    page: number;
+    results: {
+      campaignId: string;
+      contact: string;
+      status: string;
+      variables: string;
+    }[];
+    total: number;
+  };
+}
 
 export default function DetailsCampanha() {
   const { id } = useParams();
@@ -40,6 +59,30 @@ export default function DetailsCampanha() {
     ''
   );
 
+  const [page, setPage] = useState(0);
+  const [showFinished, setShowFinished] = useState(false);
+
+  const { data: dataContacts } = useQuery<DataContacts>(
+    ['contacts-by-id', id, page, showFinished],
+    async () => {
+      return await api.get(
+        `/contacts/${id}?page=${page}&list_finished=${showFinished}`
+      );
+    },
+    { staleTime: 1000 * 60 } //60 seconds
+  );
+  const contactTableHeaders = Object.keys(
+    JSON.parse(dataContacts?.data.results?.[0]?.variables || '{}')
+  );
+  const contactsFormatted =
+    dataContacts?.data.results?.map((item) => {
+      return JSON.parse(item.variables || '{}');
+    }) || [];
+
+  console.log('dataContacts: ', dataContacts);
+
+  console.log('contactsFormatted: ', contactsFormatted);
+  // console.log('page', page);
 
   async function getData() {
     try {
@@ -133,8 +176,6 @@ export default function DetailsCampanha() {
       );
     }
   }
-
-
 
   function handleNavigateResend() {
     navigate(`reenviar`, {
@@ -333,7 +374,13 @@ export default function DetailsCampanha() {
           </ShowWhenAdmin>
         )}
       </Grid>
-      <TableContactsFromApi id={id} message={data?.message} />
+      {/* <TableContactsFromApi id={id} message={data?.message} /> */}
+      <TableContacts
+        contacts={contactsFormatted}
+        headers={contactTableHeaders}
+        total={dataContacts?.data.total || 6}
+        onChangePage={setPage}
+      />
     </Stack>
   );
 }
