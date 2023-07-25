@@ -13,15 +13,17 @@ interface Props {
   updateContactTable: (contact: any) => void;
   fields: string[];
   contactKey: string;
+  selectedContact?: any;
 }
 
-export default function AddMoreContactModal({
+export default function ContactModal({
   isOpen,
   onClose,
   addContact,
   fields,
   updateContactTable,
   contactKey,
+  selectedContact,
 }: Props) {
   const toast = useToast();
 
@@ -69,7 +71,9 @@ export default function AddMoreContactModal({
 
       addContact(newContact);
 
-      toast.success('Contato adicionado com sucesso');
+      toast.success(
+        `Contato ${!!selectedContact ? 'editado' : 'adicionado'} com sucesso`
+      );
 
       onClose();
     } catch (error) {
@@ -97,9 +101,13 @@ export default function AddMoreContactModal({
       >
         <Box display={'flex'} justifyContent={'space-between'}>
           <Box>
-            <Typography variant="h5">Adicionar mais contatos</Typography>
+            <Typography variant="h5">
+              {!!selectedContact ? 'Editar contato' : 'Adicionar mais contatos'}
+            </Typography>
             <Typography variant="body1" color={'GrayText'}>
-              Adicione mais contatos e variaveis à sua campanha de forma manual.
+              {!!selectedContact
+                ? 'Edite os dados do contato de forma manual'
+                : 'Adicione mais contatos e variaveis à sua campanha de forma manual.'}
             </Typography>
           </Box>
           <Close onClick={onClose} sx={{ cursor: 'pointer' }} />
@@ -111,10 +119,17 @@ export default function AddMoreContactModal({
               label={contactKey}
               id={contactKey}
               name={contactKey}
+              defaultValue={selectedContact?.[contactKey || ''] || ''}
             />
           </InputMask>
           {fieldsWithoutContact.map((field) => (
-            <DefaultInput label={field} id={field} name={field} key={field} />
+            <DefaultInput
+              label={field}
+              id={field}
+              name={field}
+              key={field}
+              defaultValue={selectedContact?.[field] || ''}
+            />
           ))}
 
           <Grid item xs={12}>
@@ -128,7 +143,7 @@ export default function AddMoreContactModal({
               variant={'contained'}
               type="submit"
             >
-              Adicionar
+              Confirmar
             </MaterialButton>
           </Grid>
         </Grid>

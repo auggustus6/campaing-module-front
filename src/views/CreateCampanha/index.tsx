@@ -18,7 +18,7 @@ import Container from '@mui/system/Container';
 import { useXLSX } from '../../hooks/useXLSX';
 import Swal from 'sweetalert2';
 
-import { z } from 'zod';
+import { set, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useEffect, useRef, useState } from 'react';
@@ -43,7 +43,7 @@ import {
   getMinutesFromTime,
   getNowOnlyDate,
 } from '../../utils/dateAndTimeUtils';
-import AddMoreContactModal from '../../components/modals/AddMoreContactModal';
+import ContactModal from '../../components/modals/ContactModal';
 import { Box, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
@@ -123,7 +123,7 @@ const campaignSchema = z
         },
         { message: 'O tempo mínimo é de 10 segundos.' }
       ),
-    session: z.string().min(10, 'Selecione uma opção!'),
+    session: z.string().min(10, 'Selecio  ne uma opção!'),
   })
   .refine((values) => values.startTime < values.endTime, {
     message: 'O horário de início deve ser menor que o horário de término.',
@@ -153,6 +153,7 @@ export default function CreateCampanha() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(NaN);
 
   const [caretPosition, setCaretPosition] = useState(0);
 
@@ -176,7 +177,7 @@ export default function CreateCampanha() {
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
 
-  const [contactsObject, setContactsObject] = useState<[]>([]);
+  const [contactsObject, setContactsObject] = useState<any[]>([]);
   const [contactsTablePage, setContactsTablePage] = useState(0);
   const contactsToShow = contactsObject.slice(
     contactsTablePage * 5,
@@ -367,9 +368,30 @@ export default function CreateCampanha() {
     setIsLoading(false);
   }
 
+  async function handleRemoveContact(index: number) {
+    const option = await Swal.fire({
+      title: 'Tem certeza que deseja remover esse contato?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+      icon: 'question',
+    });
+
+    if (!option.isConfirmed) {
+      return;
+    }
+
+    const newContactsObject = [...contactsObject];
+    newContactsObject.splice(index, 1);
+    setContactsObject(newContactsObject);
+    const newContacts = getValues('contacts');
+    newContacts.splice(index, 1);
+    setValue('contacts', newContacts);
+  }
+
   return (
     <Container sx={{ p: 0 }}>
-      <AddMoreContactModal
+      <ContactModal
         addContact={(contact) => {
           setValue('contacts', [contact, ...getValues('contacts')]);
         }}
@@ -380,6 +402,25 @@ export default function CreateCampanha() {
         onClose={() => setIsModalOpen(false)}
         fields={variables}
         contactKey={contactKey}
+      />
+
+      {/* EditContactModal */}
+      <ContactModal
+        addContact={(contact) => {
+          const newValues = getValues('contacts');
+          newValues[selectedContact] = contact;
+          setValue('contacts', newValues);
+        }}
+        updateContactTable={(contact) => {
+          const newValues = [...contactsObject];
+          newValues[selectedContact] = contact;
+          setContactsObject(newValues);
+        }}
+        isOpen={!Number.isNaN(selectedContact)}
+        onClose={() => setSelectedContact(NaN)}
+        fields={variables}
+        contactKey={contactKey}
+        selectedContact={contactsObject[selectedContact]}
       />
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -627,6 +668,8 @@ export default function CreateCampanha() {
         <TableContacts
           allowEdit
           headers={variables}
+          onEdit={(index) => setSelectedContact(index)}
+          onDelete={handleRemoveContact}
           contacts={contactsToShow}
           total={contactsObject.length}
           onChangePage={setContactsTablePage}

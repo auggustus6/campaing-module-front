@@ -357,16 +357,7 @@ export default function EditCampanha() {
             {...register('scheduleDate')}
           />
         </Grid>
-        {/* <Grid item xs={6} sm={3}>
-          <InputLabel>Data de inicio:</InputLabel>
-          <Input
-            variant="outlined"
-            fullWidth
-            {...register('startDate')}
-            disabled
-            type="datetime-local"
-          />
-        </Grid> */}
+
         <Grid item xs={6} sm={6}>
           <InputLabel>Delay</InputLabel>
           <Input
@@ -418,7 +409,36 @@ export default function EditCampanha() {
           />
         </Grid>
       </Grid>
-      <TableContactsFromApi id={id} message={getValues('id')} />
+      {/* <TableContactsFromApi id={id} message={getValues('id')} /> */}
+      {/* <TableContacts
+          allowEdit
+          headers={variables}
+          onEdit={(index) => setSelectedContact(index)}
+          onDelete={handleRemoveContact}
+          contacts={contactsToShow}
+          total={contactsObject.length}
+          onChangePage={setContactsTablePage}
+          title={
+            <>
+              <InputLabel
+                sx={{
+                  fontSize: '1.5rem',
+                }}
+              >
+                Valores da Planilha
+              </InputLabel>
+              <MaterialButton
+                disabled={isLoading || shouldDisable}
+                sx={{ height: '3.5rem', textTransform: 'uppercase' }}
+                variant={'outlined'}
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Add />
+                Adicionar mais contato
+              </MaterialButton>
+            </>
+          }
+        /> */}
     </Stack>
   );
 }
