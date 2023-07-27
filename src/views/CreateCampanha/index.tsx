@@ -48,6 +48,7 @@ import { Box, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
+import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 
 interface Company {
   id: string;
@@ -180,9 +181,16 @@ export default function CreateCampanha() {
   const [contactsObject, setContactsObject] = useState<any[]>([]);
   const [contactsTablePage, setContactsTablePage] = useState(0);
   const contactsToShow = contactsObject.slice(
-    contactsTablePage * 5,
-    contactsTablePage * 5 + 5
+    contactsTablePage * TABLE_CONTACTS_SIZE,
+    contactsTablePage * TABLE_CONTACTS_SIZE + TABLE_CONTACTS_SIZE
   );
+
+  let selectedIndexFromPage = NaN;
+
+  if (!Number.isNaN(selectedContact)) {
+    selectedIndexFromPage =
+      selectedContact + contactsTablePage * TABLE_CONTACTS_SIZE;
+  }
 
   const [isLoading, setIsLoading] = useState(false);
   const { excelToJson } = useXLSX();
@@ -381,12 +389,21 @@ export default function CreateCampanha() {
       return;
     }
 
+    const indexToSlice = index + contactsTablePage * TABLE_CONTACTS_SIZE;
+
     const newContactsObject = [...contactsObject];
-    newContactsObject.splice(index, 1);
-    setContactsObject(newContactsObject);
     const newContacts = getValues('contacts');
-    newContacts.splice(index, 1);
+
+    newContactsObject.splice(indexToSlice, 1);
+    newContacts.splice(indexToSlice, 1);
+
+    setContactsObject(newContactsObject);
     setValue('contacts', newContacts);
+
+    if (newContactsObject.length === 0) {
+      setValue('fileName', '');
+      setValue('variables', []);
+    }
   }
 
   return (
@@ -408,19 +425,19 @@ export default function CreateCampanha() {
       <ContactModal
         addContact={(contact) => {
           const newValues = getValues('contacts');
-          newValues[selectedContact] = contact;
+          newValues[selectedIndexFromPage] = contact;
           setValue('contacts', newValues);
         }}
         updateContactTable={(contact) => {
           const newValues = [...contactsObject];
-          newValues[selectedContact] = contact;
+          newValues[selectedIndexFromPage] = contact;
           setContactsObject(newValues);
         }}
         isOpen={!Number.isNaN(selectedContact)}
         onClose={() => setSelectedContact(NaN)}
         fields={variables}
         contactKey={contactKey}
-        selectedContact={contactsObject[selectedContact]}
+        selectedContact={contactsObject[selectedIndexFromPage]}
       />
       <Grid container spacing={2}>
         <Grid item xs={12}>

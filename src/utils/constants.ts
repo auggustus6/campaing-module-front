@@ -1,3 +1,6 @@
+export const TABLE_CONTACTS_SIZE = 5;
+
+
 export const PATHS = [
   {
     name: 'Campanhas',

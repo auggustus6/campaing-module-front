@@ -11,6 +11,7 @@ import {
   SelectChangeEvent,
   Divider,
 } from '@mui/material';
+import MaterialButton from '@mui/material/Button';
 import Button from '@mui/joy/Button';
 import axios from 'axios';
 import TableContactsFromApi from '../../components/TableContacts/TableContactsFromApi';
@@ -27,7 +28,7 @@ import moment from 'moment';
 
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import { CANAL } from '../../utils/constants';
+import { CANAL, TABLE_CONTACTS_SIZE } from '../../utils/constants';
 import { theme } from '../../styles/theme';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { useToast } from '../../context/ToastContext';
@@ -36,7 +37,12 @@ import {
   formatDateTime,
   getMinutesFromTime,
   getNowOnlyDate,
+  getTimeFromMinutes,
 } from '../../utils/dateAndTimeUtils';
+import TableContacts from '../../components/TableContacts';
+import { Add } from '@mui/icons-material';
+import { phoneRegex } from '../CreateCampanha';
+import ContactModal from '../../components/modals/ContactModal';
 
 interface Campaign {
   id: string;
@@ -127,7 +133,6 @@ export default function EditCampanha() {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
     reset,
     watch,
     setValue,
@@ -148,8 +153,10 @@ export default function EditCampanha() {
   }, [status]);
 
   const [company, setCompany] = useState<Company>();
+  const [contacts, setContacts] = useState<any[]>([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalAddOpen, setIsModalAddOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(NaN);
 
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -162,6 +169,91 @@ export default function EditCampanha() {
     '_url',
     ''
   );
+
+  const [page, setPage] = useState(0);
+  const [contactKey, setContactKey] = useState('');
+
+  const contactsToShow = contacts.slice(
+    page * TABLE_CONTACTS_SIZE,
+    page * TABLE_CONTACTS_SIZE + TABLE_CONTACTS_SIZE
+  );
+
+  let selectedIndexFromPage = NaN;
+
+  if (!Number.isNaN(selectedContact)) {
+    selectedIndexFromPage = selectedContact + page * TABLE_CONTACTS_SIZE;
+  }
+
+  const selectedContactObject = JSON.parse(
+    contacts?.[selectedIndexFromPage]?.variables || '{}'
+  );
+
+  const contactTableHeaders = Object.keys(
+    JSON.parse(contacts?.[0]?.variables || '{}')
+  ).concat(['status']);
+  const contactsFormatted =
+    contactsToShow?.map((item: any) => {
+      return {
+        ...JSON.parse(item.variables || '{}'),
+        status: item.status,
+      };
+    }) || [];
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const { data } = await api.get(`/campaign/${id}`);
+
+        if (!data) {
+          navigate('/campanhas');
+        }
+
+        reset({
+          id: data.id,
+          title: data.title,
+          message: data.message,
+          scheduleDate: formatDate(data.scheduleDate) as any,
+          startTime: getTimeFromMinutes(data.startTime) as any,
+          endTime: getTimeFromMinutes(data.endTime) as any,
+          status: data.status,
+          startDate: formatDateTime(data.startDate) as any,
+          endDate: formatDateTime(data.endDate) as any,
+          sendDelay: String(data.sendDelay) as any,
+          channel_id: data.channel_id,
+        });
+
+        const { data: companyData } = await api.get(`/companies`);
+
+        if (companyData.channel?.length === 0) {
+          toast.error(
+            'Nenhum canal ativo no momento. Ative ao menos um canal para editar a campanha.'
+          );
+          navigate('./..');
+        }
+
+        const formattedValues = JSON.parse(
+          data?.contacts?.[0]?.variables || '{}'
+        );
+
+        const key = Object.keys(formattedValues).find((item) => {
+          return phoneRegex.test(
+            String(formattedValues?.[item] || '').replace(/[^0-9]/gi, '')
+          );
+        });
+
+        setContactKey(key || '');
+
+        setCompany(companyData);
+        setData(data);
+        setContacts(data.contacts || []);
+      } catch (error) {
+        console.log('error', error);
+
+        navigate('/campanhas');
+      }
+    }
+    getData();
+  }, []);
 
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
@@ -198,67 +290,86 @@ export default function EditCampanha() {
     setValue('channel_id', e.target.value);
   }
 
-  function formatTime(time: number) {
-    return String(Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2));
-  }
+  async function handleRemoveContact(index: number) {
+    const option = await Swal.fire({
+      title: 'Tem certeza que deseja remover esse contato?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+      icon: 'question',
+    });
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const { data } = await api.get(`/campaign/${id}`);
-
-        if (!data) {
-          navigate('/campanhas');
-        }
-
-        reset({
-          id: data.id,
-          title: data.title,
-          message: data.message,
-          scheduleDate: formatDate(data.scheduleDate) as any,
-          startTime: formatTime(data.startTime) as any,
-          endTime: formatTime(data.endTime) as any,
-          status: data.status,
-          startDate: formatDateTime(data.startDate) as any,
-          endDate: formatDateTime(data.endDate) as any,
-          sendDelay: String(data.sendDelay) as any,
-          channel_id: data.channel_id,
-        });
-
-        const { data: companyData } = await api.get(`/companies`);
-
-        if (companyData.channel?.length === 0) {
-          toast.error(
-            'Nenhum canal ativo no momento. Ative ao menos um canal para editar a campanha.'
-          );
-          navigate('./..');
-        }
-
-        setCompany(companyData);
-        setData(data);
-      } catch (error) {
-        navigate('/campanhas');
-      }
+    if (!option.isConfirmed) {
+      return;
     }
-    getData();
-  }, []);
 
-  function onSaveContact(contact: any) {}
+    const indexToSlice = index + page * TABLE_CONTACTS_SIZE;
+
+    const newContactsObject = [...contacts];
+
+    newContactsObject.splice(indexToSlice, 1);
+
+    setContacts(newContactsObject);
+  }
 
   return (
     <Stack justifyContent="center">
-      {/* <AddMoreContactModal
-        addContact={(contact) => {
-          setValue('contacts', [...getValues('contacts'), contact]);
+      <ContactModal
+        addContact={(cont) => {}}
+        updateContactTable={(cont) => {
+          const variablesFromJson = JSON.parse(
+            contacts?.[0]?.variables || '{}'
+          );
+          const correctKeysOrder = Object.keys(variablesFromJson);
+
+          const newObjVariables = correctKeysOrder.reduce((acc: any, key) => {
+            acc[key] = cont[key];
+            return acc;
+          }, {});
+
+          const objectToSave = {
+            contact: cont[contactKey],
+            variables: JSON.stringify(newObjVariables),
+          };
+
+          setContacts([objectToSave, ...contacts]);
         }}
-        updateContactTable={(contact) => {
-          setContactsObject([...contactsObject, contact] as any);
-        }}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        fields={variables}
+        isOpen={isModalAddOpen}
+        onClose={() => setIsModalAddOpen(false)}
+        fields={contactTableHeaders.filter((h) => h !== 'status')}
         contactKey={contactKey}
-      /> */}
+      />
+
+      {/* EditContactModal */}
+      <ContactModal
+        addContact={(contact) => {}}
+        updateContactTable={(cont) => {
+          const variablesFromJson = JSON.parse(
+            contacts?.[0]?.variables || '{}'
+          );
+          const correctKeysOrder = Object.keys(variablesFromJson);
+
+          const newObjVariables = correctKeysOrder.reduce((acc: any, key) => {
+            acc[key] = cont[key];
+            return acc;
+          }, {});
+
+          const objectToSave = {
+            contact: cont[contactKey],
+            variables: JSON.stringify(newObjVariables),
+            status: contacts?.[selectedIndexFromPage]?.status,
+          };
+
+          const newValues = [...contacts];
+          newValues[selectedIndexFromPage] = objectToSave;
+          setContacts(newValues);
+        }}
+        isOpen={!Number.isNaN(selectedContact)}
+        onClose={() => setSelectedContact(NaN)}
+        fields={contactTableHeaders.filter((h) => h !== 'status')}
+        contactKey={contactKey}
+        selectedContact={selectedContactObject}
+      />
       <Grid
         container
         spacing={2}
@@ -410,35 +521,36 @@ export default function EditCampanha() {
         </Grid>
       </Grid>
       {/* <TableContactsFromApi id={id} message={getValues('id')} /> */}
-      {/* <TableContacts
-          allowEdit
-          headers={variables}
-          onEdit={(index) => setSelectedContact(index)}
-          onDelete={handleRemoveContact}
-          contacts={contactsToShow}
-          total={contactsObject.length}
-          onChangePage={setContactsTablePage}
-          title={
-            <>
-              <InputLabel
-                sx={{
-                  fontSize: '1.5rem',
-                }}
-              >
-                Valores da Planilha
-              </InputLabel>
-              <MaterialButton
-                disabled={isLoading || shouldDisable}
-                sx={{ height: '3.5rem', textTransform: 'uppercase' }}
-                variant={'outlined'}
-                onClick={() => setIsModalOpen(true)}
-              >
-                <Add />
-                Adicionar mais contato
-              </MaterialButton>
-            </>
-          }
-        /> */}
+      <TableContacts
+        headers={contactTableHeaders}
+        onEdit={(index) => setSelectedContact(index)}
+        onDelete={handleRemoveContact}
+        contacts={contactsFormatted}
+        total={contacts.length}
+        onChangePage={setPage}
+        allowEdit
+        isEditing
+        title={
+          <>
+            <InputLabel
+              sx={{
+                fontSize: '1.5rem',
+              }}
+            >
+              Valores da Planilha
+            </InputLabel>
+            <MaterialButton
+              disabled={isLoading}
+              sx={{ height: '3.5rem', textTransform: 'uppercase' }}
+              variant={'outlined'}
+              onClick={() => setIsModalAddOpen(true)}
+            >
+              <Add />
+              Adicionar mais contato
+            </MaterialButton>
+          </>
+        }
+      />
     </Stack>
   );
 }

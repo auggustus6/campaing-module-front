@@ -14,6 +14,7 @@ import React, { ReactNode } from 'react';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { DeleteOutline } from '@mui/icons-material';
+import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 
 interface TableContactsProps {
   title?: ReactNode;
@@ -24,6 +25,7 @@ interface TableContactsProps {
   allowEdit?: boolean;
   onEdit?: (index: number) => void;
   onDelete?: (index: number) => void;
+  isEditing?: boolean;
 }
 
 export default function TableContacts({
@@ -35,6 +37,7 @@ export default function TableContacts({
   allowEdit = false,
   onEdit,
   onDelete,
+  isEditing = false,
 }: TableContactsProps) {
   const [page, setPage] = React.useState(0);
 
@@ -42,6 +45,8 @@ export default function TableContacts({
     setPage(newPage);
     onChangePage && onChangePage(newPage);
   };
+
+  const statusNotAllowed = ['ENVIADO', 'ERRO'];
 
   return (
     <TableContainer component={Paper}>
@@ -66,7 +71,19 @@ export default function TableContacts({
         </TableHead>
         <TableBody>
           {contacts?.map((row: any, i) => (
-            <TableRow key={i}>
+            <TableRow
+              key={i}
+              style={{
+                backgroundColor:
+                  !statusNotAllowed.includes(row['status']) || !isEditing
+                    ? 'white'
+                    : '#eeeeee',
+                cursor:
+                  !statusNotAllowed.includes(row['status']) || !isEditing
+                    ? 'default'
+                    : 'not-allowed',
+              }}
+            >
               {headers.map((item, k) => (
                 <TableCell key={k}>{row[item]}</TableCell>
               ))}
@@ -78,6 +95,9 @@ export default function TableContacts({
                       title="Editar"
                       sx={{ mr: 2 }}
                       onClick={() => onEdit && onEdit(i)}
+                      disabled={
+                        statusNotAllowed.includes(row['status']) && isEditing
+                      }
                     >
                       <EditIcon />
                     </Button>
@@ -86,6 +106,9 @@ export default function TableContacts({
                       color={'error'}
                       title={'Remover'}
                       onClick={() => onDelete && onDelete(i)}
+                      disabled={
+                        statusNotAllowed.includes(row['status']) && isEditing
+                      }
                     >
                       <DeleteOutline />
                     </Button>
@@ -100,7 +123,7 @@ export default function TableContacts({
         rowsPerPageOptions={[]}
         component="div"
         count={total}
-        rowsPerPage={5}
+        rowsPerPage={TABLE_CONTACTS_SIZE}
         page={page}
         onPageChange={handleChangePage}
         showFirstButton

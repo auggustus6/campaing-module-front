@@ -30,6 +30,8 @@ import {
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
 import { useQuery } from 'react-query';
+import { Switch } from '@mui/material';
+import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 
 interface DataContacts {
   data: {
@@ -62,38 +64,45 @@ export default function DetailsCampanha() {
   const [page, setPage] = useState(0);
   const [showFinished, setShowFinished] = useState(false);
 
-  const { data: dataContacts } = useQuery<DataContacts>(
-    ['contacts-by-id', id, page, showFinished],
-    async () => {
-      return await api.get(
-        `/contacts/${id}?page=${page}&list_finished=${showFinished}`
-      );
-    },
-    { staleTime: 1000 * 60 } //60 seconds
+  const contactsObject = (data?.contacts || []).filter((item: any) => {
+    if (showFinished) {
+      return item.status === 'ENVIADO';
+    } else {
+      return item.status !== 'ENVIADO';
+    }
+  });
+
+  const contactsToShow = contactsObject.slice(
+    page * TABLE_CONTACTS_SIZE,
+    page * TABLE_CONTACTS_SIZE + TABLE_CONTACTS_SIZE
   );
+
   const contactTableHeaders = Object.keys(
-    JSON.parse(dataContacts?.data.results?.[0]?.variables || '{}')
-  );
+    JSON.parse(contactsObject?.[0]?.variables || '{}')
+  ).concat(['status']);
   const contactsFormatted =
-    dataContacts?.data.results?.map((item) => {
-      return JSON.parse(item.variables || '{}');
+    contactsToShow?.map((item: any) => {
+      return {
+        ...JSON.parse(item.variables || '{}'),
+        status: item.status,
+      };
     }) || [];
-
-  console.log('dataContacts: ', dataContacts);
-
-  console.log('contactsFormatted: ', contactsFormatted);
-  // console.log('page', page);
 
   async function getData() {
     try {
       const result = await api.get(`/campaign/${id}`);
 
       if (result.data.status === 'CONCLUIDO') {
-        const contacts = await api.post(`/campaign/get-all-with-errors/${id}`);
-        if (contacts.data) {
-          setContactsWithError(contacts.data);
-          console.log('contacts error: ', contacts.data);
-        }
+        // const contacts = await api.post(`/campaign/get-all-with-errors/${id}`);
+        // if (contacts.data) {
+        //   setContactsWithError(contacts.data);
+        // }
+
+        const conts = result.data.contacts.filter(
+          (c: any) => c.status === 'ERRO'
+        );
+
+        setContactsWithError(conts || []);
       }
 
       setData(result.data);
@@ -374,11 +383,28 @@ export default function DetailsCampanha() {
           </ShowWhenAdmin>
         )}
       </Grid>
-      {/* <TableContactsFromApi id={id} message={data?.message} /> */}
       <TableContacts
+        title={
+          <>
+            <InputLabel
+              sx={{
+                fontSize: '1.5rem',
+              }}
+            >
+              Valores da Planilha
+            </InputLabel>
+            <Box display={'flex'} alignItems={'center'} gap={2}>
+              <Typography>Mostrar contatos já enviados</Typography>
+              <Switch
+                value={showFinished}
+                onChange={() => setShowFinished(!showFinished)}
+              />
+            </Box>
+          </>
+        }
         contacts={contactsFormatted}
         headers={contactTableHeaders}
-        total={dataContacts?.data.total || 6}
+        total={contactsObject?.length || 0}
         onChangePage={setPage}
       />
     </Stack>
