@@ -247,7 +247,7 @@ export default function EditCampanha() {
         setData(data);
         setContacts(data.contacts || []);
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
 
         navigate('/campanhas');
       }
@@ -268,6 +268,7 @@ export default function EditCampanha() {
         status: values.status,
         sendDelay: values.sendDelay,
         channel_id: values.channel_id,
+        contacts: contacts,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('campanhas');

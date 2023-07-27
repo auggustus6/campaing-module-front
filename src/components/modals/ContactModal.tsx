@@ -27,8 +27,6 @@ export default function ContactModal({
 }: Props) {
   const toast = useToast();
 
-  console.log('aqui', selectedContact);
-
   const fieldsWithoutContact = fields.filter((key) => key !== contactKey);
 
   const handleSubmitUser: React.FormEventHandler<HTMLFormElement> = (e) => {
