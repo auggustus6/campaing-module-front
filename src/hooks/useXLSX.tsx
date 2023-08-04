@@ -7,7 +7,10 @@ interface ExcelToJsonType {
 export function useXLSX() {
   const excelToJson = async (file?: File): Promise<ExcelToJsonType> => {
     try {
-      const workbook = XLSX.read(await file?.arrayBuffer());
+      const workbook = XLSX.read(await file?.arrayBuffer(), {
+        sheetStubs: false,
+        raw: true,
+      });
 
       const sheet_name_list = workbook.SheetNames;
 
@@ -36,6 +39,28 @@ export function useXLSX() {
         });
         return newItem;
       });
+
+      const firstKeys = Object.keys(filteredData[0] || {});
+
+      for (let i = 0; i < firstKeys.length; i++) {
+        let empty = true;
+
+        for (let k = 0; k < filteredData.length; k++) {
+          const element = filteredData[k];
+          if (element[firstKeys[i]] !== '') {
+            empty = false;
+            console.log('value', element[firstKeys[i]]);
+            break;
+          }
+        }
+
+        if (empty) {
+          filteredData = filteredData.map((item: any) => {
+            const { [firstKeys[i]]: _, ...rest } = item;
+            return rest;
+          });
+        }
+      }
 
       // filteredData = filteredData.filter((item: any) => {
       //   if (Object.values(item).every((x) => x === null || x === '')) {
