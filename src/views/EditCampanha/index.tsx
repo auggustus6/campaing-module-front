@@ -154,6 +154,7 @@ export default function EditCampanha() {
 
   const [company, setCompany] = useState<Company>();
   const [contacts, setContacts] = useState<any[]>([]);
+  const [editedContacts, setEditedContacts] = useState<any[]>([]);
 
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
@@ -258,6 +259,8 @@ export default function EditCampanha() {
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
 
+    console.log('edited contacts', editedContacts);
+
     try {
       await api.patch(`/campaign/${id}`, {
         title: values.title,
@@ -334,6 +337,7 @@ export default function EditCampanha() {
           };
 
           setContacts([objectToSave, ...contacts]);
+          setEditedContacts([objectToSave, ...editedContacts]);
         }}
         isOpen={isModalAddOpen}
         onClose={() => setIsModalAddOpen(false)}
@@ -365,6 +369,16 @@ export default function EditCampanha() {
           const newValues = [...contacts];
           newValues[selectedIndexFromPage] = objectToSave;
           setContacts(newValues);
+
+          const isEditingCreated = editedContacts.find(
+            (i) =>
+              JSON.stringify(i) ===
+              JSON.stringify(contacts?.[selectedIndexFromPage])
+          );
+
+          if (!isEditingCreated) {
+            setEditedContacts([objectToSave, ...editedContacts]);
+          }
         }}
         isOpen={!Number.isNaN(selectedContact)}
         onClose={() => setSelectedContact(NaN)}

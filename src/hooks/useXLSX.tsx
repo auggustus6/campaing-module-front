@@ -35,7 +35,7 @@ export function useXLSX() {
       filteredData = filteredData.map((item: any) => {
         const newItem: any = {};
         Object.keys(item).forEach((key) => {
-          newItem[key] = String(item[key]);
+          newItem[String(key).trim()] = String(item[key]).trim();
         });
         return newItem;
       });
