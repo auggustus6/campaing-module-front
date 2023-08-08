@@ -356,6 +356,7 @@ export default function EditCampanha() {
           }, {});
 
           const objectToSave = {
+            id: contacts?.[selectedIndexFromPage]?.id,
             contact: cont[contactKey],
             variables: JSON.stringify(newObjVariables),
             status: contacts?.[selectedIndexFromPage]?.status,
