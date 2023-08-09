@@ -84,10 +84,9 @@ const editCampaignSchema = z
       .refine(
         (date) => {
           if (!date) return false;
-
-          return date >= getNowOnlyDate();
+          return true;
         },
-        { message: 'Escolha uma data no futuro!' }
+        { message: 'Escolha uma data!' }
       )
       .optional(),
     startTime: z
