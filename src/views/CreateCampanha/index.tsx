@@ -49,6 +49,7 @@ import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
+import { useToast } from '../../context/ToastContext';
 
 interface Company {
   id: string;
@@ -153,6 +154,8 @@ export default function CreateCampanha() {
     variables: getValues('contacts')?.[0]?.variables,
   });
 
+  const toast = useToast();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
 
@@ -170,6 +173,13 @@ export default function CreateCampanha() {
   useEffect(() => {
     async function getCompany() {
       const { data } = await api.get<Company>('/companies');
+
+      if (data.channel.length === 0) {
+        toast.error(
+          'Você não possui canais conectados, crie ou conecte um canal para poder criar uma campanha.'
+        );
+        navigate('/campanhas');
+      }
       setCompany(data);
     }
     getCompany();

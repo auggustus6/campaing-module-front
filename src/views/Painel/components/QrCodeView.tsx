@@ -26,7 +26,7 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
     async function getStatus() {
       const result = await api.get(`/channels/get-status/${channelId}`);
 
-      if (result.data == 'connected') {
+      if (result.data.state == 'connected') {
         clearInterval(timer);
         clearInterval(qrCodeTimer);
         setQrCode('');

@@ -92,6 +92,8 @@ function Painel() {
     const response = await api.get<Company>('/companies');
     const responseChannels = await api.get<Channel[]>('/channels');
 
+    console.log('responseChannels', responseChannels.data);
+
     setData(response.data);
     setChannels(responseChannels.data);
     setTwoLetters(getTwoFirstLetters(response.data.name));

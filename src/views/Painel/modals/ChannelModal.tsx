@@ -30,14 +30,9 @@ const stringValidator = z
 export type ChannelSchemaSchemaType = z.infer<typeof channelSchema>;
 const channelSchema = z.object({
   id: stringValidator,
-  phoneNumber: stringValidator,
   instanceName: stringValidator,
-  instanceId: stringValidator,
-  url: stringValidator.url('URL inválida!'),
-  webhook: stringValidator.url('URL inválida!'),
-  key: stringValidator,
-  token: stringValidator.uuid('Token inválido!'),
-  login: stringValidator,
+  wppApiInstanceId: stringValidator,
+  createdAt: z.string().optional(),
 });
 
 export default function ChannelModal() {
@@ -62,6 +57,8 @@ export default function ChannelModal() {
       navigate('..');
     }
 
+    console.log('channelFromLocation', channelFromLocation);
+
     reset(channelFromLocation);
   }, []);
 
@@ -77,7 +74,7 @@ export default function ChannelModal() {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          maxWidth: '80rem',
+          maxWidth: '60rem',
           borderRadius: 1,
           width: '96%',
         }}
@@ -109,53 +106,29 @@ export default function ChannelModal() {
             </Box>
             <Grid container spacing={2} pt={4}>
               <DefaultInput
-                label={'URL API da instância'}
-                errorMessage={errors.url?.message}
-                {...register('url')}
+                label={'API ID da instância'}
+                errorMessage={errors.wppApiInstanceId?.message}
+                {...register('wppApiInstanceId')}
                 sm={12}
                 copy
                 disabled={isDisabled}
               />
-              <DefaultInput
-                label={'Webhook url da instância'}
-                errorMessage={errors.webhook?.message}
-                {...register('webhook')}
-                copy
-                disabled={isDisabled}
-              />
+
               <DefaultInput
                 errorMessage={errors.instanceName?.message}
                 label={'Apelido para o canal'}
                 {...register('instanceName')}
+                sm={12}
                 copy
                 disabled={isDisabled}
               />
+
               <DefaultInput
-                errorMessage={errors.key?.message}
-                label={'KEY da instância'}
-                {...register('key')}
-                copy
-                disabled={isDisabled}
-              />
-              <DefaultInput
-                label={'Token da instância'}
-                errorMessage={errors.token?.message}
-                {...register('token')}
-                copy
-                disabled={isDisabled}
-              />
-              <DefaultInput
-                label={'Login da instância'}
-                errorMessage={errors.login?.message}
-                {...register('login')}
-                copy
-                disabled={isDisabled}
-              />
-              <DefaultInput
-                label={'Número do canal'}
-                errorMessage={errors.phoneNumber?.message}
-                {...register('phoneNumber')}
-                copy
+                errorMessage={errors.createdAt?.message}
+                label={'Canal criado em'}
+                {...register('createdAt')}
+                sm={12}
+                // copy
                 disabled={isDisabled}
               />
             </Grid>

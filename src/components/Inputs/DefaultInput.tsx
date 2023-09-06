@@ -66,6 +66,7 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
         {label && <InputLabel error={error}>{label}</InputLabel>}
         <TextField
           error={error}
+          inputRef={otherRef}
           helperText={errorMessage}
           fullWidth
           {...rest}

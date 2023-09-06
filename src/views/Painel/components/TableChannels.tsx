@@ -59,8 +59,6 @@ export default function TableChannels({
     });
   }
 
-
-
   // function handleEdit(channel: Channel) {
   //   navigate('edit-channel', {
   //     state: channel,
@@ -103,25 +101,21 @@ export default function TableChannels({
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Key</TableCell>
+            <TableCell>Id do Canal</TableCell>
             <TableCell>Apelido</TableCell>
-            <TableCell>Login</TableCell>
-            <TableCell>URL</TableCell>
-            <TableCell>Webhook</TableCell>
-            <TableCell>Ações</TableCell>
+            <TableCell>Criado em</TableCell>
+            <TableCell align='right'>Ações</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {channelsToShow.map((row) => (
             <TableRow key={row.id}>
               {/* <TableCell>{row.id}</TableCell> */}
-              <TableCell>{row.key}</TableCell>
+              <TableCell>{row.wppApiInstanceId}</TableCell>
               <TableCell>{row.instanceName}</TableCell>
-              <TableCell>{row.login}</TableCell>
-              <TableCell>{row.url}</TableCell>
-              <TableCell>{row.webhook}</TableCell>
-              <TableCell>
-                <Stack direction={'row'}>
+              <TableCell>{row.createdAt}</TableCell>
+              <TableCell align='right'>
+                <Stack direction={'row'} justifyContent={"end"}>
                   <Button
                     variant="outlined"
                     color="secondary"
