@@ -39,10 +39,8 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
       try {
         const result = await api.get(`/channels/get-qrcode/${channelId}`);
 
-        console.log('qrcode', result);
-
         if (result.data.state != 'connected') {
-          setQrCode('data:image/webp;base64,' + result.data.base64);
+          setQrCode('data:image/webp;base64,' + result.data.qrCode);
           timer = setInterval(getStatus, statusRefreshTime);
         } else {
           setIsConnected(true);
