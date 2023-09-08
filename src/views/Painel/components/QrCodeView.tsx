@@ -31,6 +31,7 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
         clearInterval(qrCodeTimer);
         setQrCode('');
         setIsConnected(true);
+        return true;
       }
     }
 
@@ -38,8 +39,6 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
       setIsLoading(true);
       try {
         const result = await api.get(`/channels/get-qrcode/${channelId}`);
-
-        console.log('qrcode', result);
 
         if (result.data.state != 'connected') {
           setQrCode('data:image/webp;base64,' + result.data.base64);
@@ -55,7 +54,15 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
     }
 
     if (qrCodeTimer == undefined) {
-      getQrCode();
+      // i know this is ugly, but ill refactor later
+      (async () => {
+        const result = await getStatus();
+        if (!!result) {
+          setIsLoading(false);
+          return;
+        }
+        await getQrCode();
+      })();
     }
 
     qrCodeTimer = setInterval(getQrCode, qrCodeRefreshTime);
