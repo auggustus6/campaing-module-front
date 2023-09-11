@@ -33,6 +33,7 @@ const channelSchema = z.object({
   instanceName: stringValidator,
   wppApiInstanceId: stringValidator,
   createdAt: z.string().optional(),
+  state: z.string().optional(),
 });
 
 export default function ChannelModal() {

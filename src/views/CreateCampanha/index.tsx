@@ -470,7 +470,7 @@ export default function CreateCampanha() {
             <Select
               {...register('session')}
               error={!!errors.session}
-              disabled={isLoading || shouldDisable}
+              disabled={isLoading || shouldDisable || !company?.channel.length}
               value={session || 'select'}
               onChange={handleCanalSelect}
             >
@@ -608,9 +608,13 @@ export default function CreateCampanha() {
               label="Variáveis"
               onChange={handleSelectOption}
               value="0"
-              disabled={isLoading || shouldDisable}
+              disabled={isLoading || shouldDisable || !variables.length}
             >
-              <MenuItem value={'0'}>Selecione uma variável</MenuItem>
+              <MenuItem value={'0'}>
+                {!variables.length
+                  ? 'Envie um arquivo para selecionar as variáveis'
+                  : 'Selecione uma variável'}
+              </MenuItem>
               {variables.map((option) => (
                 <MenuItem value={option} key={option}>
                   {option}

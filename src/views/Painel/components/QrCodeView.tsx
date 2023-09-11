@@ -15,7 +15,7 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
   const toast = useToast();
 
   const qrCodeRefreshTime = 60 * 1000; // 40 seconds
-  const statusRefreshTime = 10 * 1000; // 4 seconds
+  const statusRefreshTime = 10 * 2000; // 4 seconds
 
   useEffect(() => {
     let timer: number;

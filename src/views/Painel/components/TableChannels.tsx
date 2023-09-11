@@ -7,16 +7,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Box, Button, Stack, TablePagination, Typography } from '@mui/material';
 import { useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ShowWhenAdmin from '../../../components/ShowWhenAdmin';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
-import { Details, Info, Preview, WhatsApp } from '@mui/icons-material';
-import AddIcon from '@mui/icons-material/Add';
+import { Ballot, Circle, Preview, WhatsApp } from '@mui/icons-material';
 import { ChannelSchemaSchemaType } from '../modals/ChannelModal';
+import { tableFormatDateTime } from '../../../utils/dateAndTimeUtils';
 
 // TODO - move model type to a dto file in a folder
 export interface Channel extends ChannelSchemaSchemaType {}
@@ -26,6 +21,21 @@ interface TableChannelsProps {
   channelsLength: number | undefined;
   isLoading: boolean;
   refetch: () => void;
+}
+
+function StatusLabel({ status }: { status?: string }) {
+  const isConnected = status === 'connected';
+  return (
+    <Typography
+      color={isConnected ? 'green' : 'red'}
+      fontWeight={700}
+      display="flex"
+      alignItems="center"
+    >
+      <Circle />
+      {isConnected ? 'Conectado' : 'Desconectado'}
+    </Typography>
+  );
 }
 
 export default function TableChannels({
@@ -39,6 +49,8 @@ export default function TableChannels({
   const ROWS_PER_PAGE = 5;
 
   const toast = useToast();
+
+  console.log('chanelspainel', channels);
 
   const channelsToShow = channels.slice(
     page * ROWS_PER_PAGE,
@@ -101,10 +113,11 @@ export default function TableChannels({
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Id do Canal</TableCell>
+            <TableCell>Id externo do Canal</TableCell>
             <TableCell>Apelido</TableCell>
             <TableCell>Criado em</TableCell>
-            <TableCell align='right'>Ações</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell align="right">Ações</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -113,9 +126,12 @@ export default function TableChannels({
               {/* <TableCell>{row.id}</TableCell> */}
               <TableCell>{row.wppApiInstanceId}</TableCell>
               <TableCell>{row.instanceName}</TableCell>
-              <TableCell>{row.createdAt}</TableCell>
-              <TableCell align='right'>
-                <Stack direction={'row'} justifyContent={"end"}>
+              <TableCell>{tableFormatDateTime(row.createdAt)}</TableCell>
+              <TableCell>
+                <StatusLabel status={row.state} />
+              </TableCell>
+              <TableCell align="right">
+                <Stack direction={'row'} justifyContent={'end'}>
                   <Button
                     variant="outlined"
                     color="secondary"

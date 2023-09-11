@@ -46,8 +46,6 @@ export default function TableCampaign() {
   const [page, setPage] = React.useState(0);
   const [showDeleted, setShowDeleted] = useState(false);
 
-  const [lengthItems, setLengthItems] = useState(0);
-
   const { data } = useQuery(
     ['campaign', page, showDeleted],
     async () => {
@@ -55,12 +53,14 @@ export default function TableCampaign() {
         `/campaign?page=${page}&list_deleted=${showDeleted}`
       );
 
-      setLengthItems(result.data.total || 0);
-
       return result;
     },
     { staleTime: 1000 * 4 } //60 seconds
   );
+
+  const itemsCount = React.useMemo(() => {
+    return data?.data?.total || 0;
+  }, [data]);
 
   const selectedCampaign = data?.data?.result?.filter(
     (item: any) => item.id === selected[0]
@@ -195,7 +195,7 @@ export default function TableCampaign() {
         <TablePagination
           rowsPerPageOptions={[]}
           component="div"
-          count={lengthItems}
+          count={itemsCount}
           rowsPerPage={5}
           page={page}
           onPageChange={handleChangePage}

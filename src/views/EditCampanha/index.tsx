@@ -154,6 +154,7 @@ export default function EditCampanha() {
   const [company, setCompany] = useState<Company>();
   const [contacts, setContacts] = useState<any[]>([]);
   const [editedContacts, setEditedContacts] = useState<any[]>([]);
+  const [removedContacts, setRemovedContacts] = useState<any[]>([]);
 
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
@@ -271,6 +272,7 @@ export default function EditCampanha() {
         sendDelay: values.sendDelay,
         channel_id: values.channel_id,
         contacts: contacts,
+        removedContacts: removedContacts,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('campanhas');
@@ -310,7 +312,14 @@ export default function EditCampanha() {
 
     const newContactsObject = [...contacts];
 
-    newContactsObject.splice(indexToSlice, 1);
+    const contactToRemove = newContactsObject.splice(indexToSlice, 1);
+
+    if (contactToRemove?.[0]?.id) {
+      setRemovedContacts([
+        newContactsObject?.[indexToSlice],
+        ...removedContacts,
+      ]);
+    }
 
     setContacts(newContactsObject);
   }
