@@ -259,8 +259,6 @@ export default function EditCampanha() {
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
 
-    console.log('edited contacts', editedContacts);
-
     try {
       await api.patch(`/campaign/${id}`, {
         title: values.title,

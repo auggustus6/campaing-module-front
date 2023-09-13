@@ -354,15 +354,12 @@ export default function CreateCampanha() {
         preConfirm: async (number) => {
           try {
             const formattedNumber = number.replace(/\D/g, '');
-            const result = await api.post(
-              '/campaign/send-message-test-campaign',
-              {
-                text: messagePreview,
-                to: formattedNumber,
-                midia: midiaBase64 || undefined,
-                instanceId: values.session,
-              }
-            );
+            const result = await api.post('/message/send-test-message', {
+              text: messagePreview,
+              to: formattedNumber,
+              midia: midiaBase64 || undefined,
+              instanceId: values.session,
+            });
 
             Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
           } catch (error) {
@@ -418,6 +415,7 @@ export default function CreateCampanha() {
 
   return (
     <Container sx={{ p: 0 }}>
+      {/* AddContact */}
       <ContactModal
         addContact={(contact) => {
           setValue('contacts', [contact, ...getValues('contacts')]);

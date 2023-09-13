@@ -58,8 +58,6 @@ export default function ChannelModal() {
       navigate('..');
     }
 
-    console.log('channelFromLocation', channelFromLocation);
-
     reset(channelFromLocation);
   }, []);
 

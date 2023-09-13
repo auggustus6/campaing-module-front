@@ -49,7 +49,6 @@ export function useXLSX() {
           const element = filteredData[k];
           if (element[firstKeys[i]] !== '') {
             empty = false;
-            console.log('value', element[firstKeys[i]]);
             break;
           }
         }

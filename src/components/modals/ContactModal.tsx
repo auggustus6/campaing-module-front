@@ -65,8 +65,6 @@ export default function ContactModal({
         contact: rawObject[contactKey],
       };
 
-      delete rawObject[contactKey];
-
       newContact.variables = JSON.stringify(rawObject || {});
 
       addContact(newContact);

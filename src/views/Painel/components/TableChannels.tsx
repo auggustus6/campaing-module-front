@@ -50,8 +50,6 @@ export default function TableChannels({
 
   const toast = useToast();
 
-  console.log('chanelspainel', channels);
-
   const channelsToShow = channels.slice(
     page * ROWS_PER_PAGE,
     page * ROWS_PER_PAGE + ROWS_PER_PAGE
