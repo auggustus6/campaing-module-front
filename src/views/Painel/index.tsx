@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import { useToast } from '../../context/ToastContext';
 
 import TableChannels, { Channel } from './components/TableChannels';
+import DefaultInput from '../../components/Inputs/DefaultInput';
 
 interface User {
   id: string;

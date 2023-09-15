@@ -4,135 +4,40 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import Input from '@mui/material/TextField';
-import moment from 'moment';
-
 import MaterialButton from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-
 import Button from '@mui/joy/Button';
 import Container from '@mui/system/Container';
-import { useXLSX } from '../../hooks/useXLSX';
+import { Add, Science, UploadFile } from '@mui/icons-material';
 import Swal from 'sweetalert2';
-
-import { set, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
-import { TextArea } from '../../components/TextArea';
-import api from '../../services/api';
-import { getFormattedMessage } from '../../utils/variablesUtils';
-import { theme } from '../../styles/theme';
-import TableContactsFromFile from '../../components/TableContacts/TableContactsFromFile';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
 import { useAuth } from '../../context/AuthContext';
-import {
-  Add,
-  HelpOutline,
-  QuestionAnswer,
-  QuestionMark,
-  Science,
-  UploadFile,
-} from '@mui/icons-material';
+
+import { theme } from '../../styles/theme';
+import { TextArea } from '../../components/TextArea';
 import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
-import {
-  getMinutesFromTime,
-  getNowOnlyDate,
-} from '../../utils/dateAndTimeUtils';
+
 import ContactModal from '../../components/modals/ContactModal';
-import { Box, Stack, Tooltip } from '@mui/material';
-import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
+import { Box } from '@mui/material';
 import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
-import { useToast } from '../../context/ToastContext';
-
-interface Company {
-  id: string;
-  name: string;
-  channel: {
-    id: string;
-    instanceName: string;
-  }[];
-}
-
-export const phoneRegex = new RegExp(/\b\d{8,14}\b/);
-
-const campaignSchema = z
-  .object({
-    title: z
-      .string()
-      .min(6, 'Muito curto!')
-      .max(70, 'Muito extenso!')
-      .nonempty('Campo obrigatório.'),
-    message: z
-      .string({
-        required_error: 'Campo obrigatório.',
-      })
-      .min(6, 'Muito curto!'),
-    scheduleDate: z
-      .string()
-      .transform((date) => (date ? new Date(date) : ''))
-      .refine(
-        (date) => {
-          if (!date) return false;
-          return date >= getNowOnlyDate();
-        },
-        { message: 'Escolha uma data no futuro!' }
-      ),
-    startTime: z
-      .string({
-        invalid_type_error: 'Horário inválido.',
-        required_error: 'Campo obrigatório.',
-      })
-      .transform((time) => {
-        return getMinutesFromTime(time);
-      }),
-    endTime: z
-      .string({
-        invalid_type_error: 'Horário inválido.',
-        required_error: 'Campo obrigatório.',
-      })
-      .transform((time) => {
-        return getMinutesFromTime(time);
-      }),
-    variables: z.string().array().min(1, 'Ao menos uma variável é necessária.'),
-    contacts: z.any().array().min(1, 'Arquivo vazio.'),
-    fileName: z.string().optional(),
-    midiaName: z.string().optional(),
-    midiaUrl: z.string().refine(
-      (url) => {
-        if (!url) return true;
-        if (z.string().url().safeParse(url).success) return true;
-        return false;
-      },
-      {
-        message: 'URL inválida.',
-      }
-    ),
-    sendDelay: z
-      .string()
-      .default('120')
-      .transform((delay) => Number(delay))
-      .refine(
-        (delay) => {
-          if (delay < 10) return false;
-          return true;
-        },
-        { message: 'O tempo mínimo é de 10 segundos.' }
-      ),
-    session: z.string().min(10, 'Selecio  ne uma opção!'),
-  })
-  .refine((values) => values.startTime < values.endTime, {
-    message: 'O horário de início deve ser menor que o horário de término.',
-    path: ['startTime'],
-  });
-
-type CampaignSchemaType = z.infer<typeof campaignSchema>;
+import DefaultInput from '../../components/Inputs/DefaultInput';
+import { CampaignSchemaType, campaignSchema } from './campaignSchema';
+import useSelectOption from './hooks/useSelectOption';
+import useIsImage from './hooks/useIsImage';
+import useFetchCompany from './hooks/useFetchCompany';
+import useCreateCampaign from './hooks/useCreateCampaign';
+import useTestMessage from './hooks/useTestMessage';
+import useUploadFile from './hooks/useUploadFile';
+import { getFormattedMessage } from '../../utils/variablesUtils';
+import useCaretPosition from './hooks/useCaretPosition';
 
 export default function CreateCampanha() {
   const {
@@ -154,36 +59,23 @@ export default function CreateCampanha() {
     variables: getValues('contacts')?.[0]?.variables,
   });
 
-  const toast = useToast();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
 
-  const [caretPosition, setCaretPosition] = useState(0);
 
   const [contactKey, setContactKey] = useState('');
 
-  const [company, setCompany] = useState<Company>();
   const { base64: midiaBase64, getBase64 } = useBase64();
 
-  // TODO - make a hook for this
-  const isImage =
-    midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1] === 'image';
+  const {caretPosition} = useCaretPosition({ id: 'messageTextArea' });
 
-  useEffect(() => {
-    async function getCompany() {
-      const { data } = await api.get<Company>('/companies');
+  const { handleSelectOption } = useSelectOption({
+    caretPosition,
+    message,
+    setMessage: (message) => setValue('message', message),
+  });
 
-      if (data.channel.length === 0) {
-        toast.error(
-          'Você não possui canais conectados, crie ou conecte um canal para poder criar uma campanha.'
-        );
-        navigate('/campanhas');
-      }
-      setCompany(data);
-    }
-    getCompany();
-  }, []);
+  const { isImage } = useIsImage({ midiaBase64 });
 
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
@@ -202,61 +94,13 @@ export default function CreateCampanha() {
       selectedContact + contactsTablePage * TABLE_CONTACTS_SIZE;
   }
 
-  const [isLoading, setIsLoading] = useState(false);
-  const { excelToJson } = useXLSX();
-  const navigate = useNavigate();
+  const { handleUploadFile } = useUploadFile({
+    setContactKey,
+    setContactsObject,
+    setValue,
+    trigger,
+  });
 
-  useEffect(() => {
-    const messageInput = document.getElementById('messageTextArea');
-
-    function getCaretPosition(e: any) {
-      setCaretPosition(() => e.target?.selectionStart || 0);
-    }
-
-    messageInput?.addEventListener('click', getCaretPosition);
-    messageInput?.addEventListener('blur', getCaretPosition);
-    messageInput?.addEventListener('keyup', getCaretPosition);
-
-    return () => {
-      messageInput?.removeEventListener('click', getCaretPosition);
-      messageInput?.removeEventListener('blur', getCaretPosition);
-      messageInput?.removeEventListener('keyup', getCaretPosition);
-    };
-  }, []);
-
-  async function handleUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const { data } = await excelToJson(e.target.files?.[0]);
-    const key = Object.keys(data[0]).find((item) => {
-      return phoneRegex.test(data[0][item].replace(/[^0-9]/gi, ''));
-    });
-
-    if (!key) {
-      Swal.fire(
-        'Erro',
-        'A planilha deve ter ao menos uma coluna que contenha números de telefone	válidos',
-        'warning'
-      );
-      return;
-    }
-
-    const formattedDate = data.map((item: any) => ({
-      ...item,
-      [key!]: addBrazilianCountryCode(item?.[key!]),
-    }));
-
-    const formattedContacts = formattedDate.map((item: any) => ({
-      contact: item?.[key!],
-      variables: JSON.stringify(item),
-    }));
-
-    setContactsObject(formattedDate);
-    setContactKey(key);
-    setValue('contacts', formattedContacts as CampaignSchemaType['contacts']);
-    setValue('variables', Object.keys(data[0]));
-    setValue('fileName', e.target.files?.[0].name);
-    trigger('variables');
-    e.target.value = '';
-  }
 
   async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
     getBase64(e.target.files?.[0]);
@@ -264,124 +108,20 @@ export default function CreateCampanha() {
     e.target.value = '';
   }
 
-  function handleSelectOption(e: SelectChangeEvent<string>) {
-    const message = getValues('message') || '';
-    let messageFirstPart = message.substring(0, caretPosition);
-    let messageLastPart = message.substring(caretPosition);
-    if (messageFirstPart[messageFirstPart.length - 1] !== ' ') {
-      messageFirstPart = messageFirstPart + ' ';
-    }
-    if (messageLastPart[0] !== ' ') {
-      messageLastPart = ' ' + messageLastPart;
-    }
-    setValue(
-      'message',
-      messageFirstPart + `{{${e.target.value}}}` + messageLastPart
-    );
-    const messageInput = document.getElementById(
-      'messageTextArea'
-    ) as HTMLTextAreaElement;
-
-    setTimeout(() => {
-      messageInput?.focus();
-      let pos = caretPosition + e.target.value.length + 6;
-
-      messageInput?.setSelectionRange(pos, pos);
-    }, 100);
-  }
-
   function handleCanalSelect(e: SelectChangeEvent<string>) {
     setValue('session', e.target.value);
   }
 
-  async function handleCreateCampaign(values: CampaignSchemaType) {
-    setIsLoading(true);
+  const { data: company, isLoading: isCompanyLoading } = useFetchCompany();
+  const { mutate: handleCreateCampaign, isLoading: isCreatingCampaign } =
+    useCreateCampaign({ midiaBase64 });
+  const { mutate: handleTestMessage, isLoading: isTestingMessage } =
+    useTestMessage({
+      messagePreview,
+      midiaBase64,
+    });
 
-    let midiaType;
-
-    if (values.midiaUrl) {
-      midiaType = 'IMAGE_URL';
-    } else {
-      midiaType = midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1];
-    }
-
-    midiaType = midiaType?.toUpperCase();
-
-    try {
-      await api.post('/campaign', {
-        title: values.title,
-        message: values.message,
-        scheduleDate: (values.scheduleDate as Date) || undefined,
-        startTime: values.startTime,
-        endTime: values.endTime,
-        contacts: values.contacts,
-        sendDelay: values.sendDelay,
-        channel_id: values.session,
-        midia: midiaBase64,
-        midiaUrl: values.midiaUrl,
-        midiaType: midiaType || 'TEXT',
-      });
-
-      navigate('/campanhas');
-      Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
-    } catch (error) {
-      console.error(error);
-      Swal.fire(
-        'Erro',
-        'Erro ao criar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
-    setIsLoading(false);
-  }
-
-  async function handleTestMessage(values: CampaignSchemaType) {
-    setIsLoading(true);
-
-    // TODO - change to react portals and react components
-    try {
-      const value = await Swal.fire({
-        text: 'Digite o número para o qual deseja enviar a mensagem',
-        input: 'text',
-        inputPlaceholder: '55 11 9 9999-9999',
-        inputAttributes: {
-          inputmode: 'numeric',
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Enviar',
-        cancelButtonText: 'Cancelar',
-        showLoaderOnConfirm: true,
-        preConfirm: async (number) => {
-          try {
-            const formattedNumber = number.replace(/\D/g, '');
-            const result = await api.post('/message/send-test-message', {
-              text: messagePreview,
-              to: formattedNumber,
-              midia: midiaBase64 || undefined,
-              instanceId: values.session,
-            });
-
-            Swal.fire('Sucesso', 'Mensagem enviada com sucesso!', 'success');
-          } catch (error) {
-            console.error(error);
-            Swal.fire(
-              'Erro',
-              'Erro ao enviar mensagem, por favor tente novamente.',
-              'error'
-            );
-          }
-        },
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire(
-        'Erro',
-        'Erro ao criar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
-    setIsLoading(false);
-  }
+  const isLoading = isCompanyLoading || isCreatingCampaign || isTestingMessage;
 
   async function handleRemoveContact(index: number) {
     const option = await Swal.fire({
@@ -451,16 +191,12 @@ export default function CreateCampanha() {
         <Grid item xs={12}>
           <Typography variant="h4">Criação de campanha</Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.title}>Titulo da Campanha</InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable}
-            {...register('title')}
-            error={!!errors.title}
-            helperText={errors.title?.message}
-            fullWidth
-          />
-        </Grid>
+        <DefaultInput
+          label={'Criação de campanha'}
+          {...register('title')}
+          errorMessage={errors.title?.message}
+          disabled={isLoading || shouldDisable}
+        />
 
         <Grid item xs={12} sm={6}>
           <InputLabel error={!!errors.session}>Canal</InputLabel>
@@ -492,69 +228,58 @@ export default function CreateCampanha() {
             {errors.session?.message}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.scheduleDate}>
-            Data para disparo:
-          </InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable}
-            type="date"
-            {...register('scheduleDate')}
-            error={!!errors.scheduleDate}
-            helperText={errors.scheduleDate?.message}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.sendDelay}>
-            Delay entre cada mensagem (em segundos):
-            <CustomTooltip title="O tempo mínimo é de 10 segundos" />
-          </InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable}
-            type="number"
-            {...register('sendDelay')}
-            defaultValue={120}
-            error={!!errors.sendDelay}
-            helperText={errors.sendDelay?.message}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <InputLabel error={!!errors.midiaUrl}>Url da imagem:</InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable || !!watch('midiaName')}
-            {...register('midiaUrl')}
-            error={!!errors.midiaUrl}
-            helperText={errors.midiaUrl?.message}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <InputLabel error={!!errors.startTime}>
-            De
-            <CustomTooltip title="O horário de inicio deve ser menor que o de término" />
-          </InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable}
-            type="time"
-            {...register('startTime')}
-            error={!!errors.startTime}
-            helperText={errors.startTime?.message}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <InputLabel error={!!errors.endTime}>Até</InputLabel>
-          <Input
-            disabled={isLoading || shouldDisable}
-            type="time"
-            {...register('endTime')}
-            error={!!errors.endTime}
-            helperText={errors.endTime?.message}
-            fullWidth
-          />
-        </Grid>
+
+        <DefaultInput
+          label={'Data para disparo:'}
+          {...register('scheduleDate')}
+          errorMessage={errors.scheduleDate?.message}
+          disabled={isLoading || shouldDisable}
+          type="date"
+        />
+
+        <DefaultInput
+          label={'Delay entre cada mensagem (em segundos):'}
+          {...register('sendDelay')}
+          errorMessage={errors.sendDelay?.message}
+          disabled={isLoading || shouldDisable}
+          type="number"
+          defaultValue={120}
+        />
+
+        <DefaultInput
+          label={'Url da imagem:'}
+          disabled={isLoading || shouldDisable || !!watch('midiaName')}
+          {...register('midiaUrl')}
+          errorMessage={errors.midiaUrl?.message}
+          fullWidth
+        />
+
+        <DefaultInput
+          label={
+            <>
+              De
+              <CustomTooltip title="O horário de inicio deve ser menor que o de término" />
+            </>
+          }
+          disabled={isLoading || shouldDisable}
+          {...register('startTime')}
+          errorMessage={errors.startTime?.message}
+          type="time"
+          fullWidth
+          xs={6}
+          sm={3}
+        />
+
+        <DefaultInput
+          label={'Até'}
+          disabled={isLoading || shouldDisable}
+          {...register('endTime')}
+          errorMessage={errors.endTime?.message}
+          type="time"
+          fullWidth
+          xs={6}
+          sm={3}
+        />
 
         <Grid item xs={12}>
           <MaterialButton
@@ -658,7 +383,7 @@ export default function CreateCampanha() {
             fullWidth
             disabled={isLoading || shouldDisable}
             loading={isLoading}
-            onClick={handleSubmit(handleCreateCampaign)}
+            onClick={handleSubmit(handleCreateCampaign as any)}
           >
             <AddCircleOutlineIcon />
             Criar Campanha
@@ -684,7 +409,7 @@ export default function CreateCampanha() {
             fullWidth
             disabled={isLoading || shouldDisable}
             loading={isLoading}
-            onClick={handleSubmit(handleTestMessage)}
+            onClick={handleSubmit(handleTestMessage as any)}
           >
             <Science />
             Testar mensagem

@@ -11,7 +11,7 @@ import { copyToClipboard } from '../../utils/copyToClipboard';
 import { useToast } from '../../context/ToastContext';
 
 type DefaultInputProps = React.ComponentProps<typeof TextField> & {
-  label?: string;
+  label?: React.ReactNode;
   xs?: number;
   sm?: number;
   errorMessage?: string;
