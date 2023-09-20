@@ -41,8 +41,8 @@ import {
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
 import { Add } from '@mui/icons-material';
-import { phoneRegex } from '../CreateCampanha';
 import ContactModal from '../../components/modals/ContactModal';
+import { phoneRegex } from '../CreateCampanha/campaignSchema';
 
 interface Campaign {
   id: string;

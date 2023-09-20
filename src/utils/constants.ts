@@ -1,6 +1,5 @@
 export const TABLE_CONTACTS_SIZE = 5;
 
-
 export const PATHS = [
   {
     name: 'Campanhas',
@@ -10,6 +9,11 @@ export const PATHS = [
   {
     name: 'Criar Campanha',
     path: '/campanhas/criar',
+    isAdminRoute: true,
+  },
+  {
+    name: 'Chat',
+    path: '/chat',
     isAdminRoute: true,
   },
   {

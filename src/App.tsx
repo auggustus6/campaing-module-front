@@ -16,6 +16,8 @@ const AuthProvider = lazy(() => import('./context/AuthContext'));
 import Campanhas from './views/Campanhas';
 import ChannelModal from './views/Painel/modals/ChannelModal';
 import ShowContactsErrorsModal from './views/DetailsCampanha/modals/ShowContactsErrorsModal';
+import ChatView from './views/Chat';
+import ChatLayout from './layouts/ChatLayout';
 
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
@@ -31,6 +33,9 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route element={<ChatLayout />}>
+            <Route path="chat" element={<ChatView />} />
+          </Route>
           <Route element={<MainLayout />}>
             <Route path="campanhas" element={<Campanhas />} />
             <Route

@@ -3,8 +3,8 @@ import MaterialButton from '@mui/material/Button';
 import { Close } from '@mui/icons-material';
 import InputMask from 'react-input-mask';
 import { useToast } from '../../context/ToastContext';
-import { phoneRegex } from '../../views/CreateCampanha';
 import DefaultInput from '../Inputs/DefaultInput';
+import { phoneRegex } from '../../views/CreateCampanha/campaignSchema';
 
 interface Props {
   isOpen: boolean;
