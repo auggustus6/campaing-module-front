@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,65 +9,35 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { EnhancedTableHead } from './components/TableHead';
 import { EnhancedTableToolbar } from './components/Toolbar';
-import { useQuery } from 'react-query';
-import api from '../../../../services/api';
-import moment from 'moment';
-import { useState } from 'react';
+
+import { useMemo, useState } from 'react';
 import StatusLabel from '../StatusLabel';
 import {
-  formatDateTime,
   getTimeFromMinutes,
   tableFormatDate,
   tableFormatDateTime,
 } from '../../../../utils/dateAndTimeUtils';
-
-export type Order = 'asc' | 'desc';
-
-export interface Data {
-  id: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  startTime: number;
-  endTime: number;
-  scheduleDate: string;
-  status: string;
-  sendDelay: string;
-  sentContactsCount: number;
-  isDeleted: boolean;
-  _count: {
-    contacts: number;
-  };
-}
+import useCampaigns from '../../../../hooks/querys/useCampaigns';
+import { Campaign } from '../../../../models/campaign';
 
 export default function TableCampaign() {
-  const [selected, setSelected] = React.useState<string[]>([]);
-  const [page, setPage] = React.useState(0);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
   const [showDeleted, setShowDeleted] = useState(false);
 
-  const { data } = useQuery(
-    ['campaign', page, showDeleted],
-    async () => {
-      const result = await api.get(
-        `/campaign?page=${page}&list_deleted=${showDeleted}`
-      );
+  const {data: campaigns} = useCampaigns({ page, showDeleted });
 
-      return result;
-    },
-    { staleTime: 1000 * 4 } //60 seconds
-  );
+  const itemsCount = useMemo(() => {
+    return campaigns?.total || 0;
+  }, [campaigns]);
 
-  const itemsCount = React.useMemo(() => {
-    return data?.data?.total || 0;
-  }, [data]);
-
-  const selectedCampaign = data?.data?.result?.filter(
+  const selectedCampaign = campaigns?.result?.filter(
     (item: any) => item.id === selected[0]
   );
 
-  const rows: Data[] = data?.data?.result || [];
+  const rows: Campaign[] = campaigns?.result || [];
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllClick = () => {
     if (selected.length === 0) {
       const newSelected = rows.map((n) => n.id);
       setSelected(newSelected);
@@ -125,7 +94,7 @@ export default function TableCampaign() {
             <EnhancedTableHead
               numSelected={selected.length}
               onSelectAllClick={handleSelectAllClick}
-              rowCount={data?.data.total}
+              rowCount={itemsCount}
             />
             <TableBody>
               {rows.map((row, index) => {

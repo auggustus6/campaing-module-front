@@ -7,7 +7,6 @@ import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 import ErrorIcon from '@mui/icons-material/Error';
 import { DoNotDisturb } from '@mui/icons-material';
 
-// function pick
 
 export default function StatusLabel({ status }: { status: string }) {
   const commonStyles = {

@@ -46,6 +46,11 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
             helperText={errorMessage}
             fullWidth
             inputRef={otherRef}
+            FormHelperTextProps={{
+              sx: {
+                ml: 0,
+              },
+            }}
             InputProps={{
               endAdornment: (
                 <>
@@ -69,6 +74,11 @@ const DefaultInput = React.forwardRef<HTMLInputElement, DefaultInputProps>(
           inputRef={otherRef}
           helperText={errorMessage}
           fullWidth
+          FormHelperTextProps={{
+            sx: {
+              ml: 0,
+            },
+          }}
           {...rest}
         />
       </Grid>

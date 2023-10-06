@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material';
 import InputMask from 'react-input-mask';
 import { useToast } from '../../context/ToastContext';
 import DefaultInput from '../Inputs/DefaultInput';
-import { phoneRegex } from '../../views/CreateCampanha/campaignSchema';
+import { phoneRegex } from '../../views/CreateCampanha/schemas/campaignSchema';
 
 interface Props {
   isOpen: boolean;

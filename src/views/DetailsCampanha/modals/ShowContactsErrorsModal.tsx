@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
+import { Contact } from '../../../models/Contact';
+import { useManageCampaign } from '../hooks/useManageCampaign';
 
 interface Contacts {
   id: string;
@@ -24,22 +26,22 @@ interface Contacts {
 
 export default function ShowContactsErrorsModal() {
   const [selected, setSelected] = useState<string[]>([]);
-  const [contacts, setContacts] = useState<Contacts[]>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { mutate, isLoading } = useManageCampaign();
+
   const { id: campaignId } = useParams();
 
   const toast = useToast();
 
-  useEffect(() => {
-    const contactsFromLocation: any = location.state;
+  const contacts: Contact[] = location.state;
 
-    if (!contactsFromLocation) {
+  useEffect(() => {
+    if (!contacts || contacts.length === 0) {
       navigate('..');
     }
-
-    setContacts(contactsFromLocation);
   }, []);
 
   function handleOnClose() {
@@ -79,16 +81,24 @@ export default function ShowContactsErrorsModal() {
   };
 
   async function handleSendContacts() {
-    try {
-      await api.post(`/campaign/resend`, {
-        campaignId,
-        contacts: selected,
-      });
-      toast.success('Contatos enviados com sucesso');
-      navigate('..');
-    } catch (error) {
-      toast.error('Erro ao enviar contatos');
-    }
+    mutate(
+      {
+        data: {
+          campaignId,
+          contacts: selected,
+        },
+        action: 'RESEND',
+      },
+      {
+        onSuccess: () => {
+          toast.success('Contatos enviados com sucesso');
+          navigate('..');
+        },
+        onError: () => {
+          toast.error('Erro ao enviar contatos');
+        },
+      }
+    );
   }
 
   return (
@@ -101,16 +111,17 @@ export default function ShowContactsErrorsModal() {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           maxWidth: '50rem',
+          maxHeight: '80vh',
           borderRadius: 1,
           width: '96%',
           padding: 4,
           bgcolor: 'white',
         }}
       >
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', position: 'relative' }}>
           <Paper sx={{ width: '100%', mb: 2 }}>
-            <TableContainer>
-              <Table aria-labelledby="tableTitle">
+            <TableContainer sx={{ maxHeight: '50vh' }}>
+              <Table aria-labelledby="tableTitle" stickyHeader>
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">
@@ -121,6 +132,7 @@ export default function ShowContactsErrorsModal() {
                           selected.length === contacts.length
                         }
                         onChange={handleSelectAllClick}
+                        disabled={isLoading}
                       />
                     </TableCell>
 
@@ -149,6 +161,10 @@ export default function ShowContactsErrorsModal() {
                         tabIndex={-1}
                         key={row.id}
                         selected={isItemSelected}
+                        sx={{
+                          cursor: isLoading ? 'not-allowed' : 'pointer',
+                          pointerEvents: isLoading ? 'none' : 'initial',
+                        }}
                       >
                         <TableCell padding="checkbox">
                           <Checkbox
@@ -157,6 +173,7 @@ export default function ShowContactsErrorsModal() {
                             inputProps={{
                               'aria-labelledby': labelId,
                             }}
+                            disabled={isLoading}
                           />
                         </TableCell>
                         <TableCell align="left">
@@ -179,7 +196,7 @@ export default function ShowContactsErrorsModal() {
           <Button
             variant="contained"
             sx={{ width: '100%' }}
-            disabled={selected.length === 0}
+            disabled={selected.length === 0 || isLoading}
             onClick={handleSendContacts}
           >
             Enviar

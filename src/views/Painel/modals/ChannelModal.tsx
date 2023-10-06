@@ -18,8 +18,9 @@ import { useToast } from '../../../context/ToastContext';
 
 import DefaultInput from '../../../components/Inputs/DefaultInput';
 import QrCodeView from '../components/QrCodeView';
+import { Channel } from '../../../models/channel';
 
-const stringValidator = z
+export const stringValidator = z
   .string({
     required_error: 'Campo obrigatório!',
     invalid_type_error: 'Campo obrigatório!',
@@ -27,7 +28,7 @@ const stringValidator = z
   .min(3, 'Deve ter no mínimo 3 caracteres')
   .max(100, 'Pode ter no máximo 50 caracteres');
 
-export type ChannelSchemaSchemaType = z.infer<typeof channelSchema>;
+type ChannelSchemaSchemaType = z.infer<typeof channelSchema>;
 const channelSchema = z.object({
   id: stringValidator,
   instanceName: stringValidator,
@@ -52,7 +53,7 @@ export default function ChannelModal() {
   const isDisabled = true;
 
   useEffect(() => {
-    const channelFromLocation: ChannelSchemaSchemaType = location.state;
+    const channelFromLocation: Channel = location.state;
 
     if (!channelFromLocation || !id) {
       navigate('..');

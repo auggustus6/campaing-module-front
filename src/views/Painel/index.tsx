@@ -23,8 +23,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../../context/ToastContext';
 
-import TableChannels, { Channel } from './components/TableChannels';
+import TableChannels from './components/TableChannels';
 import DefaultInput from '../../components/Inputs/DefaultInput';
+import { Channel } from '../../models/channel';
 
 interface User {
   id: string;

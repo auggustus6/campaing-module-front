@@ -1,6 +1,6 @@
 import React from 'react'
 import { useMutation } from 'react-query'
-import { CampaignSchemaType } from '../campaignSchema';
+import { CampaignSchemaType } from '../schemas/campaignSchema';
 import Swal from 'sweetalert2';
 import api from '../../../services/api';
 

@@ -2,8 +2,10 @@ import { Add, Circle, PlusOne } from '@mui/icons-material';
 import { IconButton } from '@mui/joy';
 import { Box, Typography } from '@mui/material';
 import React from 'react';
+import { useChatModals } from '../logic/useChatModals';
 
 export default function ChatHeader() {
+  const { openChatModal } = useChatModals();
   return (
     <Box
       sx={{
@@ -14,7 +16,7 @@ export default function ChatHeader() {
       display={'flex'}
       gap={'1rem'}
       color={'white'}
-      alignContent={'center'}
+      alignItems={'center'}
     >
       <Box
         sx={{
@@ -42,7 +44,10 @@ export default function ChatHeader() {
         </Typography>
       </Box>
       <Box height={40}>
-        <IconButton sx={{bgcolor: "white"}}>
+        <IconButton
+          sx={{ bgcolor: 'white' }}
+          onClick={() => openChatModal('newService')}
+        >
           <Add />
         </IconButton>
       </Box>

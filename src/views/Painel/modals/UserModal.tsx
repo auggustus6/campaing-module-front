@@ -8,13 +8,11 @@ import {
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Checkbox } from '../../../components/checkbox';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { useQuery, useQueryClient } from 'react-query';
 import { useEffect } from 'react';
 import { Close, Info } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';

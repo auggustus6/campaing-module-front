@@ -10,11 +10,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../../context/ToastContext';
 import { Ballot, Circle, Preview, WhatsApp } from '@mui/icons-material';
-import { ChannelSchemaSchemaType } from '../modals/ChannelModal';
-import { tableFormatDateTime } from '../../../utils/dateAndTimeUtils';
 
-// TODO - move model type to a dto file in a folder
-export interface Channel extends ChannelSchemaSchemaType {}
+import { tableFormatDateTime } from '../../../utils/dateAndTimeUtils';
+import { Channel } from '../../../models/channel';
 
 interface TableChannelsProps {
   channels: Channel[] | undefined;
@@ -69,27 +67,6 @@ export default function TableChannels({
     });
   }
 
-  // function handleEdit(channel: Channel) {
-  //   navigate('edit-channel', {
-  //     state: channel,
-  //   });
-  // }
-
-  // async function handleRemove(id: string) {
-  //   const { isConfirmed } = await Swal.fire({
-  //     title: 'Você tem certeza?',
-  //     text: 'Você não poderá reverter isso!',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Sim',
-  //     cancelButtonText: 'Não',
-  //   });
-
-  //   if (!isConfirmed) return;
-
-  //   await api.delete(`/channels/${id}`);
-  //   refetch();
-  // }
 
   return (
     <TableContainer component={Paper}>
@@ -97,16 +74,6 @@ export default function TableChannels({
         <Typography variant="h5" display={'flex'} alignItems={'center'} gap={1}>
           <WhatsApp /> Canais
         </Typography>
-        {/* <ShowWhenAdmin>
-          <Button
-            variant="outlined"
-            onClick={handleCreateNewChannel}
-            disabled={isLoading}
-          >
-            <AddIcon sx={{ marginRight: 1 }} />
-            Adicionar canal
-          </Button>
-        </ShowWhenAdmin> */}
       </Box>
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
@@ -134,33 +101,9 @@ export default function TableChannels({
                     variant="outlined"
                     color="secondary"
                     onClick={() => handleSeeDetails(row)}
-                    // sx={{ marginRight: 1 }}
                   >
                     <Preview /> Detalhes
                   </Button>
-                  {/* <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleCheckStatus(row)}
-                    // sx={{ marginRight: 1 }}
-                  >
-                    <Info /> Status
-                  </Button> */}
-                  {/* <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleEdit(row)}
-                    sx={{ marginRight: 1 }}
-                  >
-                    <EditIcon />
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleRemove(row.id!)}
-                  >
-                    <DeleteIcon />
-                  </Button> */}
                 </Stack>
               </TableCell>
             </TableRow>

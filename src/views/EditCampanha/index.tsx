@@ -42,7 +42,7 @@ import {
 import TableContacts from '../../components/TableContacts';
 import { Add } from '@mui/icons-material';
 import ContactModal from '../../components/modals/ContactModal';
-import { phoneRegex } from '../CreateCampanha/campaignSchema';
+import { phoneRegex } from '../CreateCampanha/schemas/campaignSchema';
 
 interface Campaign {
   id: string;

@@ -30,8 +30,6 @@ export function useXLSX() {
         return rest;
       });
 
-      // convert all values to string
-
       filteredData = filteredData.map((item: any) => {
         const newItem: any = {};
         Object.keys(item).forEach((key) => {
@@ -60,13 +58,6 @@ export function useXLSX() {
           });
         }
       }
-
-      // filteredData = filteredData.filter((item: any) => {
-      //   if (Object.values(item).every((x) => x === null || x === '')) {
-      //     return false;
-      //   }
-      //   return true;
-      // });
 
       return { data: filteredData };
     } catch (error) {

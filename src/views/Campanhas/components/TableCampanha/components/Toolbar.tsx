@@ -2,7 +2,6 @@ import { Toolbar, alpha, Typography, Button, Switch, Box } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Data } from '..';
 import { queryClient } from '../../../../../main';
 import api from '../../../../../services/api';
 import CampaignIcon from '@mui/icons-material/Campaign';
@@ -13,6 +12,8 @@ import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PreviewIcon from '@mui/icons-material/Preview';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useAuth } from '../../../../../context/AuthContext';
+import { Campaign } from '../../../../../models/campaign';
+import { API_URLS } from '../../../../../utils/constants';
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
@@ -20,7 +21,7 @@ interface EnhancedTableToolbarProps {
   clearSelected: () => void;
   showDeleted: boolean;
   setShowDeleted: (option: boolean) => void;
-  campaign: Data[];
+  campaign?: Campaign[];
 }
 
 export function EnhancedTableToolbar({
@@ -44,8 +45,9 @@ export function EnhancedTableToolbar({
   async function handleStartButton() {
     setIsLoading(true);
     try {
+      // TODO - move to useMutation
       await api.post(`/campaign/start`, selectedItem);
-      await queryClient.invalidateQueries('campaign');
+      await queryClient.invalidateQueries(API_URLS.CAMPAIGNS.BASE);
       Swal.fire('Sucesso', 'Campanha iniciada com sucesso!', 'success');
       clearSelected();
     } catch (error) {
@@ -61,8 +63,9 @@ export function EnhancedTableToolbar({
   async function handleFinishButton() {
     setIsLoading(true);
     try {
+      // TODO - move to useMutation
       await api.post(`/campaign/finish`, selectedItem);
-      await queryClient.invalidateQueries('campaign');
+      await queryClient.invalidateQueries(API_URLS.CAMPAIGNS.BASE);
       Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
       clearSelected();
     } catch (error) {
@@ -78,8 +81,9 @@ export function EnhancedTableToolbar({
   async function handlePauseButton() {
     setIsLoading(true);
     try {
+      // TODO - move to useMutation
       await api.post(`/campaign/pause`, selectedItem);
-      await queryClient.invalidateQueries('campaign');
+      await queryClient.invalidateQueries(API_URLS.CAMPAIGNS.BASE);
       Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
       clearSelected();
     } catch (error) {
@@ -94,8 +98,9 @@ export function EnhancedTableToolbar({
   async function handleRemoveButton() {
     setIsLoading(true);
     try {
+      // TODO - move to useMutation
       await api.post(`/campaign/delete`, selectedItem);
-      await queryClient.invalidateQueries('campaign');
+      await queryClient.invalidateQueries(API_URLS.CAMPAIGNS.BASE);
       Swal.fire('Sucesso', 'Campanha removida com sucesso!', 'success');
       setSelectedItem([]);
     } catch (error) {
@@ -166,7 +171,7 @@ export function EnhancedTableToolbar({
               Ver
             </Button>
           )}
-          {user?.isAdmin && campaign[0].status !== 'CONCLUIDO' && (
+          {user?.isAdmin && campaign?.[0].status !== 'CONCLUIDO' && (
             <>
               <Button
                 title="Iniciar Campanha"
@@ -228,7 +233,7 @@ export function EnhancedTableToolbar({
             </Button>
           )}
 
-          {user?.isAdmin && campaign[0].status !== 'CONCLUIDO' && (
+          {user?.isAdmin && campaign?.[0].status !== 'CONCLUIDO' && (
             <Button
               title="Remover Campanha"
               variant="contained"

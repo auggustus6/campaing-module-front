@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useToast } from '../../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { CampaignSchemaType } from '../campaignSchema';
+import { CampaignSchemaType } from '../schemas/campaignSchema';
 import { useMutation } from 'react-query';
 import api from '../../../services/api';
 import Swal from 'sweetalert2';

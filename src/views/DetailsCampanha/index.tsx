@@ -6,12 +6,10 @@ import Input from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 
 import Button from '@mui/joy/Button';
-import TableContactsFromApi from '../../components/TableContacts/TableContactsFromApi';
 import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
-import api from '../../services/api';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -19,7 +17,6 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-import moment from 'moment';
 import ShowWhenAdmin from '../../components/ShowWhenAdmin';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { ReplyAllSharp } from '@mui/icons-material';
@@ -29,34 +26,34 @@ import {
   getTimeFromMinutes,
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
-import { useQuery } from 'react-query';
 import { Switch } from '@mui/material';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
-
-interface DataContacts {
-  data: {
-    page: number;
-    results: {
-      campaignId: string;
-      contact: string;
-      status: string;
-      variables: string;
-    }[];
-    total: number;
-  };
-}
+import useGetCampaign from '../../hooks/querys/useGetCampaign';
+import { useManageCampaign } from './hooks/useManageCampaign';
+import { useToast } from '../../context/ToastContext';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
-  const [data, setData] = useState<any>();
-  const [contactsWithError, setContactsWithError] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    data: campaign,
+    refetch,
+    isError,
+    isLoading: isGettingCampaign,
+  } = useGetCampaign({ id: id! });
+
+  const [contactsWithError, setContactsWithError] = useState<unknown[]>([]);
+
   const navigate = useNavigate();
+  const toast = useToast();
 
-  let midiaSrc = data?.midia;
-  if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
+  const { mutate, isLoading: isChangingCampaign } = useManageCampaign();
 
-  const midiaType = (data?.midiaType?.toLowerCase() as string)?.replace(
+  const isLoading = isGettingCampaign || isChangingCampaign;
+
+  let midiaSrc = campaign?.midia;
+  if (campaign?.midiaUrl) midiaSrc = campaign?.midiaUrl;
+
+  const midiaType = (campaign?.midiaType?.toLowerCase() as string)?.replace(
     '_url',
     ''
   );
@@ -64,7 +61,7 @@ export default function DetailsCampanha() {
   const [page, setPage] = useState(0);
   const [showFinished, setShowFinished] = useState(false);
 
-  const contactsObject = (data?.contacts || []).filter((item: any) => {
+  const contactsObject = (campaign?.contacts || []).filter((item: any) => {
     if (showFinished) {
       return item.status === 'ENVIADO';
     } else {
@@ -88,32 +85,22 @@ export default function DetailsCampanha() {
       };
     }) || [];
 
-  async function getData() {
-    try {
-      const result = await api.get(`/campaign/${id}`);
+  useEffect(() => {
+    if (campaign?.status === 'CONCLUIDO') {
+      const contacts = campaign?.contacts.filter(
+        (c: any) => c.status === 'ERRO'
+      );
 
-      if (result.data.status === 'CONCLUIDO') {
-        // const contacts = await api.post(`/campaign/get-all-with-errors/${id}`);
-        // if (contacts.data) {
-        //   setContactsWithError(contacts.data);
-        // }
-
-        const conts = result.data.contacts.filter(
-          (c: any) => c.status === 'ERRO'
-        );
-
-        setContactsWithError(conts || []);
-      }
-
-      setData(result.data);
-    } catch (error) {
-      navigate('/campanhas');
+      setContactsWithError(contacts || []);
     }
-  }
+  }, [campaign]);
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (isError) {
+      toast.error('Erro ao carregar campanha, ou campanha não existe.');
+      navigate('./..');
+    }
+  }, [isError]);
 
   async function handleRemoveCampaign() {
     const option = await Swal.fire({
@@ -128,62 +115,63 @@ export default function DetailsCampanha() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await api.post(`/campaign/delete`, [id]);
-      Swal.fire('Sucesso', 'Campanha removida com sucesso!', 'success');
-      navigate('./..');
-    } catch (error) {
-      Swal.fire(
-        'Erro',
-        'Erro ao apagar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
-
-    setIsLoading(false);
+    mutate(
+      { data: [id], action: 'DELETE' },
+      {
+        onSuccess: () => {
+          toast.success('Campanha removida com sucesso!');
+          navigate('./..');
+        },
+        onError: () => {
+          toast.error('Erro ao apagar campanha, por favor tente novamente.');
+        },
+      }
+    );
   }
 
-  async function handleStartButton() {
-    try {
-      await api.post(`/campaign/start`, [id]);
-      await getData();
-      Swal.fire('Sucesso', 'Campanha iniciada com sucesso!', 'success');
-    } catch (error) {
-      Swal.fire(
-        'Erro',
-        'Erro ao iniciar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
+  function handleStartButton() {
+    mutate(
+      { data: [id], action: 'START' },
+      {
+        onSuccess: () => {
+          toast.success('Campanha iniciada com sucesso!');
+          refetch();
+        },
+        onError: () => {
+          toast.error('Erro ao iniciar campanha, por favor tente novamente.');
+        },
+      }
+    );
   }
 
-  async function handleFinishButton() {
-    try {
-      await api.post(`/campaign/finish`, [id]);
-      await getData();
-      Swal.fire('Sucesso', 'Campanha encerrada com sucesso!', 'success');
-    } catch (error) {
-      Swal.fire(
-        'Erro',
-        'Erro ao encerrar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
+  function handleFinishButton() {
+    mutate(
+      { data: [id], action: 'FINISH' },
+      {
+        onSuccess: () => {
+          toast.success('Campanha encerrada com sucesso!');
+          refetch();
+        },
+        onError: () => {
+          toast.error('Erro ao encerrar campanha, por favor tente novamente.');
+        },
+      }
+    );
   }
 
-  async function handlePauseButton() {
-    try {
-      await api.post(`/campaign/pause`, [id]);
-      await getData();
-      Swal.fire('Sucesso', 'Campanha pausada com sucesso!', 'success');
-    } catch (error) {
-      Swal.fire(
-        'Erro',
-        'Erro ao pausar campanha, por favor tente novamente.',
-        'error'
-      );
-    }
+  function handlePauseButton() {
+    mutate(
+      { data: [id], action: 'PAUSE' },
+      {
+        onSuccess: () => {
+          toast.success('Campanha pausada com sucesso!');
+          refetch();
+        },
+        onError: () => {
+          toast.error('Erro ao pausar campanha, por favor tente novamente.');
+        },
+      }
+    );
   }
 
   function handleNavigateResend() {
@@ -209,7 +197,7 @@ export default function DetailsCampanha() {
                 {contactsWithError.length > 0 && (
                   <Button
                     sx={{ textTransform: 'uppercase' }}
-                    color="info"
+                    color="neutral"
                     onClick={handleNavigateResend}
                   >
                     <ReplyAllSharp fontSize="small" />
@@ -239,27 +227,37 @@ export default function DetailsCampanha() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Titulo da Campanha</InputLabel>
-          <Input variant="outlined" value={data?.title} disabled fullWidth />
+          <Input
+            variant="outlined"
+            value={campaign?.title}
+            disabled
+            fullWidth
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Canal</InputLabel>
           <Input
             variant="outlined"
-            value={data?.channel.instanceName}
+            value={campaign?.channel.instanceName}
             disabled
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Status</InputLabel>
-          <Input variant="outlined" value={data?.status} disabled fullWidth />
+          <Input
+            variant="outlined"
+            value={campaign?.status}
+            disabled
+            fullWidth
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
           <InputLabel>Data para disparo:</InputLabel>
           <Input
             variant="outlined"
             fullWidth
-            value={formatDate(data?.scheduleDate)}
+            value={formatDate(campaign?.scheduleDate)}
             disabled
             type="date"
           />
@@ -269,7 +267,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={formatDateTime(data?.endDate)}
+            value={formatDateTime(campaign?.endDate)}
             disabled
             type="datetime-local"
           />
@@ -279,7 +277,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={data?.sendDelay}
+            value={campaign?.sendDelay}
             disabled
           />
         </Grid>
@@ -288,7 +286,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={data?.sentContactsCount}
+            value={campaign?.sentContactsCount}
             disabled
           />
         </Grid>
@@ -297,7 +295,7 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={getTimeFromMinutes(data?.startTime || 0)}
+            value={getTimeFromMinutes(campaign?.startTime || 0)}
             disabled
           />
         </Grid>
@@ -306,22 +304,22 @@ export default function DetailsCampanha() {
           <Input
             variant="outlined"
             fullWidth
-            value={getTimeFromMinutes(data?.endTime || 0)}
+            value={getTimeFromMinutes(campaign?.endTime || 0)}
             disabled
           />
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
-          <TextArea value={data?.message} disabled />
+          <TextArea value={campaign?.message} disabled />
         </Grid>
         <Grid item xs={12} pb={8}>
           <InputLabel>Preview da mensagem</InputLabel>
           <PreviewWppMessage
-            messagePreview={data?.message}
+            messagePreview={campaign?.message}
             imgSrc={midiaType == 'image' ? midiaSrc : undefined}
           />
         </Grid>
-        {!['CANCELADO', 'CONCLUIDO'].includes(data?.status) && (
+        {!['CANCELADO', 'CONCLUIDO'].includes(campaign?.status || '') && (
           <ShowWhenAdmin>
             <Stack
               direction={'row'}

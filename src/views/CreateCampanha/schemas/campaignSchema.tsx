@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {
   getMinutesFromTime,
   getNowOnlyDate,
-} from '../../utils/dateAndTimeUtils';
+} from '../../../utils/dateAndTimeUtils';
 
 export const phoneRegex = new RegExp(/\b\d{8,14}\b/);
 

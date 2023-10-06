@@ -1,4 +1,4 @@
-import { Data, Order } from "..";
+import { Campaign } from "../../../../../models/campaign";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -25,8 +25,8 @@ export function stableSort<T>(
   return stabilizedThis.map((el) => el[0]);
 }
 
-export function getComparator<Key extends keyof Data>(
-  order: Order,
+export function getComparator<Key extends keyof Campaign>(
+  order: 'asc' | 'desc',
   orderBy: Key
 ): (
   a: { [key in Key]: number | string },

@@ -29,15 +29,16 @@ import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 import DefaultInput from '../../components/Inputs/DefaultInput';
-import { CampaignSchemaType, campaignSchema } from './campaignSchema';
+import { CampaignSchemaType, campaignSchema } from './schemas/campaignSchema';
 import useSelectOption from './hooks/useSelectOption';
 import useIsImage from './hooks/useIsImage';
-import useFetchCompany from './hooks/useFetchCompany';
 import useCreateCampaign from './hooks/useCreateCampaign';
 import useTestMessage from './hooks/useTestMessage';
 import useUploadFile from './hooks/useUploadFile';
 import { getFormattedMessage } from '../../utils/variablesUtils';
 import useCaretPosition from './hooks/useCaretPosition';
+import useCompany from '../../hooks/querys/useCompany';
+import useChannels from '../../hooks/querys/useChannels';
 
 export default function CreateCampanha() {
   const {
@@ -62,12 +63,11 @@ export default function CreateCampanha() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
 
-
   const [contactKey, setContactKey] = useState('');
 
   const { base64: midiaBase64, getBase64 } = useBase64();
 
-  const {caretPosition} = useCaretPosition({ id: 'messageTextArea' });
+  const { caretPosition } = useCaretPosition({ id: 'messageTextArea' });
 
   const { handleSelectOption } = useSelectOption({
     caretPosition,
@@ -101,7 +101,6 @@ export default function CreateCampanha() {
     trigger,
   });
 
-
   async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
     getBase64(e.target.files?.[0]);
     setValue('midiaName', e.target.files?.[0].name);
@@ -112,7 +111,7 @@ export default function CreateCampanha() {
     setValue('session', e.target.value);
   }
 
-  const { data: company, isLoading: isCompanyLoading } = useFetchCompany();
+  const { data: channels, isLoading: isChannelsLoading } = useChannels();
   const { mutate: handleCreateCampaign, isLoading: isCreatingCampaign } =
     useCreateCampaign({ midiaBase64 });
   const { mutate: handleTestMessage, isLoading: isTestingMessage } =
@@ -121,7 +120,9 @@ export default function CreateCampanha() {
       midiaBase64,
     });
 
-  const isLoading = isCompanyLoading || isCreatingCampaign || isTestingMessage;
+  const isLoading = isCreatingCampaign || isTestingMessage || isChannelsLoading;
+
+  console.log(channels);
 
   async function handleRemoveContact(index: number) {
     const option = await Swal.fire({
@@ -204,12 +205,12 @@ export default function CreateCampanha() {
             <Select
               {...register('session')}
               error={!!errors.session}
-              disabled={isLoading || shouldDisable || !company?.channel.length}
+              disabled={isLoading || shouldDisable || !channels?.length}
               value={session || 'select'}
               onChange={handleCanalSelect}
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
-              {company?.channel.map((option) => (
+              {channels?.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
                   {option.instanceName}
                 </MenuItem>

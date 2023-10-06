@@ -1,6 +1,6 @@
 import React from 'react';
 import { useXLSX } from '../../../hooks/useXLSX';
-import { phoneRegex } from '../campaignSchema';
+import { phoneRegex } from '../schemas/campaignSchema';
 import Swal from 'sweetalert2';
 import { addBrazilianCountryCode } from '../../../utils/phoneNumbers';
 

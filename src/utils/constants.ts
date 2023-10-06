@@ -51,3 +51,26 @@ export const CANAL = [
   ['KEFF - 2', '5517981180102'],
   ['WebForMe Suplementos', '5517982190056'],
 ];
+
+export const API_URLS = {
+  AUTH: {
+    BASE: '/auth',
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+  },
+  COMPANY: {
+    BASE: '/companies',
+    USERS: '/companies/users',
+  },
+  CAMPAIGNS: {
+    BASE: '/campaign',
+    DELETE: '/campaign/delete',
+    PAUSE: '/campaign/pause',
+    FINISH: '/campaign/finish',
+    START: '/campaign/start',
+    RESEND: '/campaign/resend',
+  },
+  CHANNELS: {
+    BASE: '/channels',
+  },
+} as const;

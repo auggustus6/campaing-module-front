@@ -1,16 +1,4 @@
-import { Circle, MoreVert, Search, Send } from '@mui/icons-material';
-import {
-  Avatar,
-  Box,
-  Divider,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Typography,
-} from '@mui/material';
-import React from 'react';
-import DefaultInput from '../../components/Inputs/DefaultInput';
+import { Box } from '@mui/material';
 
 import ChatHeader from './components/ChatHeader';
 import MessagesList from './components/MessagesList';
@@ -19,8 +7,12 @@ import ContentHeader from './components/ContentHeader';
 import Messages from './components/Messages';
 import SendMessage from './components/SendMessage';
 import NewServiceModal from './modals/NewServiceModal';
+import { useChatModals } from './logic/useChatModals';
+import Show from '../../components/MetaComponents/Show';
 
 export default function ChatView() {
+  const { chatModals, toggleCurrentChatModal } = useChatModals();
+
   return (
     <Box
       display={'grid'}
@@ -30,7 +22,12 @@ export default function ChatView() {
       overflow={'hidden'}
       boxShadow={'0px 0px 10px rgba(0,0,0,0.1)'}
     >
-      <NewServiceModal />
+      {/* MODALS */}
+      <>
+        <Show when={chatModals === 'newService'}>
+          <NewServiceModal onClose={toggleCurrentChatModal} />
+        </Show>
+      </>
       <Box
         sx={{
           height: '84vh',
@@ -42,7 +39,7 @@ export default function ChatView() {
         <ChatHeader />
         <SearchInput />
         <MessagesList />
-      NewServiceModal</Box>
+      </Box>
       <Box
         sx={{
           background: '#f7f7f7',
