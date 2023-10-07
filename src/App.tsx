@@ -18,6 +18,7 @@ import ChannelModal from './views/Painel/modals/ChannelModal';
 import ShowContactsErrorsModal from './views/DetailsCampanha/modals/ShowContactsErrorsModal';
 import ChatView from './views/Chat';
 import ChatLayout from './layouts/ChatLayout';
+import { TesteView } from './views/TesteView';
 
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
@@ -33,6 +34,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="test" element={<TesteView />} />
           <Route element={<ChatLayout />}>
             <Route path="chat" element={<ChatView />} />
           </Route>

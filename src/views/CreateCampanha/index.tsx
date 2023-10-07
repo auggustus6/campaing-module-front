@@ -14,7 +14,7 @@ import { Add, Science, UploadFile } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -31,7 +31,7 @@ import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 import DefaultInput from '../../components/Inputs/DefaultInput';
 import { CampaignSchemaType, campaignSchema } from './schemas/campaignSchema';
 import useSelectOption from './hooks/useSelectOption';
-import useIsImage from './hooks/useIsImage';
+import useIsImage from '../../hooks/useIsImage';
 import useCreateCampaign from './hooks/useCreateCampaign';
 import useTestMessage from './hooks/useTestMessage';
 import useUploadFile from './hooks/useUploadFile';
@@ -39,6 +39,7 @@ import { getFormattedMessage } from '../../utils/variablesUtils';
 import useCaretPosition from './hooks/useCaretPosition';
 import useCompany from '../../hooks/querys/useCompany';
 import useChannels from '../../hooks/querys/useChannels';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function CreateCampanha() {
   const {
@@ -81,18 +82,16 @@ export default function CreateCampanha() {
   const shouldDisable = !user?.company?.isActive ?? true;
 
   const [contactsObject, setContactsObject] = useState<any[]>([]);
-  const [contactsTablePage, setContactsTablePage] = useState(0);
-  const contactsToShow = contactsObject.slice(
-    contactsTablePage * TABLE_CONTACTS_SIZE,
-    contactsTablePage * TABLE_CONTACTS_SIZE + TABLE_CONTACTS_SIZE
-  );
 
-  let selectedIndexFromPage = NaN;
-
-  if (!Number.isNaN(selectedContact)) {
-    selectedIndexFromPage =
-      selectedContact + contactsTablePage * TABLE_CONTACTS_SIZE;
-  }
+  const {
+    dataToShow: contactsToShow,
+    page: contactsTablePage,
+    setPage: setContactsTablePage,
+    selectedIndex,
+  } = usePagination({
+    data: contactsObject,
+    selectedFromPageIndex: selectedContact,
+  });
 
   const { handleUploadFile } = useUploadFile({
     setContactKey,
@@ -114,6 +113,7 @@ export default function CreateCampanha() {
   const { data: channels, isLoading: isChannelsLoading } = useChannels();
   const { mutate: handleCreateCampaign, isLoading: isCreatingCampaign } =
     useCreateCampaign({ midiaBase64 });
+
   const { mutate: handleTestMessage, isLoading: isTestingMessage } =
     useTestMessage({
       messagePreview,
@@ -121,8 +121,6 @@ export default function CreateCampanha() {
     });
 
   const isLoading = isCreatingCampaign || isTestingMessage || isChannelsLoading;
-
-  console.log(channels);
 
   async function handleRemoveContact(index: number) {
     const option = await Swal.fire({
@@ -174,19 +172,19 @@ export default function CreateCampanha() {
       <ContactModal
         addContact={(contact) => {
           const newValues = getValues('contacts');
-          newValues[selectedIndexFromPage] = contact;
+          newValues[selectedIndex] = contact;
           setValue('contacts', newValues);
         }}
         updateContactTable={(contact) => {
           const newValues = [...contactsObject];
-          newValues[selectedIndexFromPage] = contact;
+          newValues[selectedIndex] = contact;
           setContactsObject(newValues);
         }}
         isOpen={!Number.isNaN(selectedContact)}
         onClose={() => setSelectedContact(NaN)}
         fields={variables}
         contactKey={contactKey}
-        selectedContact={contactsObject[selectedIndexFromPage]}
+        selectedContact={contactsObject[selectedIndex]}
       />
       <Grid container spacing={2}>
         <Grid item xs={12}>
