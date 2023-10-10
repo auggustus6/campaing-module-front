@@ -3,6 +3,7 @@ import { CrudBuilder } from '../components/CrudBuilder';
 import { CrudBuilderSchema } from '../components/CrudBuilder/models/CrudBuilderSchema';
 import { z } from 'zod';
 import { CrudBuilderField } from '../components/CrudBuilder/models/CrudBuilderField';
+import DefaultInput from '../components/Inputs/DefaultInput';
 
 enum Campos {
   Nome = 'Nome',
@@ -20,6 +21,9 @@ const schemaAndFields = new CrudBuilderSchema({
     new CrudBuilderField({
       label: Campos.Nome,
       type: 'TEXT',
+      disableOn: {
+        create: true,
+      }
     }),
     new CrudBuilderField({
       label: Campos.Idade,
@@ -39,38 +43,34 @@ export const TesteView = () => {
       fields={schemaAndFields.fields}
       zodSchema={schemaAndFields.schema}
       onCreate={async (data) => alert('foi')}
+      onRemove={async () => {
+        throw new Error('Not implemented');
+      }}
+      buttons={({ onRemove }) => (
+        <>
+          <button type="submit">Enviar</button>
+          <button onClick={onRemove} type="button">
+            Remover
+          </button>
+        </>
+      )}
       render={({ field, hook, errorMessage, disabled }) => {
         switch (field.type) {
           case 'TEXT':
           case 'NUMBER':
           case 'EMAIL':
             return (
-              <div key={field.label}>
-                <input
-                  {...hook.register(field.label)}
-                  disabled={disabled}
-                  type={field.type.toLowerCase()}
-                  placeholder={field.label}
-                />
-                {errorMessage && <span>{errorMessage}</span>}
-              </div>
+              <DefaultInput
+                key={field.label}
+                {...hook.register(field.label)}
+                disabled={disabled}
+                type={field.type.toLowerCase()}
+                placeholder={field.label}
+                errorMessage={errorMessage}
+              />
             );
         }
-
-        return null;
       }}
-      container={(children) => (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            width: 300,
-          }}
-        >
-          {children}
-        </div>
-      )}
     />
   );
 };

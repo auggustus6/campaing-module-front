@@ -31,9 +31,3 @@ export const TextAreaStyle = styled.textarea<TextAreaProps>`
     color: rgba(0, 0, 0, 0.23);
   }
 `;
-
-export const ErrorLabel = styled.small`
-  color: ${() => theme.palette.error.main};
-  font-size: 0.75rem;
-  margin-left: 14px;
-`;

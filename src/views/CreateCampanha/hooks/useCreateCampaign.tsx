@@ -17,6 +17,8 @@ export default function useCreateCampaign({
 
   return useMutation({
     mutationFn: async (values: CampaignSchemaType) => {
+      console.log(midiaBase64);
+
       try {
         await api.post('/campaign', {
           title: values.title,
@@ -30,7 +32,7 @@ export default function useCreateCampaign({
           midia: midiaBase64,
           midiaUrl: values.midiaUrl,
         });
-  
+
         navigate('/campanhas');
         Swal.fire('Sucesso', 'Campanha criada com sucesso!', 'success');
       } catch (error) {

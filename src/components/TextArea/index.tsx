@@ -3,29 +3,31 @@ import { FieldError } from 'react-hook-form';
 import * as Styles from './styles';
 import Show from '../MetaComponents/Show';
 import { InputLabel } from '@mui/material';
+import ErrorLabel from '../Labels/ErrorLabel';
 
 interface TextArea {
-  error?: FieldError;
+  errorMessage?: string;
   disabled?: boolean;
   label?: string;
   style?: React.CSSProperties;
-  [key: string]: any;
+  // [key: string]: any;
 }
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextArea>(
-  ({ error, disabled, label, ...rest }: TextArea, ref) => {
+  ({ errorMessage, disabled, label, ...rest }: TextArea, ref) => {
     return (
-      <>
+      <div>
         <Show when={!!label}>
-          <InputLabel error={!!error}>{label}</InputLabel>
+          <InputLabel error={!!errorMessage}>{label}</InputLabel>
         </Show>
         <Styles.TextAreaStyle
           ref={ref}
-          error={!!error}
+          error={!!errorMessage}
           disabled={disabled}
           {...rest}
-        ></Styles.TextAreaStyle>
-        {error && <Styles.ErrorLabel>{error.message}</Styles.ErrorLabel>}
-      </>
+        />
+        <ErrorLabel>{errorMessage}</ErrorLabel>
+        {/* {error && <Styles.ErrorLabel>{error.message}</Styles.ErrorLabel>} */}
+      </div>
     );
   }
 );

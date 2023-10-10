@@ -19,6 +19,7 @@ import ShowContactsErrorsModal from './views/DetailsCampanha/modals/ShowContacts
 import ChatView from './views/Chat';
 import ChatLayout from './layouts/ChatLayout';
 import { TesteView } from './views/TesteView';
+import { CampaignCrud } from './views/CampaignCrud';
 
 const CreateCampanha = lazy(() => import('./views/CreateCampanha'));
 const DetailsCampanha = lazy(() => import('./views/DetailsCampanha'));
@@ -41,8 +42,12 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="campanhas" element={<Campanhas />} />
             <Route
-              path="campanhas/criar"
+              path="campanhas/criar2"
               element={<AdminRoute e={<CreateCampanha />} />}
+            />
+            <Route
+              path="campanhas/criar"
+              element={<AdminRoute e={<CampaignCrud screenState="create" />} />}
             />
             <Route path="campanhas/:id" element={<DetailsCampanha />}>
               <Route path="reenviar" element={<ShowContactsErrorsModal />} />

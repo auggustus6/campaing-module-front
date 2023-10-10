@@ -101,6 +101,8 @@ export default function CreateCampanha() {
   });
 
   async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log(e.target.files?.[0]);
+
     getBase64(e.target.files?.[0]);
     setValue('midiaName', e.target.files?.[0].name);
     e.target.value = '';
@@ -310,8 +312,7 @@ export default function CreateCampanha() {
           <TextArea
             {...register('message')}
             disabled={isLoading || shouldDisable}
-            error={errors.message?.message}
-            id="messageTextArea"
+            errorMessage={errors.message?.message}
           />
         </Grid>
         <Grid item xs={12} sx={{ marginBottom: 2 }}>

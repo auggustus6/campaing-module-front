@@ -14,7 +14,7 @@ export default function ErrorLabel({ children }: Props) {
           color: '#d32f2f',
           marginLeft: '0.875rem',
           fontSize: '0.75rem',
-          marginTop: '3px',
+          // marginTop: '3px',
           ml: 0,
         }}
       >

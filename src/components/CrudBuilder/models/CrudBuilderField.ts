@@ -1,22 +1,22 @@
 import { ZodRawShape } from 'zod';
 
-export type FieldType =
+export type CBFieldType =
   | 'TEXT'
   | 'TEXTAREA'
   | 'NUMBER'
   | 'EMAIL'
   | 'SELECT'
   | 'RADIO'
+  | "FILE"
   | 'CHECKBOX'
   | 'DATE'
   | 'TIME'
   | 'DATETIME'
   | 'SWITCH'
   | 'SLIDER'
-  | 'UPLOAD'
   | 'CUSTOM';
 
-type Actions = {
+type CBScreenActions = {
   create?: boolean;
   update?: boolean;
   // delete?: boolean;
@@ -24,10 +24,11 @@ type Actions = {
 };
 
 type CrudBuilderFieldProps = {
-  type: FieldType;
+  type: CBFieldType;
   label: string;
-  disableOn?: Actions;
-  hideOn?: Actions;
+  name: string;
+  disableOn?: CBScreenActions;
+  hideOn?: CBScreenActions;
 };
 
 export class CrudBuilderField {
@@ -47,5 +48,9 @@ export class CrudBuilderField {
 
   get hideOn() {
     return this.props.hideOn;
+  }
+
+  get name() {
+    return this.props.name;
   }
 }
