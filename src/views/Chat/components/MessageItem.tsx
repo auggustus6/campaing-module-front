@@ -7,7 +7,7 @@ type Props = {
   sentAt: Date;
 };
 
-export default function MessageItem({ type, text, sentAt }: Props) {
+export  function MessageItem({ type, text, sentAt }: Props) {
   return (
     <Box display={'flex'} justifyContent={type === "sent" ? 'start' : 'end'}>
       <Box

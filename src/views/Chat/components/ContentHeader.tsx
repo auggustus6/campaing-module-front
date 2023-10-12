@@ -2,7 +2,7 @@ import { MoreVert, Search } from '@mui/icons-material';
 import { Box, Avatar, Typography } from '@mui/material';
 import { IconButton } from '@mui/joy';
 
-export default function ContentHeader() {
+export  function ContentHeader() {
   return (
     <Box
       display={'flex'}

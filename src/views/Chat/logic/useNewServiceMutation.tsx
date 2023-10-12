@@ -1,10 +1,9 @@
-import React from 'react';
 import { useMutation } from 'react-query';
 import api from '../../../services/api';
 import { NewServiceSchemaType } from '../schemas/newServiceSchema';
 import { useToast } from '../../../context/ToastContext';
 
-export default function useNewServiceMutation() {
+export function useNewServiceMutation() {
   const toast = useToast();
 
   return useMutation({

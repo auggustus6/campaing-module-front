@@ -73,4 +73,8 @@ export const API_URLS = {
   CHANNELS: {
     BASE: '/channels',
   },
+  CALL: {
+    BASE: '/call',
+    MESSAGES: '/call/messages',
+  }
 } as const;

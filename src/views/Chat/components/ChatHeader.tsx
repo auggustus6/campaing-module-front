@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { useChatModals } from '../logic/useChatModals';
 
-export default function ChatHeader() {
+export  function ChatHeader() {
   const { openChatModal } = useChatModals();
   return (
     <Box

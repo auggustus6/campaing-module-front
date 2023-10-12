@@ -1,17 +1,20 @@
 import { Box } from '@mui/material';
 
-import ChatHeader from './components/ChatHeader';
-import MessagesList from './components/MessagesList';
-import SearchInput from './components/SearchInput';
-import ContentHeader from './components/ContentHeader';
-import Messages from './components/Messages';
-import SendMessage from './components/SendMessage';
+import { ChatHeader } from './components/ChatHeader';
+import { MessagesList } from './components/ChatsList';
+import { SearchInput } from './components/SearchInput';
+import { ContentHeader } from './components/ContentHeader';
+import { Messages } from './components/Messages';
+import { SendMessage } from './components/SendMessage';
 import NewServiceModal from './modals/NewServiceModal';
 import { useChatModals } from './logic/useChatModals';
 import Show from '../../components/MetaComponents/Show';
+import { useChats } from './logic/useChats';
 
 export default function ChatView() {
   const { chatModals, toggleCurrentChatModal } = useChatModals();
+  const { store } = useChats();
+  const chats = store((state) => state.chats);
 
   return (
     <Box

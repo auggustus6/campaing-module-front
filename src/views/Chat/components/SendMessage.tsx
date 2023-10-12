@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { IconButton } from '@mui/joy';
 import DefaultInput from '../../../components/Inputs/DefaultInput';
 
-export default function SendMessage() {
+export  function SendMessage() {
   return (
     <Box p={4}>
       <DefaultInput

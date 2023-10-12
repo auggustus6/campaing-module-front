@@ -1,8 +1,8 @@
 import { Box } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
-import MessageItem from './MessageItem';
+import {MessageItem} from './MessageItem';
 
-export default function Messages() {
+export  function Messages() {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

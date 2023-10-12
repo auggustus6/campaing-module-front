@@ -17,7 +17,7 @@ import {
   newServiceSchema,
 } from '../schemas/newServiceSchema';
 import ErrorLabel from '../../../components/Labels/ErrorLabel';
-import useNewServiceMutation from '../logic/useNewServiceMutation';
+import { useNewServiceMutation } from '../logic/useNewServiceMutation';
 import useChannels from '../../../hooks/querys/useChannels';
 import useCompany from '../../../hooks/querys/useCompany';
 import Show from '../../../components/MetaComponents/Show';
@@ -58,7 +58,6 @@ export default function NewServiceModal({ onClose }: Props) {
   function handleFormSubmit(data: NewServiceSchemaType) {
     newServiceMutation.mutate(data);
   }
-
 
   return (
     <Modal
