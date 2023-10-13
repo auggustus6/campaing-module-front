@@ -18,6 +18,16 @@ export function formatDateTime(date?: string) {
   return moment(date).format('YYYY-MM-DDTHH:mm');
 }
 
+export function chatFormatDateTime(date?: string) {
+  const today = moment().format('YYYY-MM-DD');
+  const dateFormatted = moment(date).format('YYYY-MM-DD');
+  if (today === dateFormatted) {
+    return moment(date).format('HH:mm');
+  } else {
+    return moment(date).format('DD/MM/YYYY');
+  }
+}
+
 export function formatDate(date?: string) {
   return moment.utc(date).format('YYYY-MM-DD');
 }

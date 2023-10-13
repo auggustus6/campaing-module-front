@@ -1,17 +1,18 @@
 import { Box } from '@mui/material';
 import React from 'react';
+import { MessageType } from '../../../models/message';
 
 type Props = {
-  type: "sent" | "received";
+  type: MessageType;
   text: string;
-  sentAt: Date;
+  sentAt: string;
 };
 
 export  function MessageItem({ type, text, sentAt }: Props) {
   return (
-    <Box display={'flex'} justifyContent={type === "sent" ? 'start' : 'end'}>
+    <Box display={'flex'} justifyContent={type === "RECEIVED" ? 'start' : 'end'}>
       <Box
-        bgcolor={type === "sent" ? 'white' : '#4b00df'}
+        bgcolor={type === "RECEIVED" ? 'white' : '#4b00df'}
         pl={2}
         pr={6}
         borderRadius={2}
@@ -20,7 +21,7 @@ export  function MessageItem({ type, text, sentAt }: Props) {
         // boxShadow={'0px 0px 3px rgba(0,0,0,0.1)'}
         border={'1px solid #dfdfdf'}
         maxWidth={'50%'}
-        color={type === "sent" ? '#333333' : 'white'}
+        color={type === "RECEIVED" ? '#333333' : 'white'}
       >
         {text}
       </Box>

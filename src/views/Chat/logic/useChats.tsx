@@ -3,49 +3,46 @@ import { useQuery } from 'react-query';
 import { create } from 'zustand';
 import { API_URLS } from '../../../utils/constants';
 import api from '../../../services/api';
+import { Chat } from '../../../models/call';
 
 type State = {
-  // TODO - create model for chat
-  chats: {
-    id: string;
-    lastMessage: string;
-    [key: string]: any;
-  }[];
+  chats: Chat[];
   selectedChatId: string | null;
 };
 
-type ApiResult = {
-  id: string;
-  [key: string]: any;
-};
-
 type Actions = {
-  setChats: (chats: any[]) => void;
-  addChat: (chat: any) => void;
+  setChats: (chats: Chat[]) => void;
+  addChat: (chat: Chat) => void;
   removeChat: (id: string) => void;
-  updateChat: (id: string, chat: any) => void;
-  selectChat: (id: string) => void;
+  updateChat: (id: string, chat: Chat) => void;
+  setSelectedChatId: (id: string) => void;
 };
 
 const chatsStore = create<State & Actions>((set) => ({
   chats: [],
   selectedChatId: null,
   setChats: (chats) => set({ chats }),
-  addChat: (chat) => set((prev) => ({ chats: [...prev.chats, chat] })),
+  addChat: (chat) => set((prev) => ({ chats: [chat, ...prev.chats] })),
   removeChat: (id) =>
     set((prev) => ({ chats: prev.chats.filter((chat) => chat.id !== id) })),
   updateChat: (id, chat) =>
     set((prev) => ({
-      chats: prev.chats.map((oldChat) => (oldChat.id === id ? chat : chat)),
+      chats: prev.chats
+        .map((oldChat) => (oldChat.id === id ? chat : oldChat))
+        .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
     })),
-  selectChat: (id) => set({ selectedChatId: id }),
+  setSelectedChatId: (id) => set({ selectedChatId: id }),
 }));
 
 export function useChats() {
+  const setChats = chatsStore((state) => state.setChats);
+  const chats = chatsStore((state) => state.chats);
   const query = useQuery(
-    API_URLS.CALL.BASE,
+    [API_URLS.CALL.BASE, 'GET'],
     async () => {
-      return await api.get<ApiResult[]>(API_URLS.CALL.BASE);
+      if (chats.length === 0) {
+        return await api.get<Chat[]>(API_URLS.CALL.BASE);
+      }
     },
     {
       refetchOnWindowFocus: false,
@@ -53,13 +50,11 @@ export function useChats() {
     }
   );
 
-  const setChats = chatsStore((state) => state.setChats);
-
   useEffect(() => {
-    if (query.data) {
+    if (query.data && !!query.data.data.length && !chats.length) {
       setChats(query.data.data);
     }
-  }, [query]);
+  }, [query.data]);
 
   return {
     query: query,

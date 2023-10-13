@@ -9,7 +9,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Button from '@mui/joy/Button';
-import Container from '@mui/system/Container';
 import { Add, Science, UploadFile } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,7 +23,7 @@ import useBase64 from '../../hooks/useBase64';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 
 import ContactModal from '../../components/modals/ContactModal';
-import { Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';

@@ -12,42 +12,65 @@ import { Call } from '@mui/icons-material';
 import InputMask from 'react-input-mask';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import {
-  NewServiceSchemaType,
-  newServiceSchema,
-} from '../schemas/newServiceSchema';
+
 import ErrorLabel from '../../../components/Labels/ErrorLabel';
-import { useNewServiceMutation } from '../logic/useNewServiceMutation';
 import useChannels from '../../../hooks/querys/useChannels';
-import useCompany from '../../../hooks/querys/useCompany';
 import Show from '../../../components/MetaComponents/Show';
+import { useNewChatMutation } from '../logic/useNewChatMutation';
+import { NewChatSchemaType, newChatSchema } from '../schemas/newServiceSchema';
+import { useEffect } from 'react';
+import { useToast } from '../../../context/ToastContext';
+import { useChats } from '../logic/useChats';
 
 type Props = {
   onClose: () => void;
 };
 
-export default function NewServiceModal({ onClose }: Props) {
+export default function NewChatModal({ onClose }: Props) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-  } = useForm<NewServiceSchemaType>({
-    resolver: zodResolver(newServiceSchema),
+  } = useForm<NewChatSchemaType>({
+    resolver: zodResolver(newChatSchema),
   });
   const channel = watch('channel');
 
   const channelsQuery = useChannels();
+  const toast = useToast();
 
-  const newServiceMutation = useNewServiceMutation();
+  const { store } = useChats();
+  const chatStore = store();
+
+  const newChatMutation = useNewChatMutation({
+    onError: (error) => {
+      return toast.error('Erro ao iniciar atendimento!');
+    },
+    onSuccess: (data) => {
+      console.log('callcreated', data);
+
+      if (data.alreadyExists) {
+        chatStore.updateChat(data.call.id, data.call);
+        chatStore.setSelectedChatId(data.call.id);
+        onClose();
+        toast.info('Atendimento já iniciado!');
+      } else {
+        chatStore.setSelectedChatId(data.call.id);
+        chatStore.addChat(data.call);
+        onClose();
+        toast.success('Atendimento iniciado com sucesso!');
+      }
+    },
+  });
 
   const shouldDisable =
     !channelsQuery.data?.length ||
-    newServiceMutation.isLoading ||
+    newChatMutation.isLoading ||
     channelsQuery.isLoading;
 
-  const isLoading = channelsQuery.isLoading || newServiceMutation.isLoading;
+  const isLoading = channelsQuery.isLoading || newChatMutation.isLoading;
 
   function handleChannelSelect(event: any, value: string | null) {
     if (value) {
@@ -55,9 +78,11 @@ export default function NewServiceModal({ onClose }: Props) {
     }
   }
 
-  function handleFormSubmit(data: NewServiceSchemaType) {
-    newServiceMutation.mutate(data);
+  function handleFormSubmit(data: NewChatSchemaType) {
+    newChatMutation.mutate(data);
   }
+
+  useEffect(() => {}, [newChatMutation.error]);
 
   return (
     <Modal

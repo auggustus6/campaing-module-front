@@ -1,11 +1,4 @@
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-} from '@mui/material';
+import { Box, List } from '@mui/material';
 import { useChats } from '../logic/useChats';
 import { ChatItem } from './ChatItem';
 
@@ -27,9 +20,16 @@ export function MessagesList() {
         },
       }}
     >
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        {new Array(30).fill(0).map((_, i) => (
-          <ChatItem />
+      <List sx={{ width: '100%', py: 0, bgcolor: 'background.paper' }}>
+        {chats.map((chat) => (
+          <ChatItem
+            key={chat.id}
+            id={chat.id}
+            sentAt={chat.updatedAt}
+            text={chat.lastMessage.content.message}
+            type={chat.lastMessage.type}
+            number={chat.number}
+          />
         ))}
       </List>
     </Box>

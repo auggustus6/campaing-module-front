@@ -6,8 +6,8 @@ const stringValidator = z.string({
   invalid_type_error: 'Campo obrigatório!',
 });
 
-export type NewServiceSchemaType = z.infer<typeof newServiceSchema>;
-export const newServiceSchema = z.object({
+export type NewChatSchemaType = z.infer<typeof newChatSchema>;
+export const newChatSchema = z.object({
   channel: stringValidator
     .nonempty()
     .refine((value) => value !== 'default', { message: 'Selecione um canal' }),

@@ -10,12 +10,13 @@ import NewServiceModal from './modals/NewServiceModal';
 import { useChatModals } from './logic/useChatModals';
 import Show from '../../components/MetaComponents/Show';
 import { useChats } from './logic/useChats';
+import { useEffect } from 'react';
 
 export default function ChatView() {
   const { chatModals, toggleCurrentChatModal } = useChatModals();
   const { store } = useChats();
   const chats = store((state) => state.chats);
-
+  
   return (
     <Box
       display={'grid'}

@@ -9,4 +9,4 @@ export interface Contact {
   status: Status;
 }
 
-type Status = 'ENVIADO' | 'NAO_ENVIADO' | 'ERRO';
+export type Status = 'ENVIADO' | 'NAO_ENVIADO' | 'ERRO';
