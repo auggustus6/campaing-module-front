@@ -22,16 +22,16 @@ const store = create<State & Actions>((set) => ({
   messages: [],
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
-    set((prev) => ({ messages: [message, ...prev.messages] })),
+    set((prev) => ({ messages: [...prev.messages, message] })),
   removeMessage: (id) =>
     set((prev) => ({
       messages: prev.messages.filter((message) => message.id !== id),
     })),
   updateMessage: (id, message) =>
     set((prev) => ({
-      messages: prev.messages
-        .map((oldMessage) => (oldMessage.id === id ? message : oldMessage))
-        .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
+      messages: prev.messages.map((oldMessage) =>
+        oldMessage.id === id ? message : oldMessage
+      ),
     })),
 }));
 

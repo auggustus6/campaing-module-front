@@ -1,6 +1,5 @@
 import { useMutation } from 'react-query';
 import api from '../../../services/api';
-import { useToast } from '../../../context/ToastContext';
 import { NewChatSchemaType } from '../schemas/newServiceSchema';
 import { Chat } from '../../../models/call';
 import { API_URLS } from '../../../utils/constants';
@@ -16,8 +15,6 @@ type ApiResponse = {
 };
 
 export function useNewChatMutation({ onError, onSuccess }: Props) {
-  const toast = useToast();
-
   return useMutation({
     onError: onError,
     onSuccess: onSuccess,

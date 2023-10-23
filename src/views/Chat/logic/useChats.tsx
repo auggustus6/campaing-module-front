@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { create } from 'zustand';
 import { API_URLS } from '../../../utils/constants';
@@ -18,7 +18,7 @@ type Actions = {
   setSelectedChatId: (id: string) => void;
 };
 
-const chatsStore = create<State & Actions>((set) => ({
+const chatsStore = create<State & Actions>((set, get) => ({
   chats: [],
   selectedChatId: null,
   setChats: (chats) => set({ chats }),
@@ -37,6 +37,9 @@ const chatsStore = create<State & Actions>((set) => ({
 export function useChats() {
   const setChats = chatsStore((state) => state.setChats);
   const chats = chatsStore((state) => state.chats);
+  const selectedChatId = chatsStore((state) => state.selectedChatId);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+
   const query = useQuery(
     [API_URLS.CALL.BASE, 'GET'],
     async () => {
@@ -56,8 +59,17 @@ export function useChats() {
     }
   }, [query.data]);
 
+  useEffect(() => {
+    setSelectedChat(chats.find((chat) => chat.id === selectedChatId) || null);
+  }, [selectedChatId]);
+
+  // function getSelectedChat() {
+  //   return chats.find((chat) => chat.id === chatsStore.getState().selectedChatId);
+  // }
+
   return {
     query: query,
     store: chatsStore,
+    selectedChat: selectedChat,
   };
 }

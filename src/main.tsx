@@ -9,6 +9,7 @@ import { ToastProvider } from './context/ToastContext';
 import LoadingScreen from './components/LoadingScreen';
 import App from './App';
 
+
 export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

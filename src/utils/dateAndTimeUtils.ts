@@ -28,6 +28,10 @@ export function chatFormatDateTime(date?: string) {
   }
 }
 
+export function getTime(date?: string) {
+  return moment(date).format('HH:mm');
+}
+
 export function formatDate(date?: string) {
   return moment.utc(date).format('YYYY-MM-DD');
 }

@@ -1,8 +1,15 @@
 import { MoreVert, Search } from '@mui/icons-material';
 import { Box, Avatar, Typography } from '@mui/material';
 import { IconButton } from '@mui/joy';
+import { useChats } from '../logic/useChats';
+import { formatPhoneNumber } from '../../../utils/phoneNumbers';
 
-export  function ContentHeader() {
+export function ContentHeader() {
+  const { selectedChat } = useChats();
+
+  console.log(selectedChat);
+  
+
   return (
     <Box
       display={'flex'}
@@ -19,7 +26,7 @@ export  function ContentHeader() {
           src="https://love.doghero.com.br/wp-content/uploads/2019/09/Corgi-1.jpg-1.jpg"
         />
         <Typography ml={2} fontWeight={'bold'}>
-          Chris Coy
+          {selectedChat?.name || formatPhoneNumber(selectedChat?.number || '')}
         </Typography>
       </Box>
       <Box display={'flex'} gap={2}>

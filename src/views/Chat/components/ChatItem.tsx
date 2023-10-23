@@ -23,9 +23,10 @@ type Props = {
   text: string;
   sentAt: string;
   number: string;
+  author?: string;
 };
 
-export function ChatItem({ id, type, text, sentAt, number }: Props) {
+export function ChatItem({ id, type, text, sentAt, number, author }: Props) {
   const { store } = useChats();
   const selectedChatId = store((state) => state.selectedChatId);
   const setSelectedChatId = store((state) => state.setSelectedChatId);
@@ -52,7 +53,7 @@ export function ChatItem({ id, type, text, sentAt, number }: Props) {
         />
       </ListItemAvatar>
       <ListItemText
-        primary={<Typography>{formatPhoneNumber(number)}</Typography>}
+        primary={<Typography>{author || formatPhoneNumber(number)}</Typography>}
         secondary={
           <Typography
             display={'flex'}

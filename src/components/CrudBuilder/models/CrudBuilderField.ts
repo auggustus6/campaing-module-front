@@ -1,5 +1,3 @@
-import { ZodRawShape } from 'zod';
-
 export type CBFieldType =
   | 'TEXT'
   | 'TEXTAREA'
@@ -7,7 +5,7 @@ export type CBFieldType =
   | 'EMAIL'
   | 'SELECT'
   | 'RADIO'
-  | "FILE"
+  | 'FILE'
   | 'CHECKBOX'
   | 'DATE'
   | 'TIME'
@@ -19,20 +17,20 @@ export type CBFieldType =
 type CBScreenActions = {
   create?: boolean;
   update?: boolean;
-  // delete?: boolean;
   view?: boolean;
 };
 
-type CrudBuilderFieldProps = {
+type CrudBuilderFieldProps<T> = {
   type: CBFieldType;
   label: string;
   name: string;
+  validator: T;
   disableOn?: CBScreenActions;
   hideOn?: CBScreenActions;
 };
 
-export class CrudBuilderField {
-  constructor(private props: CrudBuilderFieldProps) {}
+export class CrudBuilderField<T = any> {
+  constructor(private props: CrudBuilderFieldProps<T>) {}
 
   get type() {
     return this.props.type;
@@ -52,5 +50,9 @@ export class CrudBuilderField {
 
   get name() {
     return this.props.name;
+  }
+
+  get validator() {
+    return this.props.validator;
   }
 }

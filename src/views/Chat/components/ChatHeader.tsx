@@ -3,6 +3,7 @@ import { IconButton } from '@mui/joy';
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { useChatModals } from '../logic/useChatModals';
+import { useChats } from '../logic/useChats';
 
 export  function ChatHeader() {
   const { openChatModal } = useChatModals();

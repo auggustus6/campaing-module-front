@@ -4,8 +4,6 @@ import {
   getNowOnlyDate,
 } from '../../../utils/dateAndTimeUtils';
 
-export const phoneRegex = new RegExp(/\b\d{8,14}\b/);
-
 export type CampaignSchemaType = z.infer<typeof campaignSchema>;
 export const campaignSchema = z
   .object({

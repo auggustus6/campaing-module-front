@@ -1,7 +1,8 @@
 import { Search } from '@mui/icons-material';
 import DefaultInput from '../../../components/Inputs/DefaultInput';
 
-export  function SearchInput() {
+export 
+ function SearchInput() {
   return (
     <DefaultInput
       sx={{ p: 0, margin: 0 }}

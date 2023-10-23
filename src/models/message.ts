@@ -10,9 +10,14 @@ export interface Message {
     id: string;
     type: ContentType;
     message: string;
-    midiaUrl: string;
-    midiaBase64: string;
+    midiaUrl?: string;
+    midiaBase64?: string;
   };
+
+  // fields below are not returned by the API
+  // they are used to show if the message was sent or not
+  sending?: boolean;
+  errorOnSending?: boolean;
 }
 
 export type MessageType = 'SENT' | 'RECEIVED';
@@ -26,4 +31,5 @@ export type ContentType =
   | 'AUDIO_BASE64'
   | 'AUDIO_URL'
   | 'DOCUMENT_BASE64'
-  | 'DOCUMENT_URL';
+  | 'DOCUMENT_URL'
+  | 'STICKER';

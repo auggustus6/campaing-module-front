@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { phoneRegex } from '../../CreateCampanha/schemas/campaignSchema';
 
 const stringValidator = z.string({
   required_error: 'Campo obrigatório!',
@@ -12,8 +11,8 @@ export const newChatSchema = z.object({
     .nonempty()
     .refine((value) => value !== 'default', { message: 'Selecione um canal' }),
   phone: stringValidator
-    .transform((value) => value.replaceAll(/[ -]/g, ''))
-    .refine((value) => phoneRegex.test(value), {
+    .transform((value) => value.replaceAll(/[ _-]/g, ''))
+    .refine((value) => value.length >= 8, {
       message: 'Telefone inválido',
     }),
   message: stringValidator.nonempty("Campo 'Mensagem' obrigatório!"),
