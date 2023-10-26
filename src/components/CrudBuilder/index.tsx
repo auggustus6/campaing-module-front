@@ -6,7 +6,7 @@ import { useToast } from '../../context/ToastContext';
 import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { CrudDefaultContainer } from './components/CrudDefaultContainer';
-import { CrudBuilderSchema } from './models/CrudBuilderSchema';
+import { CrudBuilderSchema } from './schemaBuilder/crudSchema';
 import { ZodType, z } from 'zod';
 import React from 'react';
 

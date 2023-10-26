@@ -16,11 +16,12 @@ export default function ChatView() {
   const { chatModals, toggleCurrentChatModal } = useChatModals();
   const { store } = useChats();
   const chats = store((state) => state.chats);
-  
+
   return (
     <Box
       display={'grid'}
       gridTemplateColumns={'1fr 3fr'}
+      maxHeight={'84vh'}
       height={'100%'}
       borderRadius={1}
       overflow={'hidden'}
@@ -34,15 +35,24 @@ export default function ChatView() {
       </>
       <Box
         sx={{
-          height: '84vh',
-          maxHeight: '84vh',
+          height: '100%',
+          // maxHeight: '84vh',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
         <ChatHeader />
         <SearchInput />
-        <MessagesList />
+        <Box position={'relative'} flex={1}>
+          <Box
+            position={'absolute'}
+            sx={{
+              inset: 0,
+            }}
+          >
+            <MessagesList />
+          </Box>
+        </Box>
       </Box>
       <Box
         sx={{

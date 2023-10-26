@@ -12,6 +12,7 @@ export function MessagesList() {
     <Box
       sx={{
         display: 'flex',
+        flex: 1,
         flexDirection: 'column',
         height: '100%',
         overflowY: 'scroll',

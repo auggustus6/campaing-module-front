@@ -23,10 +23,10 @@ export function TextMessage({ type, text, sentAt, sending }: Props) {
         borderRadius={2}
         py={1}
         textAlign={'start'}
-        // boxShadow={'0px 0px 3px rgba(0,0,0,0.1)'}
+        minHeight={'42px'}
         position={'relative'}
         border={'1px solid #dfdfdf'}
-        maxWidth={'50%'}
+        maxWidth={'500px'}
         color={type === 'RECEIVED' ? '#333333' : 'white'}
         sx={{ opacity: sending ? 0.5 : 1 }}
       >

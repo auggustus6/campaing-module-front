@@ -5,11 +5,11 @@ import { getTime } from '../../../../utils/dateAndTimeUtils';
 
 type Props = {
   type: MessageType;
-  image: string;
+  src?: string;
   sentAt: string;
 };
 
-export function StickerMessage({ type, image, sentAt }: Props) {
+export function StickerMessage({ type, src, sentAt }: Props) {
   return (
     <Box
       display={'flex'}
@@ -21,10 +21,10 @@ export function StickerMessage({ type, image, sentAt }: Props) {
         alignItems={'end'}
         gap={0.2}
         borderRadius={2}
-        maxWidth={'50%'}
+        maxWidth={'500px'}
       >
         <img
-          src={`data:image/jpeg;base64,${image}`}
+          src={`data:image/jpeg;base64,${src}`}
           alt="sticker"
           style={{
             maxWidth: '200px',

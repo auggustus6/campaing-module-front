@@ -5,6 +5,8 @@ export interface Company {
   name: string;
   isActive: boolean;
 
+  owner: User;
+
   createdAt: string;
   updatedAt: string;
 }

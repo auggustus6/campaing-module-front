@@ -26,6 +26,10 @@ import { useToast } from '../../context/ToastContext';
 import TableChannels from './components/TableChannels';
 import DefaultInput from '../../components/Inputs/DefaultInput';
 import { Channel } from '../../models/channel';
+import { useUpdateCompanyMutation } from './hooks/useUpdateCompanyMutation';
+import useCompany from '../../hooks/querys/useCompany';
+import useChannels from '../../hooks/querys/useChannels';
+import useCompanyUsers from '../../hooks/querys/useCompanyUsers';
 
 interface User {
   id: string;
@@ -79,65 +83,53 @@ function Painel() {
   } = useForm<CompanySchemaSchemaType>({
     resolver: zodResolver(companySchema),
   });
+  const toast = useToast();
   const { user } = useAuth();
   const location = useLocation();
   const [twoLetters, setTwoLetters] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [data, setData] = useState<Company>();
-  const [channels, setChannels] = useState<Channel[]>();
 
-  const toast = useToast();
+  const { data: company, isLoading: isFetchingCompany } = useCompany();
+  const { data: channels, isLoading: isFetchingChannels } = useChannels();
+  const { data: users, isLoading: isFetchingUsers } = useCompanyUsers();
 
-  async function fetchData() {
-    setIsLoading(true);
-    const response = await api.get<Company>('/companies');
-    const responseChannels = await api.get<Channel[]>('/channels');
-
-    setData(response.data);
-    setChannels(responseChannels.data);
-    setTwoLetters(getTwoFirstLetters(response.data.name));
-    reset({
-      name: response.data.name,
+  const { mutate: handleUpdateCompany, isLoading: isUpdatingCompany } =
+    useUpdateCompanyMutation({
+      onError() {
+        toast.error('Erro ao editar empresa!');
+      },
+      onSuccess(data, values) {
+        setTwoLetters(getTwoFirstLetters(values.name));
+        setIsEditing(false);
+        toast.success('Empresa editada com sucesso!');
+      },
     });
 
-    setIsLoading(false);
-  }
-
-  useEffect(() => {
-    if (!user) return;
-    fetchData();
-  }, [user, location]);
-
-  async function handleSaveEdition(values: CompanySchemaSchemaType) {
-    try {
-      setIsLoading(true);
-      setIsEditing(false);
-
-      await api.patch('/companies', values);
-      setTwoLetters(getTwoFirstLetters(values.name));
-      setIsLoading(false);
-
-      toast.success('Empresa editada com sucesso!');
-    } catch (error) {
-      toast.error('Erro ao editar empresa!');
-      return;
-    }
-  }
+  const isLoading =
+    isUpdatingCompany || isFetchingCompany || isFetchingChannels;
 
   function handleCancel() {
     reset({
-      name: data?.name,
+      name: company?.name,
     });
     setIsEditing(false);
   }
 
+  useEffect(() => {
+    if(!company) return;
+    reset({
+      name: company.name,
+    });
+    setTwoLetters(getTwoFirstLetters(company.name));
+  }, [company]);
+
   return (
     <>
+      teste
       <Container
         sx={{ paddingInline: '0px' }}
         component={'form'}
-        onSubmit={handleSubmit(handleSaveEdition)}
+        onSubmit={handleSubmit((values) => handleUpdateCompany(values))}
       >
         <Stack
           direction={'row'}
@@ -208,30 +200,30 @@ function Painel() {
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <InputLabel>Dono</InputLabel>
-            <TextField fullWidth disabled value={data?.owner.name} />
+            <TextField fullWidth disabled value={company?.owner.name} />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <InputLabel>Campanhas criadas</InputLabel>
-            <TextField
+            {/* <TextField
               fullWidth
               value={(data?._count.campaign || 0) + ' Campanhas criadas'}
               disabled
-            />
+            /> */}
           </Grid>
         </Grid>
         <Box marginTop={8} />
 
         <TableChannels
           channels={channels || []}
-          channelsLength={data?._count.users}
-          refetch={fetchData}
+          channelsLength={channels?.length}
+          refetch={() => {}}
           isLoading={isLoading}
         />
         <Box marginTop={8} />
         <TableUsers
-          users={data?.users}
-          usersLength={data?._count.users}
-          refetch={fetchData}
+          users={users}
+          usersLength={users?.length}
+          refetch={() => {}}
           isLoading={isLoading}
         />
       </Container>

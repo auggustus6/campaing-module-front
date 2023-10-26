@@ -32,6 +32,14 @@ export function getTime(date?: string) {
   return moment(date).format('HH:mm');
 }
 
+export function getSecondsFromNumber(time: number) {
+  if (time === 0) return '0:00';
+  const minutes = Math.abs(Math.floor(time / 60));
+
+  const seconds = Math.abs(Math.floor(time % 60));
+  return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+}
+
 export function formatDate(date?: string) {
   return moment.utc(date).format('YYYY-MM-DD');
 }

@@ -4,6 +4,9 @@ import {
   getNowOnlyDate,
 } from '../../../utils/dateAndTimeUtils';
 
+// regex 8 to 14 digits ignoring special characters
+export const phoneRegex = /(\d.*){8,14}/;
+
 export type CampaignSchemaType = z.infer<typeof campaignSchema>;
 export const campaignSchema = z
   .object({

@@ -4,6 +4,9 @@ import { useMessages } from '../logic/useMessages';
 import { useChats } from '../logic/useChats';
 import { TextMessage } from './messages/TextMessage';
 import { StickerMessage } from './messages/StickerMessage';
+import { AudioMessage } from './messages/AudioMessage';
+import { ImageMessage } from './messages/ImageMessage';
+import { VideoMessage } from './messages/VideoMessage';
 
 export function Messages() {
   const scrollToRef = useRef<HTMLDivElement>(null);
@@ -42,7 +45,7 @@ export function Messages() {
       gap={2}
       px={4}
       py={2}
-      overflow={'scroll'}
+      overflow={'auto'}
       sx={{
         '&::-webkit-scrollbar-thumb': {
           borderRadius: 0,
@@ -56,7 +59,7 @@ export function Messages() {
             return (
               <StickerMessage
                 key={message.id}
-                image={message.content.midiaBase64!}
+                src={message.content.midiaBase64}
                 sentAt={message.updatedAt}
                 type={message.type}
               />
@@ -69,6 +72,39 @@ export function Messages() {
                 sentAt={message.updatedAt}
                 text={message.content.message}
                 sending={message.sending}
+              />
+            );
+          case 'AUDIO_BASE64':
+          case 'AUDIO_URL':
+            return (
+              <AudioMessage
+                key={message.id}
+                sentAt={message.updatedAt}
+                type={message.type}
+                src64={message.content.midiaBase64}
+                srcUrl={message.content.midiaUrl}
+              />
+            );
+          case 'IMAGE_BASE64':
+          case 'IMAGE_URL':
+            return (
+              <ImageMessage
+                sentAt={message.updatedAt}
+                type={message.type}
+                src64={message.content.midiaBase64}
+                srcUrl={message.content.midiaUrl}
+                text={message.content.message}
+              />
+            );
+          case 'VIDEO_BASE64':
+          case 'VIDEO_URL':
+            return (
+              <VideoMessage
+                sentAt={message.updatedAt}
+                type={message.type}
+                src64={message.content.midiaBase64}
+                srcUrl={message.content.midiaUrl}
+                text={message.content.message}
               />
             );
         }

@@ -42,13 +42,13 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="campanhas" element={<Campanhas />} />
             <Route
-              path="campanhas/criar2"
+              path="campanhas/criar"
               element={<AdminRoute e={<CreateCampanha />} />}
             />
-            <Route
+            {/* <Route
               path="campanhas/criar"
               element={<AdminRoute e={<CampaignCrud screenState="create" />} />}
-            />
+            /> */}
             <Route path="campanhas/:id" element={<DetailsCampanha />}>
               <Route path="reenviar" element={<ShowContactsErrorsModal />} />
             </Route>
