@@ -12,6 +12,7 @@ export interface Message {
     message: string;
     midiaUrl?: string;
     midiaBase64?: string;
+    fileName?: string;
   };
 
   // fields below are not returned by the API

@@ -7,6 +7,7 @@ import { StickerMessage } from './messages/StickerMessage';
 import { AudioMessage } from './messages/AudioMessage';
 import { ImageMessage } from './messages/ImageMessage';
 import { VideoMessage } from './messages/VideoMessage';
+import { DocumentMessage } from './messages/DocumentMessage';
 
 export function Messages() {
   const scrollToRef = useRef<HTMLDivElement>(null);
@@ -105,6 +106,17 @@ export function Messages() {
                 src64={message.content.midiaBase64}
                 srcUrl={message.content.midiaUrl}
                 text={message.content.message}
+              />
+            );
+          case 'DOCUMENT_BASE64':
+          case 'DOCUMENT_URL':
+            return (
+              <DocumentMessage
+                sentAt={message.updatedAt}
+                type={"SENT"}
+                src64={message.content.midiaBase64}
+                srcUrl={message.content.midiaUrl}
+                fileName={message.content.fileName}
               />
             );
         }
