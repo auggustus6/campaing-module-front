@@ -11,11 +11,14 @@ import { useChatModals } from './logic/useChatModals';
 import Show from '../../components/MetaComponents/Show';
 import { useChats } from './logic/useChats';
 import { useEffect } from 'react';
+import { ChatBubbleOutline } from '@mui/icons-material';
+import { Typography } from '@mui/joy';
 
 export default function ChatView() {
   const { chatModals, toggleCurrentChatModal } = useChatModals();
   const { store } = useChats();
   const chats = store((state) => state.chats);
+  const selectedChatId = store((state) => state.selectedChatId);
 
   return (
     <Box
@@ -63,9 +66,26 @@ export default function ChatView() {
           maxHeight: '84vh',
         }}
       >
-        <ContentHeader />
-        <Messages />
-        <SendMessage />
+        <Show when={!selectedChatId}>
+          <Box
+            display={'flex'}
+            flexDirection={'column'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            flex={1}
+            gap={4}
+          >
+            <ChatBubbleOutline sx={{ fontSize: '10rem', color: '#4b00df' }} />
+            <Typography color="neutral" fontSize={'1.5rem'} fontWeight={'300'}>
+              Selecione um atendimento
+            </Typography>
+          </Box>
+        </Show>
+        <Show when={!!selectedChatId}>
+          <ContentHeader />
+          <Messages />
+          <SendMessage />
+        </Show>
       </Box>
     </Box>
   );

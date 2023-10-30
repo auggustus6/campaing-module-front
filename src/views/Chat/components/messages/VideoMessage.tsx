@@ -47,10 +47,7 @@ export function VideoMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
   // }, []);
 
   return (
-    <Box
-      display={'flex'}
-      justifyContent={type === 'RECEIVED' ? 'start' : 'end'}
-    >
+    <>
       <Show when={isVideoOpen}>
         <MidiaModal
           onClose={() => setIsVideoOpen(false)}
@@ -136,6 +133,6 @@ export function VideoMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
           {getTime(sentAt)}
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }

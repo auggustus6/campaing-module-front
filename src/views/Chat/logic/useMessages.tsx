@@ -52,8 +52,9 @@ export function useMessages() {
     },
     {
       enabled: !!selectedChatId,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
+      // refetchOnWindowFocus: false,
+      // refetchInterval: false,
+      refetchInterval: 2000,
       onError: (error) => {
         toast.error('Erro ao carregar mensagens!');
       },

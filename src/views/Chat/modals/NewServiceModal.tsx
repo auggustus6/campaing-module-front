@@ -165,7 +165,7 @@ export default function NewChatModal({ onClose }: Props) {
         </FormControl>
 
         <InputMask
-          mask={'55 99 9999-9999'}
+          mask={'55 99 99999-9999'}
           {...register('phone')}
           onChange={(e) => setValue('phone', e.target.value)}
           disabled={shouldDisable}

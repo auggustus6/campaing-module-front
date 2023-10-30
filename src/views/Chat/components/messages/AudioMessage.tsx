@@ -63,52 +63,31 @@ export function AudioMessage({ type, srcUrl, sentAt, src64 }: Props) {
 
   return (
     <Box
-      display={'flex'}
-      justifyContent={type === 'RECEIVED' ? 'start' : 'end'}
+      sx={{
+        width: '300px',
+        height: '60px',
+        position: 'relative',
+        borderRadius: 2,
+        p: 1,
+        bgcolor: type === 'RECEIVED' ? 'white' : '#4b00df',
+        display: 'flex',
+        alignItems: 'center',
+        border: '1px solid #dfdfdf',
+        gap: 2,
+      }}
     >
-      <Box
-        sx={{
-          width: '300px',
-          height: '60px',
-          position: 'relative',
-          borderRadius: 2,
-          p: 1,
-          bgcolor: type === 'RECEIVED' ? 'white' : '#4b00df',
-          display: 'flex',
-          alignItems: 'center',
-          border: '1px solid #dfdfdf',
-          gap: 2,
-        }}
-      >
-        <audio
-          src={audioSrc}
-          ref={audioRef}
-          onPlay={() => play()}
-          onPause={() => pause()}
-          onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-        />
-        <Show
-          when={!isPlaying}
-          fallback={
-            <IconButton
-              onClick={pause}
-              sx={{
-                color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
-                ['&:hover>svg']: {
-                  color: type === 'RECEIVED' ? '#8e2ce1' : '#8e2ce1',
-                },
-              }}
-            >
-              <Pause
-                sx={{
-                  color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
-                }}
-              />
-            </IconButton>
-          }
-        >
+      <audio
+        src={audioSrc}
+        ref={audioRef}
+        onPlay={() => play()}
+        onPause={() => pause()}
+        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+      />
+      <Show
+        when={!isPlaying}
+        fallback={
           <IconButton
-            onClick={play}
+            onClick={pause}
             sx={{
               color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
               ['&:hover>svg']: {
@@ -116,40 +95,56 @@ export function AudioMessage({ type, srcUrl, sentAt, src64 }: Props) {
               },
             }}
           >
-            <PlayCircle
-              id="iconlol"
+            <Pause
               sx={{
-                color: type === 'RECEIVED' ? 'initial' : 'white',
+                color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
               }}
             />
           </IconButton>
-        </Show>
-        <Slider
-          value={percent}
-          onChange={onSliderTimeChange}
+        }
+      >
+        <IconButton
+          onClick={play}
           sx={{
             color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
-          }}
-        />
-        <Typography
-          variant={'caption'}
-          sx={{
-            color: type === 'RECEIVED' ? 'initial' : 'white',
+            ['&:hover>svg']: {
+              color: type === 'RECEIVED' ? '#8e2ce1' : '#8e2ce1',
+            },
           }}
         >
-          {getSecondsFromNumber(duration - currentTime)}
-        </Typography>
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 2,
-            right: 4,
-            fontSize: '0.7rem',
-            color: type === 'RECEIVED' ? '#8b8b8b' : 'white',
-          }}
-        >
-          {getTime(sentAt)}
-        </Box>
+          <PlayCircle
+            id="iconlol"
+            sx={{
+              color: type === 'RECEIVED' ? 'initial' : 'white',
+            }}
+          />
+        </IconButton>
+      </Show>
+      <Slider
+        value={percent}
+        onChange={onSliderTimeChange}
+        sx={{
+          color: type === 'RECEIVED' ? '#8e2ce1' : 'white',
+        }}
+      />
+      <Typography
+        variant={'caption'}
+        sx={{
+          color: type === 'RECEIVED' ? 'initial' : 'white',
+        }}
+      >
+        {getSecondsFromNumber(duration - currentTime)}
+      </Typography>
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 2,
+          right: 4,
+          fontSize: '0.7rem',
+          color: type === 'RECEIVED' ? '#8b8b8b' : 'white',
+        }}
+      >
+        {getTime(sentAt)}
       </Box>
     </Box>
   );

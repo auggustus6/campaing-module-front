@@ -34,56 +34,51 @@ export function DocumentMessage({
 
   return (
     <Box
-      display={'flex'}
-      justifyContent={type === 'RECEIVED' ? 'start' : 'end'}
+      sx={{
+        width: '300px',
+        height: '70px',
+        position: 'relative',
+        borderRadius: 2,
+        bgcolor: type === 'RECEIVED' ? 'white' : '#4b00df',
+        border: '1px solid #dfdfdf',
+      }}
     >
       <Box
         sx={{
-          width: '300px',
-          height: '70px',
-          position: 'relative',
-          borderRadius: 2,
-          bgcolor: type === 'RECEIVED' ? 'white' : '#4b00df',
-          border: '1px solid #dfdfdf',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 2,
+          px: 2,
+          py: 0.5,
+          backgroundColor: '#f5f5f5',
+          borderRadius: '5px',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 2,
-            px: 2,
-            py: 0.5,
-            backgroundColor: '#f5f5f5',
-            borderRadius: '5px',
-          }}
-        >
-          <PictureAsPdf />
-          <Box flex={1}>
-            <Typography>{fileName || 'arquivo'}</Typography>
-          </Box>
-          <a
-            href={documentSrc}
-            download={fileName || fileNameFormatted}
-            style={{ all: 'unset' }}
-          >
-            <IconButton>
-              <DownloadForOffline />
-            </IconButton>
-          </a>
+        <PictureAsPdf />
+        <Box flex={1}>
+          <Typography>{fileName || 'arquivo'}</Typography>
         </Box>
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 2,
-            right: 4,
-            fontSize: '0.7rem',
-            color: type === 'RECEIVED' ? '#8b8b8b' : 'white',
-          }}
+        <a
+          href={documentSrc}
+          download={fileName || fileNameFormatted}
+          style={{ all: 'unset' }}
         >
-          {getTime(sentAt)}
-        </Box>
+          <IconButton>
+            <DownloadForOffline />
+          </IconButton>
+        </a>
+      </Box>
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 2,
+          right: 4,
+          fontSize: '0.7rem',
+          color: type === 'RECEIVED' ? '#8b8b8b' : 'white',
+        }}
+      >
+        {getTime(sentAt)}
       </Box>
     </Box>
   );

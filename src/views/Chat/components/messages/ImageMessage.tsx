@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { getTime } from '../../../../utils/dateAndTimeUtils';
 import Show from '../../../../components/MetaComponents/Show';
 import MidiaModal from '../../modals/MidiaModal';
+import { BrokenImage, BrokenImageOutlined } from '@mui/icons-material';
 
 type Props = {
   type: MessageType;
@@ -15,31 +16,40 @@ type Props = {
 
 export function ImageMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
   const imageRef = React.createRef<HTMLImageElement>();
-  const imageSrc = src64 ? `data:audio/ogg;base64,${src64}` : srcUrl;
+  const imageSrc = src64 ? `data:image/png;base64,${src64}` : srcUrl;
   const maxWidth = 330;
   const [imageWidth, setImageWidth] = useState<number>(maxWidth);
 
   const [isImageOpen, setIsImageOpen] = useState(false);
+
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const img = new Image();
     img.src = imageSrc!;
     img.onload = () => {
       if (img.width <= maxWidth) {
-        setImageWidth(maxWidth);
-        return;
+        return setImageWidth(maxWidth);
+      }
+      if (img.width >= img.height) {
+        if (img.width > maxWidth) {
+          return setImageWidth(maxWidth);
+        } else {
+          return setImageWidth(img.width);
+        }
       }
 
       const aspectRatio = img.width / img.height;
       setImageWidth(Math.floor(aspectRatio * maxWidth));
     };
+    img.onerror = () => {
+      setIsError(true);
+      setImageWidth(200);
+    };
   }, []);
 
   return (
-    <Box
-      display={'flex'}
-      justifyContent={type === 'RECEIVED' ? 'start' : 'end'}
-    >
+    <>
       <Show when={isImageOpen}>
         <MidiaModal
           onClose={() => setIsImageOpen(false)}
@@ -68,24 +78,36 @@ export function ImageMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
         width={'100%'}
       >
         {/* IMAGE */}
-        <Box
-          onClick={() => setIsImageOpen(true)}
-          component={'img'}
-          ref={imageRef}
-          draggable={false}
-          src={imageSrc}
-          sx={{
-            maxWidth: `${maxWidth}px`,
-            width: '100%',
-            maxHeight: '500px',
-            borderRadius: '6px',
-            objectFit: 'contain',
-            cursor: 'pointer',
-            ['&:hover']: {
-              opacity: 0.9,
-            },
-          }}
-        />
+        <Show when={isError}>
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+            <BrokenImageOutlined
+              sx={{
+                fontSize: '6rem',
+                color: type === 'RECEIVED' ? '#8b8b8b' : 'white',
+              }}
+            />
+          </Box>
+        </Show>
+        <Show when={!isError}>
+          <Box
+            onClick={() => setIsImageOpen(true)}
+            component={'img'}
+            ref={imageRef}
+            draggable={false}
+            src={imageSrc}
+            sx={{
+              maxWidth: `${maxWidth}px`,
+              width: '100%',
+              maxHeight: '500px',
+              borderRadius: '6px',
+              objectFit: 'contain',
+              cursor: 'pointer',
+              ['&:hover']: {
+                opacity: 0.9,
+              },
+            }}
+          />
+        </Show>
         <Show when={!!text}>
           <Typography
             p={1}
@@ -107,6 +129,6 @@ export function ImageMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
           {getTime(sentAt)}
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }

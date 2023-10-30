@@ -8,33 +8,27 @@ import { AudioMessage } from './messages/AudioMessage';
 import { ImageMessage } from './messages/ImageMessage';
 import { VideoMessage } from './messages/VideoMessage';
 import { DocumentMessage } from './messages/DocumentMessage';
+import { MessageWrapper } from './messages/MessageWrapper';
 
 export function Messages() {
   const scrollToRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { store } = useMessages();
+  const { store, query: messagesQuery } = useMessages();
   const messages = store((state) => state.messages);
   const { store: chatStore } = useChats();
   const selectedChatId = chatStore((state) => state.selectedChatId);
 
-  // useEffect(() => {
-  //   if (!scrollToRef.current || !selectedChatId) return;
+  function scrollToBottom(mode?: 'smooth' | 'instant') {
+    scrollToRef.current?.scrollIntoView({
+      behavior: mode || 'smooth',
+      block: 'end',
+    });
+  }
 
-  //   setTimeout(() => {
-  //     if (containerRef.current && scrollToRef.current) {
-  //       scrollToRef.current.scrollIntoView({
-  //         behavior: 'smooth',
-  //         block: 'end',
-  //       });
-  //       containerRef.current.scrollTop =
-  //         containerRef.current?.scrollHeight || 0;
-  //         setTimeout(() => {
-  //           containerRef.current!.style.overflow = 'scroll';
-  //           containerRef.current!.style.opacity = 1;
-  //       }, 10);
-  //     }
-  //   }, 0);
-  // }, [scrollToRef.current, selectedChatId]);
+  // useEffect(() => {
+  //   if (!scrollToRef.current || !selectedChatId)
+  //     return;
+  // }, [scrollToRef.current, selectedChatId, messagesQuery]);
 
   console.log('messages', messages);
 
@@ -54,73 +48,82 @@ export function Messages() {
       }}
       ref={containerRef}
     >
-      {messages.map((message, i) => {
-        switch (message.content.type) {
-          case 'STICKER':
-            return (
-              <StickerMessage
-                key={message.id}
-                src={message.content.midiaBase64}
-                sentAt={message.updatedAt}
-                type={message.type}
-              />
-            );
-          case 'TEXT':
-            return (
-              <TextMessage
-                key={message.id}
-                type={message.type}
-                sentAt={message.updatedAt}
-                text={message.content.message}
-                sending={message.sending}
-              />
-            );
-          case 'AUDIO_BASE64':
-          case 'AUDIO_URL':
-            return (
-              <AudioMessage
-                key={message.id}
-                sentAt={message.updatedAt}
-                type={message.type}
-                src64={message.content.midiaBase64}
-                srcUrl={message.content.midiaUrl}
-              />
-            );
-          case 'IMAGE_BASE64':
-          case 'IMAGE_URL':
-            return (
-              <ImageMessage
-                sentAt={message.updatedAt}
-                type={message.type}
-                src64={message.content.midiaBase64}
-                srcUrl={message.content.midiaUrl}
-                text={message.content.message}
-              />
-            );
-          case 'VIDEO_BASE64':
-          case 'VIDEO_URL':
-            return (
-              <VideoMessage
-                sentAt={message.updatedAt}
-                type={message.type}
-                src64={message.content.midiaBase64}
-                srcUrl={message.content.midiaUrl}
-                text={message.content.message}
-              />
-            );
-          case 'DOCUMENT_BASE64':
-          case 'DOCUMENT_URL':
-            return (
-              <DocumentMessage
-                sentAt={message.updatedAt}
-                type={"SENT"}
-                src64={message.content.midiaBase64}
-                srcUrl={message.content.midiaUrl}
-                fileName={message.content.fileName}
-              />
-            );
-        }
-      })}
+      {messages.map((message) => (
+        <MessageWrapper
+          key={message.id}
+          type={message.type}
+          loading={message.sending}
+          error={message.error}
+        >
+          {() => {
+            switch (message.content.type) {
+              case 'STICKER':
+                return (
+                  <StickerMessage
+                    key={message.id}
+                    src={message.content.midiaBase64}
+                    sentAt={message.updatedAt}
+                    type={message.type}
+                  />
+                );
+              case 'TEXT':
+                return (
+                  <TextMessage
+                    key={message.id}
+                    type={message.type}
+                    sentAt={message.updatedAt}
+                    text={message.content.message}
+                  />
+                );
+              case 'AUDIO_BASE64':
+              case 'AUDIO_URL':
+                return (
+                  <AudioMessage
+                    key={message.id}
+                    sentAt={message.updatedAt}
+                    type={message.type}
+                    src64={message.content.midiaBase64}
+                    srcUrl={message.content.midiaUrl}
+                  />
+                );
+              case 'IMAGE_BASE64':
+              case 'IMAGE_URL':
+                return (
+                  <ImageMessage
+                    sentAt={message.updatedAt}
+                    type={message.type}
+                    src64={message.content.midiaBase64}
+                    srcUrl={message.content.midiaUrl}
+                    text={message.content.message}
+                  />
+                );
+              case 'VIDEO_BASE64':
+              case 'VIDEO_URL':
+                return (
+                  <VideoMessage
+                    sentAt={message.updatedAt}
+                    type={message.type}
+                    src64={message.content.midiaBase64}
+                    srcUrl={message.content.midiaUrl}
+                    text={message.content.message}
+                  />
+                );
+              case 'DOCUMENT_BASE64':
+              case 'DOCUMENT_URL':
+                return (
+                  <DocumentMessage
+                    sentAt={message.updatedAt}
+                    type={message.type}
+                    src64={message.content.midiaBase64}
+                    srcUrl={message.content.midiaUrl}
+                    fileName={message.content.fileName}
+                  />
+                );
+            }
+            return null;
+          }}
+        </MessageWrapper>
+      ))}
       <div ref={scrollToRef} />
     </Box>
   );

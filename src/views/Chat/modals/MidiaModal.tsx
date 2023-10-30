@@ -25,6 +25,8 @@ export default function MidiaModal({ onClose, content, text }: Props) {
       <Box
         sx={{
           p: 2,
+          border: 'none',
+          outline: 'none',
           borderRadius: '8px',
           display: 'flex',
           flexDirection: 'column',
@@ -34,7 +36,7 @@ export default function MidiaModal({ onClose, content, text }: Props) {
       >
         <ModalClose />
         {content}
-        <Typography sx={{color: "white"}}>{text}</Typography>
+        <Typography sx={{ color: 'white' }}>{text}</Typography>
       </Box>
     </Modal>
   );

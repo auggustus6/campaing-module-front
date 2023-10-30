@@ -31,6 +31,8 @@ export function MessagesList() {
             type={chat.lastMessage.type}
             number={chat.number}
             author={chat.name}
+            contentType={chat.lastMessage.content.type}
+            sending={chat.lastMessage.sending}
           />
         ))}
       </List>

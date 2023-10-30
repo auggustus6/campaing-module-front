@@ -14,7 +14,7 @@ type Actions = {
   setChats: (chats: Chat[]) => void;
   addChat: (chat: Chat) => void;
   removeChat: (id: string) => void;
-  updateChat: (id: string, chat: Chat) => void;
+  updateChat: (id: string, chat: Partial<Chat>) => void;
   setSelectedChatId: (id: string) => void;
 };
 
@@ -28,7 +28,9 @@ const chatsStore = create<State & Actions>((set, get) => ({
   updateChat: (id, chat) =>
     set((prev) => ({
       chats: prev.chats
-        .map((oldChat) => (oldChat.id === id ? chat : oldChat))
+        .map((oldChat) =>
+          oldChat.id === id ? { ...oldChat, ...chat } : oldChat
+        )
         .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
     })),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
@@ -43,19 +45,22 @@ export function useChats() {
   const query = useQuery(
     [API_URLS.CALL.BASE, 'GET'],
     async () => {
+      return await api.get<Chat[]>(API_URLS.CALL.BASE);
       if (chats.length === 0) {
-        return await api.get<Chat[]>(API_URLS.CALL.BASE);
       }
     },
     {
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
+      // refetchOnWindowFocus: false,
+      refetchInterval: 2000,
     }
   );
 
   useEffect(() => {
-    if (query.data && !!query.data.data.length && !chats.length) {
-      setChats(query.data.data);
+    // if (query.data && !!query.data.data.length && !chats.length) {
+    //   setChats(query.data.data);
+    // }
+    if(query.data){
+      setChats(query.data.data)
     }
   }, [query.data]);
 

@@ -7,9 +7,18 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { MessageType } from '../../../models/message';
+import { ContentType, MessageType } from '../../../models/message';
 import Show from '../../../components/MetaComponents/Show';
-import { DoneAll, QueryBuilder } from '@mui/icons-material';
+import {
+  Audiotrack,
+  DoneAll,
+  FilePresent,
+  Image,
+  QueryBuilder,
+  StickyNote2,
+  Update,
+  VideoLibrary,
+} from '@mui/icons-material';
 import {
   chatFormatDateTime,
   formatDateTime,
@@ -24,9 +33,20 @@ type Props = {
   sentAt: string;
   number: string;
   author?: string;
+  sending?: boolean;
+  contentType: ContentType;
 };
 
-export function ChatItem({ id, type, text, sentAt, number, author }: Props) {
+export function ChatItem({
+  id,
+  type,
+  text,
+  sentAt,
+  number,
+  author,
+  sending = false,
+  contentType,
+}: Props) {
   const { store } = useChats();
   const selectedChatId = store((state) => state.selectedChatId);
   const setSelectedChatId = store((state) => state.setSelectedChatId);
@@ -60,11 +80,19 @@ export function ChatItem({ id, type, text, sentAt, number, author }: Props) {
             gap={1}
             fontSize={'0.85rem'}
             color={'GrayText'}
+            alignItems={'center'}
           >
             <Show when={type === 'SENT'}>
-              <DoneAll fontSize="small" />
+              <Show when={sending}>
+                <Update fontSize="small" />
+              </Show>
+              <Show when={!sending}>
+                <DoneAll fontSize="small" />
+              </Show>
             </Show>
-            {text}
+            <Box display="flex" gap={0.3} alignItems={'center'}>
+              <MessageType type={contentType} text={text} />
+            </Box>
           </Typography>
         }
       />
@@ -82,4 +110,52 @@ export function ChatItem({ id, type, text, sentAt, number, author }: Props) {
       </Typography>
     </ListItem>
   );
+}
+
+function MessageType({ type, text }: { type?: ContentType; text: string }) {
+  switch (type) {
+    case 'TEXT':
+      return <Typography>{text}</Typography>;
+    case 'STICKER':
+      return (
+        <>
+          <StickyNote2 />
+          <Typography>Figurinha</Typography>
+        </>
+      );
+    case 'AUDIO_BASE64':
+    case 'AUDIO_URL':
+      return (
+        <>
+          <Audiotrack />
+          <Typography>Audio</Typography>
+        </>
+      );
+    case 'IMAGE_BASE64':
+    case 'IMAGE_URL':
+      return (
+        <>
+          <Image />
+          <Typography>Imagem</Typography>
+        </>
+      );
+    case 'VIDEO_BASE64':
+    case 'VIDEO_URL':
+      return (
+        <>
+          <VideoLibrary />
+          <Typography>Video</Typography>
+        </>
+      );
+    case 'DOCUMENT_BASE64':
+    case 'DOCUMENT_URL':
+      return (
+        <>
+          <FilePresent />
+          <Typography>Anexo</Typography>
+        </>
+      );
+    default:
+      return 'default';
+  }
 }
