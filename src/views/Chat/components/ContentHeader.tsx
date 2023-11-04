@@ -1,14 +1,27 @@
-import { MoreVert, Search } from '@mui/icons-material';
+import { DeleteForever, MoreVert, Remove, Search } from '@mui/icons-material';
 import { Box, Avatar, Typography } from '@mui/material';
-import { IconButton } from '@mui/joy';
+import {
+  Dropdown,
+  IconButton,
+  ListItemDecorator,
+  Menu,
+  MenuButton,
+  MenuItem,
+} from '@mui/joy';
 import { useChats } from '../logic/useChats';
 import { formatPhoneNumber } from '../../../utils/phoneNumbers';
+import { useRemoveChatMutation } from '../logic/useRemoveChatMutation';
 
 export function ContentHeader() {
   const { selectedChat } = useChats();
+  const {mutate} = useRemoveChatMutation();
 
   console.log(selectedChat);
-  
+
+  function handleRemoveCall() {
+    if(!selectedChat) return;
+    mutate(selectedChat.id);
+  }
 
   return (
     <Box
@@ -30,12 +43,25 @@ export function ContentHeader() {
         </Typography>
       </Box>
       <Box display={'flex'} gap={2}>
-        <IconButton>
+        {/* <IconButton>
           <Search />
-        </IconButton>
-        <IconButton>
+        </IconButton> */}
+        <Dropdown>
+          <MenuButton slots={{ root: IconButton }}>
+            <MoreVert />
+          </MenuButton>
+          <Menu placement="bottom-end">
+            <MenuItem onClick={handleRemoveCall}>
+              <ListItemDecorator>
+                <DeleteForever sx={{ color: '#f7485f' }} />
+              </ListItemDecorator>
+              Remover atendimento
+            </MenuItem>
+          </Menu>
+        </Dropdown>
+        {/* <IconButton>
           <MoreVert />
-        </IconButton>
+        </IconButton> */}
       </Box>
     </Box>
   );

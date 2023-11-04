@@ -81,6 +81,7 @@ export function VideoMessage({ type, srcUrl, text, sentAt, src64 }: Props) {
         <Box
           onClick={() => setIsVideoOpen(true)}
           position="relative"
+          display={"flex"}
           sx={{
             cursor: 'pointer',
             ['&:hover']: {

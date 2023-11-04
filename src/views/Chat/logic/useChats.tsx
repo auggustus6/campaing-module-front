@@ -4,10 +4,12 @@ import { create } from 'zustand';
 import { API_URLS } from '../../../utils/constants';
 import api from '../../../services/api';
 import { Chat } from '../../../models/call';
+import { Channel } from '../../../models/channel';
 
 type State = {
   chats: Chat[];
   selectedChatId: string | null;
+  selectedChannel: Channel | null;
 };
 
 type Actions = {
@@ -15,12 +17,14 @@ type Actions = {
   addChat: (chat: Chat) => void;
   removeChat: (id: string) => void;
   updateChat: (id: string, chat: Partial<Chat>) => void;
-  setSelectedChatId: (id: string) => void;
+  setSelectedChatId: (id: string | null) => void;
+  setSelectedChannel: (channel: Channel | null) => void;
 };
 
 const chatsStore = create<State & Actions>((set, get) => ({
   chats: [],
   selectedChatId: null,
+  selectedChannel: null,
   setChats: (chats) => set({ chats }),
   addChat: (chat) => set((prev) => ({ chats: [chat, ...prev.chats] })),
   removeChat: (id) =>
@@ -34,6 +38,7 @@ const chatsStore = create<State & Actions>((set, get) => ({
         .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
     })),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
+  setSelectedChannel: (channel) => set({ selectedChannel: channel }),
 }));
 
 export function useChats() {
@@ -41,17 +46,25 @@ export function useChats() {
   const chats = chatsStore((state) => state.chats);
   const selectedChatId = chatsStore((state) => state.selectedChatId);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const selectedChannel = chatsStore((state) => state.selectedChannel);
 
   const query = useQuery(
-    [API_URLS.CALL.BASE, 'GET'],
+    [API_URLS.CALL.BASE, 'GET', selectedChannel?.id],
     async () => {
-      return await api.get<Chat[]>(API_URLS.CALL.BASE);
-      if (chats.length === 0) {
+      if(!selectedChannel?.id){
+        return null;
       }
+      return await api.get<Chat[]>(API_URLS.CALL.BASE, {
+        params: {
+          channelId: selectedChannel?.id,
+        },
+      });
+      // if (chats.length === 0) {
+      // }
     },
     {
-      // refetchOnWindowFocus: false,
-      refetchInterval: 2000,
+      refetchOnWindowFocus: false,
+      // refetchInterval: 2000,
     }
   );
 

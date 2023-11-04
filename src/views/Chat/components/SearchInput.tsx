@@ -1,15 +1,34 @@
-import { Search } from '@mui/icons-material';
+import { Clear, Search } from '@mui/icons-material';
 import DefaultInput from '../../../components/Inputs/DefaultInput';
+import { searchStore } from '../logic/useSearchStore';
+import Show from '../../../components/MetaComponents/Show';
+import { IconButton } from '@mui/material';
+import { useChats } from '../logic/useChats';
 
-export 
- function SearchInput() {
+export function SearchInput() {
+  const {store} = useChats();
+  const chats = store((state) => state.chats);
+  const [chatSearch, setChatSearch] = searchStore((state) => [
+    state.chatSearch,
+    state.setChatSearch,
+  ]);
   return (
     <DefaultInput
       sx={{ p: 0, margin: 0 }}
       variant="standard"
-      placeholder="Pesquisar ou começar uma nova conversa"
+      name="contacts-search"
+      value={chatSearch}
+      onChange={(e) => setChatSearch(e.target.value)}
+      placeholder="Pesquisar uma conversa"
+      disabled={!chats.length}
       InputProps={{
-        endAdornment: <Search />,
+        endAdornment: (
+          <Show when={!!chatSearch} fallback={<Search />}>
+            <IconButton onClick={() => setChatSearch('')} size="small">
+              <Clear fontSize='small'/>
+            </IconButton>
+          </Show>
+        ),
         sx: {
           py: 1,
           px: 2,

@@ -35,7 +35,7 @@ import useCreateCampaign from './hooks/useCreateCampaign';
 import useTestMessage from './hooks/useTestMessage';
 import useUploadFile from './hooks/useUploadFile';
 import { getFormattedMessage } from '../../utils/variablesUtils';
-import useCaretPosition from './hooks/useCaretPosition';
+import useCaretPosition from '../../hooks/useCaretPosition';
 import useCompany from '../../hooks/querys/useCompany';
 import useChannels from '../../hooks/querys/useChannels';
 import { usePagination } from '../../hooks/usePagination';

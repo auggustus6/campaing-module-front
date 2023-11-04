@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import React, { useEffect, useRef } from 'react';
+import React, { createRef, useEffect, useRef } from 'react';
 import { useMessages } from '../logic/useMessages';
 import { useChats } from '../logic/useChats';
 import { TextMessage } from './messages/TextMessage';
@@ -9,31 +9,36 @@ import { ImageMessage } from './messages/ImageMessage';
 import { VideoMessage } from './messages/VideoMessage';
 import { DocumentMessage } from './messages/DocumentMessage';
 import { MessageWrapper } from './messages/MessageWrapper';
+import { IconButton } from '@mui/joy';
+import { ArrowDownward } from '@mui/icons-material';
 
 export function Messages() {
-  const scrollToRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollToRef = createRef<HTMLDivElement>();
+  const containerMessagesRef = createRef<HTMLDivElement>();
   const { store, query: messagesQuery } = useMessages();
   const messages = store((state) => state.messages);
   const { store: chatStore } = useChats();
-  const selectedChatId = chatStore((state) => state.selectedChatId);
 
-  function scrollToBottom(mode?: 'smooth' | 'instant') {
+  function scrollToBottom(mode?: ScrollBehavior) {
     scrollToRef.current?.scrollIntoView({
       behavior: mode || 'smooth',
       block: 'end',
     });
+    containerMessagesRef.current?.style.setProperty('opacity', '1');
   }
 
-  // useEffect(() => {
-  //   if (!scrollToRef.current || !selectedChatId)
-  //     return;
-  // }, [scrollToRef.current, selectedChatId, messagesQuery]);
-
-  console.log('messages', messages);
+  useEffect(() => {
+    if (messagesQuery.isSuccess && scrollToRef.current) {
+      setTimeout(() => {
+        scrollToBottom('instant' as any);
+      }, 100);
+    }
+  }, [messagesQuery.isSuccess, scrollToRef]);
 
   return (
     <Box
+      ref={containerMessagesRef}
+      id="containerMessagesRef"
       flex={1}
       display={'flex'}
       flexDirection={'column'}
@@ -45,11 +50,12 @@ export function Messages() {
         '&::-webkit-scrollbar-thumb': {
           borderRadius: 0,
         },
+        opacity: 0,
       }}
-      ref={containerRef}
     >
       {messages.map((message) => (
         <MessageWrapper
+          id={message.id}
           key={message.id}
           type={message.type}
           loading={message.sending}
@@ -124,7 +130,7 @@ export function Messages() {
           }}
         </MessageWrapper>
       ))}
-      <div ref={scrollToRef} />
+      <div ref={scrollToRef} id="scrollToRef" />
     </Box>
   );
 }

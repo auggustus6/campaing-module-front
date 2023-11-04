@@ -18,7 +18,7 @@ export default function useGetCampaign({
   additionalQueryArgs = [],
 }: Props) {
   return useQuery<Campaign>(
-    [API_URLS.CAMPAIGNS.BASE, 'get', id, ...additionalQueryArgs],
+    [API_URLS.CAMPAIGNS.BASE, 'GET', id, ...additionalQueryArgs],
     async () => {
       const { data } = await api.get<Campaign>(
         `${API_URLS.CAMPAIGNS.BASE}/${id}`

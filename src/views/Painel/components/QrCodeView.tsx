@@ -2,6 +2,8 @@ import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
+import { queryClient } from '../../../main';
+import { API_URLS } from '../../../utils/constants';
 
 interface QrCodeViewProps {
   channelId: string;
@@ -17,6 +19,10 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
   const qrCodeRefreshTime = 60 * 1000; // 40 seconds
   const statusRefreshTime = 10 * 2000; // 4 seconds
 
+  function invalidateChannelQuery() {
+    queryClient.invalidateQueries([API_URLS.CHANNELS.BASE, 'GET']);
+  }
+
   useEffect(() => {
     let timer: number;
     let qrCodeTimer: number | undefined = undefined;
@@ -31,6 +37,7 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
         clearInterval(qrCodeTimer);
         setQrCode('');
         setIsConnected(true);
+        invalidateChannelQuery();
         return true;
       }
     }
@@ -78,6 +85,7 @@ export default function QrCodeView({ channelId }: QrCodeViewProps) {
       await api.get(`/channels/disconnect/${channelId}`);
 
       setIsConnected(false);
+      invalidateChannelQuery();
     } catch (error) {
       toast.error('Erro ao desconectar instância');
     }

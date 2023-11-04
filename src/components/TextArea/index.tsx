@@ -5,7 +5,7 @@ import Show from '../MetaComponents/Show';
 import { InputLabel } from '@mui/material';
 import ErrorLabel from '../Labels/ErrorLabel';
 
-interface TextArea {
+interface TextArea extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   errorMessage?: string;
   disabled?: boolean;
   label?: string;

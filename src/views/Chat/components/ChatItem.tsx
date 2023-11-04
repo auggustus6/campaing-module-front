@@ -50,9 +50,21 @@ export function ChatItem({
   const { store } = useChats();
   const selectedChatId = store((state) => state.selectedChatId);
   const setSelectedChatId = store((state) => state.setSelectedChatId);
+
+  function handleChatClick(id: string) {
+    if (selectedChatId === id) return;
+    const container = document.getElementById('containerMessagesRef');
+    console.log('container', container);
+    
+    if (container) {
+      container.style.setProperty('opacity', '0');
+    }
+    setSelectedChatId(id);
+  }
+
   return (
     <ListItem
-      onClick={() => setSelectedChatId(id)}
+      onClick={() => handleChatClick(id)}
       alignItems="flex-start"
       sx={{
         '&+li': {
@@ -90,7 +102,12 @@ export function ChatItem({
                 <DoneAll fontSize="small" />
               </Show>
             </Show>
-            <Box display="flex" gap={0.3} alignItems={'center'}>
+            <Box
+              component={'span'}
+              display="flex"
+              gap={0.3}
+              alignItems={'center'}
+            >
               <MessageType type={contentType} text={text} />
             </Box>
           </Typography>
@@ -115,12 +132,12 @@ export function ChatItem({
 function MessageType({ type, text }: { type?: ContentType; text: string }) {
   switch (type) {
     case 'TEXT':
-      return <Typography>{text}</Typography>;
+      return <Typography component={'span'}>{text}</Typography>;
     case 'STICKER':
       return (
         <>
           <StickyNote2 />
-          <Typography>Figurinha</Typography>
+          <Typography component={'span'}>Figurinha</Typography>
         </>
       );
     case 'AUDIO_BASE64':
@@ -128,7 +145,7 @@ function MessageType({ type, text }: { type?: ContentType; text: string }) {
       return (
         <>
           <Audiotrack />
-          <Typography>Audio</Typography>
+          <Typography component={'span'}>Audio</Typography>
         </>
       );
     case 'IMAGE_BASE64':
@@ -136,7 +153,7 @@ function MessageType({ type, text }: { type?: ContentType; text: string }) {
       return (
         <>
           <Image />
-          <Typography>Imagem</Typography>
+          <Typography component={'span'}>Imagem</Typography>
         </>
       );
     case 'VIDEO_BASE64':
@@ -144,7 +161,7 @@ function MessageType({ type, text }: { type?: ContentType; text: string }) {
       return (
         <>
           <VideoLibrary />
-          <Typography>Video</Typography>
+          <Typography component={'span'}>Video</Typography>
         </>
       );
     case 'DOCUMENT_BASE64':
@@ -152,10 +169,9 @@ function MessageType({ type, text }: { type?: ContentType; text: string }) {
       return (
         <>
           <FilePresent />
-          <Typography>Anexo</Typography>
+          <Typography component={'span'}>Anexo</Typography>
         </>
       );
-    default:
-      return 'default';
   }
+  return null;
 }

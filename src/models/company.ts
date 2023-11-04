@@ -7,6 +7,8 @@ export interface Company {
 
   owner: User;
 
+  createdCampaigns: number;
+
   createdAt: string;
   updatedAt: string;
 }

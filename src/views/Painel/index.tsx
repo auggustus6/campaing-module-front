@@ -30,6 +30,7 @@ import { useUpdateCompanyMutation } from './hooks/useUpdateCompanyMutation';
 import useCompany from '../../hooks/querys/useCompany';
 import useChannels from '../../hooks/querys/useChannels';
 import useCompanyUsers from '../../hooks/querys/useCompanyUsers';
+import { getTwoFirstLetters } from '../../utils/stringUtils';
 
 interface User {
   id: string;
@@ -66,13 +67,6 @@ const companySchema = z.object({
 
 type CompanySchemaSchemaType = z.infer<typeof companySchema>;
 
-function getTwoFirstLetters(name: string) {
-  const [first, second] = name.split(' ');
-  let text = '';
-  if (!!first) text += first[0].toUpperCase();
-  if (!!second) text += second[0].toUpperCase();
-  return text;
-}
 
 function Painel() {
   const {
@@ -125,7 +119,6 @@ function Painel() {
 
   return (
     <>
-      teste
       <Container
         sx={{ paddingInline: '0px' }}
         component={'form'}
@@ -204,11 +197,11 @@ function Painel() {
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <InputLabel>Campanhas criadas</InputLabel>
-            {/* <TextField
+            <TextField
               fullWidth
-              value={(data?._count.campaign || 0) + ' Campanhas criadas'}
+              value={(company?.createdCampaigns || 0) + ' Campanhas criadas'}
               disabled
-            /> */}
+            />
           </Grid>
         </Grid>
         <Box marginTop={8} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CBScreenState, CrudBuilder } from '../../components/CrudBuilder';
+import { CBScreenState } from '../../components/CrudBuilder';
 import { z } from 'zod';
 import DefaultInput from '../../components/Inputs/DefaultInput';
 // import { campaignSchema } from './schema/campaignSchema';

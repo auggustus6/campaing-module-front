@@ -1,5 +1,5 @@
 import React from 'react';
-import { CrudBuilder } from '../components/CrudBuilder';
+// import { CrudBuilder } from '../components/CrudBuilder';
 // import { CrudBuilderSchema } from '../components/CrudBuilder/schemaBuilder/crudSchema';
 import { z } from 'zod';
 import { CrudBuilderField } from '../components/CrudBuilder/models/CrudBuilderField';

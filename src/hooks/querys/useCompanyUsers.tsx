@@ -6,7 +6,7 @@ import { User } from '../../models/user';
 
 export default function useCompanyUsers() {
   return useQuery(
-    API_URLS.COMPANY.USERS,
+    [API_URLS.COMPANY.USERS, "GET"],
     async () => {
       const { data } = await api.get<User[]>(API_URLS.COMPANY.USERS);
       return data;

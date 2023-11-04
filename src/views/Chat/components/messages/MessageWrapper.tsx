@@ -9,6 +9,7 @@ type Props = {
   loading?: boolean;
   error?: boolean;
   type: MessageType;
+  id: string;
 };
 
 export function MessageWrapper({
@@ -16,6 +17,7 @@ export function MessageWrapper({
   loading = false,
   error = false,
   type,
+  id
 }: Props) {
   return (
     <Box
@@ -24,6 +26,7 @@ export function MessageWrapper({
       sx={{
         position: 'relative',
       }}
+      id={id}
     >
       <Box position={'relative'}>
         <Box

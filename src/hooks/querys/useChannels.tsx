@@ -5,7 +5,7 @@ import { API_URLS } from '../../utils/constants';
 
 export default function useChannels() {
   return useQuery<Channel[]>(
-    API_URLS.CHANNELS.BASE,
+    [API_URLS.CHANNELS.BASE, "GET"],
     async () => {
       const { data } = await api.get<Channel[]>(API_URLS.CHANNELS.BASE);
 
