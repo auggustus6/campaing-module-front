@@ -11,7 +11,10 @@ export function getMinutesFromTime(time: string) {
 }
 
 export function getTimeFromMinutes(time: number) {
-  return Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2);
+  let hours: any = Math.floor(time / 60);
+  hours = hours < 10 ? '0' + hours : hours;
+  const minutes = time % 60;
+  return hours + ':' + ('0' + minutes).slice(-2);
 }
 
 export function formatDateTime(date?: string) {

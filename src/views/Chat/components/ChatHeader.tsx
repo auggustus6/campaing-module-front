@@ -9,6 +9,7 @@ import { getTwoFirstLetters } from '../../../utils/stringUtils';
 import useChannels from '../../../hooks/querys/useChannels';
 import { Channel } from '../../../models/channel';
 import { searchStore } from '../logic/useSearchStore';
+import Show from '../../../components/MetaComponents/Show';
 
 export function ChatHeader() {
   const { openChatModal } = useChatModals();
@@ -38,14 +39,14 @@ export function ChatHeader() {
 
   const companyInitialLetters = getTwoFirstLetters(company?.name);
 
-  const shouldDisable = isChannelsLoading || !company;
+  const shouldDisable = isChannelsLoading || !company || !channels?.length;
 
   function handleChannelSelect(e: any, id: string | null) {
     if (!id) return;
 
     setSelectedChannel(channels?.find((channel) => channel.id === id) || null);
     setSelectedChatId(null);
-    localStorage.setItem('lastChannelSelected', id);
+    localStorage.setItem('@campaign:lastChannelSelected', id);
   }
 
   useEffect(() => {
@@ -57,12 +58,14 @@ export function ChatHeader() {
     );
   }, [isChannelsSuccess, lastChannelSelected]);
 
-  
   useEffect(() => {
     if (!channels) return;
-    const lastChannel = localStorage.getItem('lastChannelSelected');
-    console.log('lastChannel', lastChannel);
-    
+    const lastChannel = localStorage.getItem('@campaign:lastChannelSelected');
+    if (!lastChannel) {
+      setLastChannelSelected(channels[0]?.id);
+      return;
+    }
+
     setLastChannelSelected(lastChannel);
   }, [channels]);
 
@@ -99,37 +102,43 @@ export function ChatHeader() {
         justifyContent={'center'}
       >
         {/* <p>{company?.name}</p> */}
-        <Box pr={4} display={'flex'} gap={1} alignItems={'center'}>
-          <FormControl sx={{ flex: 1, maxWidth: '12rem' }}>
-            <Select
-              value={selectedChannel?.id}
-              onChange={handleChannelSelect}
-              disabled={shouldDisable}
-              indicator={<KeyboardArrowDown />}
-            >
-              {channels?.map((option) => (
-                <Option
-                  value={option.id}
-                  key={option.id}
-                  sx={{
-                    color: option.state === 'connected' ? 'green' : 'initial',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    maxWidth: '12rem',
-                  }}
-                >
-                  {option.instanceName}
-                  <Circle
-                    color={option?.state === 'connected' ? 'success' : 'error'}
-                  />
-                </Option>
-              ))}
-            </Select>
-          </FormControl>
-          <Circle
-            color={selectedChannel?.state === 'connected' ? 'success' : 'error'}
-          />
-        </Box>
+        <Show when={!!channels?.length}>
+          <Box pr={4} display={'flex'} gap={1} alignItems={'center'}>
+            <FormControl sx={{ flex: 1, maxWidth: '12rem' }}>
+              <Select
+                value={selectedChannel?.id}
+                onChange={handleChannelSelect}
+                disabled={shouldDisable}
+                indicator={<KeyboardArrowDown />}
+              >
+                {channels?.map((option) => (
+                  <Option
+                    value={option.id}
+                    key={option.id}
+                    sx={{
+                      color: option.state === 'connected' ? 'green' : 'initial',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      maxWidth: '12rem',
+                    }}
+                  >
+                    {option.instanceName}
+                    <Circle
+                      color={
+                        option?.state === 'connected' ? 'success' : 'error'
+                      }
+                    />
+                  </Option>
+                ))}
+              </Select>
+            </FormControl>
+            <Circle
+              color={
+                selectedChannel?.state === 'connected' ? 'success' : 'error'
+              }
+            />
+          </Box>
+        </Show>
         {/* <Typography display={'flex'} alignItems={'center'} gap={1}>
           online <Circle color="success" fontSize={'small'} />
         </Typography> */}
@@ -138,6 +147,7 @@ export function ChatHeader() {
         <IconButton
           sx={{ bgcolor: 'white' }}
           onClick={() => openChatModal('newService')}
+          disabled={shouldDisable}
         >
           <Add />
         </IconButton>
