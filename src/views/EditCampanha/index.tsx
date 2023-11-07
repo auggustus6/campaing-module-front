@@ -63,7 +63,25 @@ export default function EditCampanha() {
 
   const toast = useToast();
 
-  const { data: channels } = useChannels();
+  const {
+    data: channels,
+    isLoading: isChannelsLoading,
+    isSuccess: isChannelsSuccess,
+    isError: isChannelError,
+  } = useChannels();
+  const activeChannels = channels?.filter(
+    (channel) => channel.state === 'connected'
+  );
+  useEffect(() => {
+    if (isChannelError) {
+      toast.error('Erro ao carregar canais');
+      return navigate('/campanhas');
+    }
+    if (isChannelsSuccess && !activeChannels?.length) {
+      toast.error('Não há canais disponíveis');
+      return navigate('/campanhas');
+    }
+  }, [isChannelsSuccess, isChannelError]);
 
   const [statusState, setStatusState] = useState('');
   useEffect(() => {

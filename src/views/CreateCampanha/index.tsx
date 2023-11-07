@@ -13,7 +13,7 @@ import { Add, Science, UploadFile } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -39,6 +39,8 @@ import useCaretPosition from '../../hooks/useCaretPosition';
 import useCompany from '../../hooks/querys/useCompany';
 import useChannels from '../../hooks/querys/useChannels';
 import { usePagination } from '../../hooks/usePagination';
+import { useToast } from '../../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateCampanha() {
   const {
@@ -77,6 +79,9 @@ export default function CreateCampanha() {
 
   const { isImage } = useIsImage({ midiaBase64 });
 
+  const toast = useToast();
+  const navigate = useNavigate();
+
   const { user } = useAuth();
   const shouldDisable = !user?.company?.isActive ?? true;
 
@@ -111,7 +116,26 @@ export default function CreateCampanha() {
     setValue('session', e.target.value);
   }
 
-  const { data: channels, isLoading: isChannelsLoading } = useChannels();
+  const {
+    data: channels,
+    isLoading: isChannelsLoading,
+    isSuccess: isChannelsSuccess,
+    isError: isChannelError,
+  } = useChannels();
+  const activeChannels = channels?.filter(
+    (channel) => channel.state === 'connected'
+  );
+  useEffect(() => {
+    if (isChannelError) {
+      toast.error('Erro ao carregar canais');
+      return navigate('/campanhas');
+    }
+    if (isChannelsSuccess && !activeChannels?.length) {
+      toast.error('Não há canais disponíveis');
+      return navigate('/campanhas');
+    }
+  }, [isChannelsSuccess, isChannelError]);
+
   const { mutate: handleCreateCampaign, isLoading: isCreatingCampaign } =
     useCreateCampaign({ midiaBase64 });
 
@@ -209,7 +233,7 @@ export default function CreateCampanha() {
               onChange={handleCanalSelect}
             >
               <MenuItem value={'select'}>Selecione um canal</MenuItem>
-              {channels?.map((option) => (
+              {activeChannels?.map((option) => (
                 <MenuItem value={option.id} key={option.id}>
                   {option.instanceName}
                 </MenuItem>

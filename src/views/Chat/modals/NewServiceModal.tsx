@@ -44,6 +44,10 @@ export default function NewChatModal({ onClose }: Props) {
   const { store } = useChats();
   const chatStore = store();
 
+  const channelsActive = channelsQuery.data?.filter(
+    (channel) => channel.state === 'connected'
+  );
+
   const newChatMutation = useNewChatMutation({
     onError: (error) => {
       return toast.error('Erro ao iniciar atendimento!');
@@ -133,7 +137,7 @@ export default function NewChatModal({ onClose }: Props) {
               disabled={shouldDisable}
             >
               <Option value={'default'}>Selecione um canal</Option>
-              {channelsQuery.data?.map((option) => (
+              {channelsActive?.map((option) => (
                 <Option value={option.id} key={option.id}>
                   {option.instanceName}
                 </Option>

@@ -16,6 +16,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useEffect } from 'react';
 import { Close, Info } from '@mui/icons-material';
 import { useToast } from '../../../context/ToastContext';
+import { queryClient } from '../../../main';
+import { API_URLS } from '../../../utils/constants';
 
 type UserSchemaSchemaType = z.infer<typeof userSchema>;
 const userSchema = z.object({
@@ -109,6 +111,8 @@ export default function UserModal() {
       }
       toast.error('Erro ao criar usuário!');
     }
+
+    queryClient.invalidateQueries([API_URLS.COMPANY.USERS, "GET"]);
   };
 
   function handleOnClose() {
