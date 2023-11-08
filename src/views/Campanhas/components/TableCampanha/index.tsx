@@ -32,7 +32,7 @@ export default function TableCampaign() {
   }, [campaigns]);
 
   const selectedCampaign = campaigns?.result?.filter(
-    (item: any) => item.id === selected[0]
+    (item: any) => selected.includes(item.id)
   );
 
   const rows: Campaign[] = campaigns?.result || [];

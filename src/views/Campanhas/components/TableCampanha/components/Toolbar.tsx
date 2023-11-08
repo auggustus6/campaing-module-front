@@ -14,6 +14,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useAuth } from '../../../../../context/AuthContext';
 import { Campaign } from '../../../../../models/campaign';
 import { API_URLS } from '../../../../../utils/constants';
+import Show from '../../../../../components/MetaComponents/Show';
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selectedItem: string[];
@@ -38,9 +39,15 @@ export function EnhancedTableToolbar({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const canEditCampaigns = !campaign?.some(
+    (campaign) => campaign.status === 'CONCLUIDO'
+  );
+
   function handleSeeDetailsButton() {
     navigate(`${selectedItem}`);
   }
+
+  console.log(campaign);
 
   async function handleStartButton() {
     setIsLoading(true);
@@ -151,9 +158,22 @@ export function EnhancedTableToolbar({
           Campanhas
         </Typography>
       )}
-      {numSelected > 0 ? (
+      <Show
+        when={numSelected > 0}
+        fallback={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Typography>Mostrar campanhas removidas</Typography>
+            <Switch
+              value={showDeleted}
+              // defaultValue={showDeleted}
+              defaultChecked={showDeleted}
+              onChange={() => setShowDeleted(!showDeleted)}
+            />
+          </Box>
+        }
+      >
         <>
-          {numSelected < 2 && (
+          <Show when={numSelected < 2}>
             <Button
               title="Ver Campanha"
               variant="contained"
@@ -170,9 +190,15 @@ export function EnhancedTableToolbar({
               <PreviewIcon />
               Ver
             </Button>
-          )}
-          {user?.isAdmin && campaign?.[0].status !== 'CONCLUIDO' && (
-            <>
+          </Show>
+          <Show when={user?.isAdmin && !campaign?.[0]?.isDeleted}>
+            <Show
+              when={
+                campaign?.some(
+                  (c) => c.status !== 'INICIAR' && c.status !== 'EM_PROGRESSO'
+                ) && canEditCampaigns
+              }
+            >
               <Button
                 title="Iniciar Campanha"
                 variant="contained"
@@ -190,6 +216,16 @@ export function EnhancedTableToolbar({
                 <PlayCircleOutlineIcon />
                 Iniciar
               </Button>
+            </Show>
+
+            <Show
+              when={
+                campaign?.some(
+                  (c) =>
+                    c.status !== 'PAUSADO' && c.status !== 'PAUSE_AUTOMATIC'
+                ) && canEditCampaigns
+              }
+            >
               <Button
                 title="Pausar Campanha"
                 variant="contained"
@@ -207,60 +243,54 @@ export function EnhancedTableToolbar({
                 <PauseCircleOutlineIcon />
                 Pausar
               </Button>
-            </>
-          )}
-          {user?.isAdmin && (
-            <Button
-              title="Encerrar Campanha"
-              variant="contained"
-              // color="error"
-              sx={{
-                mr: '1rem',
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
-                background: '#232323',
-                '&:hover': {
-                  background: '#595959',
-                },
-              }}
-              disabled={isLoading}
-              onClick={handleFinishButton}
-            >
-              <CheckCircleOutlineIcon />
-              Encerrar
-            </Button>
-          )}
+            </Show>
 
-          {user?.isAdmin && campaign?.[0].status !== 'CONCLUIDO' && (
-            <Button
-              title="Remover Campanha"
-              variant="contained"
-              color="error"
-              sx={{
-                height: '40px',
-                paddingInline: '2rem',
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-              disabled={isLoading}
-              onClick={handleRemoveButton}
+            <Show
+              when={campaign?.[0]?.status !== 'CONCLUIDO' && canEditCampaigns}
             >
-              <DeleteOutlineIcon />
-              Remover
-            </Button>
-          )}
+              <Button
+                title="Encerrar Campanha"
+                variant="contained"
+                sx={{
+                  mr: '1rem',
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  background: '#232323',
+                  '&:hover': {
+                    background: '#595959',
+                  },
+                }}
+                disabled={isLoading}
+                onClick={handleFinishButton}
+              >
+                <CheckCircleOutlineIcon />
+                Encerrar
+              </Button>
+            </Show>
+
+            <Show when={!campaign?.[0]?.isDeleted}>
+              <Button
+                title="Remover Campanha"
+                variant="contained"
+                color="error"
+                sx={{
+                  height: '40px',
+                  paddingInline: '2rem',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+                disabled={isLoading}
+                onClick={handleRemoveButton}
+              >
+                <DeleteOutlineIcon />
+                Remover
+              </Button>
+            </Show>
+          </Show>
         </>
-      ) : (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Typography>Mostrar campanhas removidas</Typography>
-          <Switch
-            value={showDeleted}
-            onChange={() => setShowDeleted(!showDeleted)}
-          />
-        </Box>
-      )}
+      </Show>
     </Toolbar>
   );
 }

@@ -27,10 +27,12 @@ import {
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
 import { Switch } from '@mui/material';
-import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
+import { API_URLS, TABLE_CONTACTS_SIZE } from '../../utils/constants';
 import useGetCampaign from '../../hooks/querys/useGetCampaign';
 import { useManageCampaign } from './hooks/useManageCampaign';
 import { useToast } from '../../context/ToastContext';
+import { queryClient } from '../../main';
+import Show from '../../components/MetaComponents/Show';
 
 export default function DetailsCampanha() {
   const { id } = useParams();
@@ -102,6 +104,10 @@ export default function DetailsCampanha() {
     }
   }, [isError]);
 
+  async function invalidateCampaignQuery() {
+    queryClient.invalidateQueries([API_URLS.CAMPAIGNS.BASE]);
+  }
+
   async function handleRemoveCampaign() {
     const option = await Swal.fire({
       title: 'Tem certeza que deseja remover essa campanha?',
@@ -127,6 +133,8 @@ export default function DetailsCampanha() {
         },
       }
     );
+
+    invalidateCampaignQuery();
   }
 
   function handleStartButton() {
@@ -142,6 +150,7 @@ export default function DetailsCampanha() {
         },
       }
     );
+    invalidateCampaignQuery();
   }
 
   function handleFinishButton() {
@@ -157,6 +166,7 @@ export default function DetailsCampanha() {
         },
       }
     );
+    invalidateCampaignQuery();
   }
 
   function handlePauseButton() {
@@ -172,6 +182,7 @@ export default function DetailsCampanha() {
         },
       }
     );
+    invalidateCampaignQuery();
   }
 
   function handleNavigateResend() {
@@ -193,35 +204,37 @@ export default function DetailsCampanha() {
           >
             <Typography variant="h4">Detalhes da campanha</Typography>
             <Stack direction={'row'} gap={2}>
-              <ShowWhenAdmin>
-                {contactsWithError.length > 0 && (
-                  <Button
-                    sx={{ textTransform: 'uppercase' }}
-                    color="neutral"
-                    onClick={handleNavigateResend}
-                  >
-                    <ReplyAllSharp fontSize="small" />
-                    Reenviar para contatos com erro
-                  </Button>
-                )}
-                <Link to={'editar'}>
-                  <Button sx={{ textTransform: 'uppercase' }}>
-                    <EditIcon fontSize="small" />
-                    Editar
-                  </Button>
-                </Link>
-                <Box>
-                  <Button
-                    color="danger"
-                    loading={isLoading}
-                    onClick={handleRemoveCampaign}
-                    sx={{ textTransform: 'uppercase' }}
-                  >
-                    <DeleteOutlineIcon fontSize="small" />
-                    Remover
-                  </Button>
-                </Box>
-              </ShowWhenAdmin>
+              <Show when={!campaign?.isDeleted}>
+                <ShowWhenAdmin>
+                  {contactsWithError.length > 0 && !campaign?.isDeleted && (
+                    <Button
+                      sx={{ textTransform: 'uppercase' }}
+                      color="neutral"
+                      onClick={handleNavigateResend}
+                    >
+                      <ReplyAllSharp fontSize="small" />
+                      Reenviar para contatos com erro
+                    </Button>
+                  )}
+                  <Link to={'editar'}>
+                    <Button sx={{ textTransform: 'uppercase' }}>
+                      <EditIcon fontSize="small" />
+                      Editar
+                    </Button>
+                  </Link>
+                  <Box>
+                    <Button
+                      color="danger"
+                      loading={isLoading}
+                      onClick={handleRemoveCampaign}
+                      sx={{ textTransform: 'uppercase' }}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                      Remover
+                    </Button>
+                  </Box>
+                </ShowWhenAdmin>
+              </Show>
             </Stack>
           </Stack>
         </Grid>
@@ -319,67 +332,82 @@ export default function DetailsCampanha() {
             imgSrc={midiaType == 'image' ? midiaSrc : undefined}
           />
         </Grid>
-        {!['CANCELADO', 'CONCLUIDO'].includes(campaign?.status || '') && (
-          <ShowWhenAdmin>
-            <Stack
-              direction={'row'}
-              gap={4}
-              justifyContent={'flex-end'}
-              width={'100%'}
-              py={2}
-            >
-              <Button
-                title="Iniciar Campanha"
-                color="success"
-                sx={{
-                  height: '40px',
-                  paddingInline: '2rem',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                }}
-                onClick={handleStartButton}
+        {!['CANCELADO', 'CONCLUIDO'].includes(campaign?.status || '') &&
+          !campaign?.isDeleted && (
+            <ShowWhenAdmin>
+              <Stack
+                direction={'row'}
+                gap={4}
+                justifyContent={'flex-end'}
+                width={'100%'}
+                py={2}
               >
-                <PlayCircleOutlineIcon fontSize="small" />
-                Iniciar
-              </Button>
-              <Button
-                title="Pausar Campanha"
-                sx={{
-                  height: '40px',
-                  paddingInline: '2rem',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  background: '#9c27b0',
-                  '&:hover': {
-                    background: '#882999',
-                  },
-                }}
-                onClick={handlePauseButton}
-              >
-                <PauseCircleOutlineIcon fontSize="small" />
-                Pausar
-              </Button>
-              <Button
-                title="Encerrar Campanha"
-                color="neutral"
-                sx={{
-                  height: '40px',
-                  paddingInline: '2rem',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  background: '#232323',
-                }}
-                onClick={handleFinishButton}
-              >
-                <CheckCircleOutlineIcon />
-                Encerrar
-              </Button>
-            </Stack>
-          </ShowWhenAdmin>
-        )}
+                <Show
+                  when={
+                    campaign?.status !== 'INICIAR' &&
+                    campaign?.status !== 'EM_PROGRESSO'
+                  }
+                >
+                  <Button
+                    title="Iniciar Campanha"
+                    color="success"
+                    sx={{
+                      height: '40px',
+                      paddingInline: '2rem',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                    }}
+                    onClick={handleStartButton}
+                  >
+                    <PlayCircleOutlineIcon fontSize="small" />
+                    Iniciar
+                  </Button>
+                </Show>
+                <Show
+                  when={
+                    campaign?.status !== 'PAUSADO' &&
+                    campaign?.status !== 'PAUSE_AUTOMATIC'
+                  }
+                >
+                  <Button
+                    title="Pausar Campanha"
+                    sx={{
+                      height: '40px',
+                      paddingInline: '2rem',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      background: '#9c27b0',
+                      '&:hover': {
+                        background: '#882999',
+                      },
+                    }}
+                    onClick={handlePauseButton}
+                  >
+                    <PauseCircleOutlineIcon fontSize="small" />
+                    Pausar
+                  </Button>
+                </Show>
+                <Button
+                  title="Encerrar Campanha"
+                  color="neutral"
+                  sx={{
+                    height: '40px',
+                    paddingInline: '2rem',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    background: '#232323',
+                  }}
+                  onClick={handleFinishButton}
+                >
+                  <CheckCircleOutlineIcon />
+                  Encerrar
+                </Button>
+              </Stack>
+            </ShowWhenAdmin>
+          )}
       </Grid>
       <TableContacts
         title={
