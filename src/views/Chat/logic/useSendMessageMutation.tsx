@@ -6,6 +6,7 @@ import { API_URLS } from '../../../utils/constants';
 import { useChats } from './useChats';
 import { useMessages } from './useMessages';
 import { ContentType, Message } from '../../../models/message';
+import { useToast } from '../../../context/ToastContext';
 
 type ApiResponse = Message;
 
@@ -22,6 +23,8 @@ export function useSendMessageMutation() {
   const { store: messagesStore } = useMessages();
   const addMessage = messagesStore((state) => state.addMessage);
   const updateMessage = messagesStore((state) => state.updateMessage);
+
+  const toast = useToast();
 
   return useMutation({
     mutationFn: async ({

@@ -14,12 +14,10 @@ import { useRemoveChatMutation } from '../logic/useRemoveChatMutation';
 
 export function ContentHeader() {
   const { selectedChat } = useChats();
-  const {mutate} = useRemoveChatMutation();
-
-  console.log(selectedChat);
+  const { mutate } = useRemoveChatMutation();
 
   function handleRemoveCall() {
-    if(!selectedChat) return;
+    if (!selectedChat) return;
     mutate(selectedChat.id);
   }
 
@@ -36,7 +34,10 @@ export function ContentHeader() {
       <Box display={'flex'} alignItems={'center'}>
         <Avatar
           alt="Remy Sharp"
-          src="https://love.doghero.com.br/wp-content/uploads/2019/09/Corgi-1.jpg-1.jpg"
+          src={
+            selectedChat?.profilePictureUrl ||
+            'https://love.doghero.com.br/wp-content/uploads/2019/09/Corgi-1.jpg-1.jpg'
+          }
         />
         <Typography ml={2} fontWeight={'bold'}>
           {selectedChat?.name || formatPhoneNumber(selectedChat?.number || '')}

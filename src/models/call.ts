@@ -7,6 +7,7 @@ export interface Chat {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  profilePictureUrl: string;
 
   companyId: string;
   channelId: string;

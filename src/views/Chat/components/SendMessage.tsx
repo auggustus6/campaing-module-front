@@ -32,13 +32,13 @@ import MidiaModal from '../modals/MidiaModal';
 
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import i18n from '@emoji-mart/data/i18n/pt.json'
+import i18n from '@emoji-mart/data/i18n/pt.json';
 
 import useCaretPosition from '../../../hooks/useCaretPosition';
 
 export function SendMessage() {
+  const toast = useToast();
   const [text, setText] = useState('');
-  // const [caretPosition, setCaretPosition] = useState(0);
   const { caretPosition } = useCaretPosition({ id: 'sendMessageInput' });
   const { mutate, mutateAsync } = useSendMessageMutation();
   const [modalText, setModalText] = useState('');
@@ -74,6 +74,11 @@ export function SendMessage() {
     const midia64 = await fileToBase64(file);
 
     if (type == 'IMAGE_BASE64' || type == 'VIDEO_BASE64') {
+      const size = file.size / 1024;
+      if (size > 2000) {
+        toast.error('O arquivo é muito grande, o tamanho máximo é 2MB');
+        return;
+      }
       setModalContent({ type: type, content: midia64, fileName: file.name });
       return;
     }
@@ -174,7 +179,11 @@ export function SendMessage() {
                   <EmojiEmotions />
                 </MenuButton>
                 <Menu placement="top-end">
-                  <Picker data={data} onEmojiSelect={onEmojiSelect} i18n={i18n} />
+                  <Picker
+                    data={data}
+                    onEmojiSelect={onEmojiSelect}
+                    i18n={i18n}
+                  />
                 </Menu>
               </Dropdown>
               <Show when={!text}>

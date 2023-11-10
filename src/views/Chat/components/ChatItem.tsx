@@ -35,6 +35,7 @@ type Props = {
   author?: string;
   sending?: boolean;
   contentType: ContentType;
+  picture?: string;
 };
 
 export function ChatItem({
@@ -46,6 +47,7 @@ export function ChatItem({
   author,
   sending = false,
   contentType,
+  picture,
 }: Props) {
   const { store } = useChats();
   const selectedChatId = store((state) => state.selectedChatId);
@@ -55,7 +57,7 @@ export function ChatItem({
     if (selectedChatId === id) return;
     const container = document.getElementById('containerMessagesRef');
     console.log('container', container);
-    
+
     if (container) {
       container.style.setProperty('opacity', '0');
     }
@@ -81,7 +83,10 @@ export function ChatItem({
       <ListItemAvatar>
         <Avatar
           alt="Remy Sharp"
-          src="https://love.doghero.com.br/wp-content/uploads/2019/09/Corgi-1.jpg-1.jpg"
+          src={
+            picture ||
+            'https://love.doghero.com.br/wp-content/uploads/2019/09/Corgi-1.jpg-1.jpg'
+          }
         />
       </ListItemAvatar>
       <ListItemText

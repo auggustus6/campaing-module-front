@@ -13,12 +13,30 @@ import { useChats } from './logic/useChats';
 import { useEffect } from 'react';
 import { ChatBubbleOutline } from '@mui/icons-material';
 import { Typography } from '@mui/joy';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ChatView() {
   const { chatModals, toggleCurrentChatModal } = useChatModals();
-  const { store } = useChats();
+  const { store, query } = useChats();
   const chats = store((state) => state.chats);
   const selectedChatId = store((state) => state.selectedChatId);
+  const setSelectedChatId = store((state) => state.setSelectedChatId);
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (!selectedChatId) return;
+    setSearchParams({ id: selectedChatId });
+  }, [selectedChatId]);
+
+  // i dont know why i cant just set the chat after is loaded, but this work...
+  useEffect(() => {
+    if (!query.isFetched) return;
+    const chatId = searchParams.get('id');
+    if (!chatId) return;
+    setTimeout(() => {
+      setSelectedChatId(chatId);
+    }, 1000);
+  }, [query.isFetched]);
 
   return (
     <Box

@@ -44,6 +44,7 @@ export function MessagesList() {
             author={chat.name}
             contentType={chat.lastMessage.content.type}
             sending={chat.lastMessage.sending}
+            picture={chat.profilePictureUrl}
           />
         ))}
       </List>

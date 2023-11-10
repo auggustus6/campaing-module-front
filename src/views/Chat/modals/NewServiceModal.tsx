@@ -56,7 +56,6 @@ export default function NewChatModal({ onClose }: Props) {
       console.log('callcreated', data);
 
       if (data.alreadyExists) {
-        chatStore.updateChat(data.call.id, data.call);
         chatStore.setSelectedChatId(data.call.id);
         onClose();
         toast.info('Atendimento já iniciado!');
