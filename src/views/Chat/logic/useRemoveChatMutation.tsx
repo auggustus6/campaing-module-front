@@ -4,12 +4,15 @@ import { Chat } from '../../../models/call';
 import api from '../../../services/api';
 import { useToast } from '../../../context/ToastContext';
 import { useChats } from './useChats';
+import { queryClient } from '../../../main';
 
 export function useRemoveChatMutation() {
   const toast = useToast();
   const { store } = useChats();
   const removeChat = store((state) => state.removeChat);
   const setSelectedChatId = store((state) => state.setSelectedChatId);
+
+  console.log('chatsstore', store().chats);
 
   return useMutation({
     mutationKey: 'removeChat',
@@ -18,7 +21,8 @@ export function useRemoveChatMutation() {
     },
     onSuccess: (data) => {
       toast.success('Chat removido com sucesso!');
-      removeChat(data.id);
+      queryClient.invalidateQueries([API_URLS.CALL.BASE, 'GET',]);
+
       setSelectedChatId(null);
     },
     mutationFn: async (id: string) => {

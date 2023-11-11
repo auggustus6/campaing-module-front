@@ -1,20 +1,24 @@
 import { Box, List } from '@mui/material';
-import { useChats } from '../logic/useChats';
+import { useChats } from '../../logic/useChats';
 import { ChatItem } from './ChatItem';
-import Show from '../../../components/MetaComponents/Show';
+import Show from '../../../../components/MetaComponents/Show';
 import { CircularProgress, Stack } from '@mui/joy';
-import { searchStore } from '../logic/useSearchStore';
+import { searchStore } from '../../logic/useSearchStore';
+import useChannels from '../../../../hooks/querys/useChannels';
 
 export function MessagesList() {
   const { store, query } = useChats();
   const chatSearch = searchStore((state) => state.chatSearch);
 
   const chats = store((state) => state.chats);
+  const selectedChannel = store((state) => state.selectedChannel);
 
-  const chatsFiltered = chats.filter((chat) => {
+  const chatsFiltered = chats.filter((chat, i) => {
+    console.log(`chat ${i}`, chat);
+    
     if (!chatSearch) return true;
     return (
-      chat.name.toLowerCase().includes(chatSearch?.toLowerCase() || '') ||
+      chat.name?.toLowerCase().includes(chatSearch?.toLowerCase() || '') ||
       chat.number.toLowerCase().includes(chatSearch?.toLowerCase() || '')
     );
   });
@@ -48,10 +52,18 @@ export function MessagesList() {
           />
         ))}
       </List>
-      <Show when={query.isLoading}>
-        <Stack alignItems={'center'} py={8}>
-          <CircularProgress />
-        </Stack>
+      <Show when={query.isLoading || !selectedChannel}>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+        }}
+      >
+        <CircularProgress size="lg" />
+      </Box>
       </Show>
     </Box>
   );

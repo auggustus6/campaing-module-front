@@ -166,6 +166,8 @@ export function SendMessage() {
 
       <DefaultInput
         sx={{ p: 0, margin: 0, bgcolor: 'white' }}
+        // autocomplete="off"
+        autoComplete='off'
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Digite uma mensagem"

@@ -48,6 +48,8 @@ export default function NewChatModal({ onClose }: Props) {
     (channel) => channel.state === 'connected'
   );
 
+  console.log('chats', chatStore.chats);
+
   const newChatMutation = useNewChatMutation({
     onError: (error) => {
       return toast.error('Erro ao iniciar atendimento!');
@@ -56,6 +58,9 @@ export default function NewChatModal({ onClose }: Props) {
       console.log('callcreated', data);
 
       if (data.alreadyExists) {
+        if (!chatStore.chats.find((chat) => chat.id === data.call.id)) {
+          chatStore.addChat(data.call);
+        }
         chatStore.setSelectedChatId(data.call.id);
         onClose();
         toast.info('Atendimento já iniciado!');

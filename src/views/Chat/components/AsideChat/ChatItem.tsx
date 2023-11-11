@@ -7,8 +7,8 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { ContentType, MessageType } from '../../../models/message';
-import Show from '../../../components/MetaComponents/Show';
+import { ContentType, MessageType } from '../../../../models/message';
+import Show from '../../../../components/MetaComponents/Show';
 import {
   Audiotrack,
   DoneAll,
@@ -22,9 +22,10 @@ import {
 import {
   chatFormatDateTime,
   formatDateTime,
-} from '../../../utils/dateAndTimeUtils';
-import { formatPhoneNumber } from '../../../utils/phoneNumbers';
-import { useChats } from '../logic/useChats';
+} from '../../../../utils/dateAndTimeUtils';
+import { formatPhoneNumber } from '../../../../utils/phoneNumbers';
+import { useChats } from '../../logic/useChats';
+import { menuStateStore } from '../../logic/useMenus';
 
 type Props = {
   id: string;
@@ -52,8 +53,10 @@ export function ChatItem({
   const { store } = useChats();
   const selectedChatId = store((state) => state.selectedChatId);
   const setSelectedChatId = store((state) => state.setSelectedChatId);
+  const closeAside = menuStateStore((state) => state.closeAside);
 
   function handleChatClick(id: string) {
+    closeAside();
     if (selectedChatId === id) return;
     const container = document.getElementById('containerMessagesRef');
     console.log('container', container);
@@ -90,7 +93,15 @@ export function ChatItem({
         />
       </ListItemAvatar>
       <ListItemText
-        primary={<Typography>{author || formatPhoneNumber(number)}</Typography>}
+        primary={
+          <Typography
+            // style={{
+            //   whiteSpace: 'nowrap',
+            // }}
+          >
+            {author || number}
+          </Typography>
+        }
         secondary={
           <Typography
             display={'flex'}
@@ -98,6 +109,7 @@ export function ChatItem({
             fontSize={'0.85rem'}
             color={'GrayText'}
             alignItems={'center'}
+            noWrap
           >
             <Show when={type === 'SENT'}>
               <Show when={sending}>

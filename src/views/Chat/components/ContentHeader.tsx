@@ -1,5 +1,11 @@
-import { DeleteForever, MoreVert, Remove, Search } from '@mui/icons-material';
-import { Box, Avatar, Typography } from '@mui/material';
+import {
+  DeleteForever,
+  Menu as MenuIcon,
+  MoreVert,
+  Remove,
+  Search,
+} from '@mui/icons-material';
+import { Box, Avatar, Typography, Divider } from '@mui/material';
 import {
   Dropdown,
   IconButton,
@@ -11,10 +17,13 @@ import {
 import { useChats } from '../logic/useChats';
 import { formatPhoneNumber } from '../../../utils/phoneNumbers';
 import { useRemoveChatMutation } from '../logic/useRemoveChatMutation';
+import { theme } from '../../../styles/theme';
+import { menuStateStore } from '../logic/useMenus';
 
 export function ContentHeader() {
   const { selectedChat } = useChats();
   const { mutate } = useRemoveChatMutation();
+  const openAside = menuStateStore((state) => state.openAside);
 
   function handleRemoveCall() {
     if (!selectedChat) return;
@@ -28,10 +37,32 @@ export function ContentHeader() {
       alignItems={'center'}
       bgcolor={'white'}
       borderBottom={'1px solid #dfdfdf'}
-      p={4}
       height={'80px'}
+      sx={{
+        p: 4,
+        [theme.breakpoints.down('md')]: {
+          px: 1.8,
+        },
+      }}
     >
       <Box display={'flex'} alignItems={'center'}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            pr: 3,
+            [theme.breakpoints.up('md')]: {
+              display: 'none',
+            },
+          }}
+        >
+          <IconButton onClick={openAside}>
+            <MenuIcon />
+          </IconButton>
+          <Box sx={{width: "1px", height: "40px", background: "#dfdfdf"}}/>
+        </Box>
+
         <Avatar
           alt="Remy Sharp"
           src={
@@ -40,13 +71,10 @@ export function ContentHeader() {
           }
         />
         <Typography ml={2} fontWeight={'bold'}>
-          {selectedChat?.name || formatPhoneNumber(selectedChat?.number || '')}
+          {selectedChat?.name || selectedChat?.number}
         </Typography>
       </Box>
       <Box display={'flex'} gap={2}>
-        {/* <IconButton>
-          <Search />
-        </IconButton> */}
         <Dropdown>
           <MenuButton slots={{ root: IconButton }}>
             <MoreVert />
@@ -60,9 +88,6 @@ export function ContentHeader() {
             </MenuItem>
           </Menu>
         </Dropdown>
-        {/* <IconButton>
-          <MoreVert />
-        </IconButton> */}
       </Box>
     </Box>
   );

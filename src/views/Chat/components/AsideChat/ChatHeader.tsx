@@ -2,14 +2,14 @@ import { Add, Circle, KeyboardArrowDown, PlusOne } from '@mui/icons-material';
 import { FormControl, IconButton, Select, Option } from '@mui/joy';
 import { Box, Typography } from '@mui/material';
 import React, { createRef, useEffect, useState } from 'react';
-import { useChatModals } from '../logic/useChatModals';
-import { useChats } from '../logic/useChats';
-import useCompany from '../../../hooks/querys/useCompany';
-import { getTwoFirstLetters } from '../../../utils/stringUtils';
-import useChannels from '../../../hooks/querys/useChannels';
-import { Channel } from '../../../models/channel';
-import { searchStore } from '../logic/useSearchStore';
-import Show from '../../../components/MetaComponents/Show';
+import { useChatModals } from '../../logic/useChatModals';
+import { useChats } from '../../logic/useChats';
+import useCompany from '../../../../hooks/querys/useCompany';
+import { getTwoFirstLetters } from '../../../../utils/stringUtils';
+import useChannels from '../../../../hooks/querys/useChannels';
+import { Channel } from '../../../../models/channel';
+import { searchStore } from '../../logic/useSearchStore';
+import Show from '../../../../components/MetaComponents/Show';
 
 export function ChatHeader() {
   const { openChatModal } = useChatModals();

@@ -9,7 +9,7 @@ export default function ChatLayout() {
     <div style={{ minHeight: '100vh', position: 'relative', overflowY: "hidden" }}>
       <Header />
       <Box pt={8} />
-      <Box sx={{ px: { xs: 0, md: 0, lg: 4 }, py: 4 }}>
+      <Box sx={{ px: { xs: 0, md: 0, lg: 4 }, py: { xs: 0, md: 2, lg: 4 } }}>
         <Outlet />
       </Box>
       {/* <Footer /> */}

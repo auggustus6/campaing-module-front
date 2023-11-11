@@ -9,6 +9,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import Show from '../../../../components/MetaComponents/Show';
 import { Pause, PlayCircle } from '@mui/icons-material';
 import { IconButton } from '@mui/joy';
+import { theme } from '../../../../styles/theme';
 
 type Props = {
   type: MessageType;
@@ -65,6 +66,9 @@ export function AudioMessage({ type, srcUrl, sentAt, src64 }: Props) {
     <Box
       sx={{
         width: '300px',
+        [theme.breakpoints.down('md')]: {
+          width: '220px',
+        },
         height: '60px',
         position: 'relative',
         borderRadius: 2,

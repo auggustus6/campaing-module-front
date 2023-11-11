@@ -10,6 +10,7 @@ import {
   PictureAsPdf,
 } from '@mui/icons-material';
 import { IconButton, Typography } from '@mui/joy';
+import { theme } from '../../../../styles/theme';
 
 type Props = {
   type: MessageType;
@@ -30,12 +31,13 @@ export function DocumentMessage({
 
   const fileNameFormatted = fileName || new Date().getTime() + '.pdf';
 
-  function handleDownload() {}
-
   return (
     <Box
       sx={{
         width: '300px',
+        [theme.breakpoints.down('md')]: {
+          width: '220px',
+        },
         height: '70px',
         position: 'relative',
         borderRadius: 2,

@@ -5,6 +5,7 @@ import { API_URLS } from '../../../utils/constants';
 import api from '../../../services/api';
 import { Chat } from '../../../models/call';
 import { Channel } from '../../../models/channel';
+import { AxiosResponse } from 'axios';
 
 type State = {
   chats: Chat[];
@@ -48,10 +49,10 @@ export function useChats() {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const selectedChannel = chatsStore((state) => state.selectedChannel);
 
-  const query = useQuery(
+  const query = useQuery<AxiosResponse<Chat[]> | null>(
     [API_URLS.CALL.BASE, 'GET', selectedChannel?.id],
     async () => {
-      if(!selectedChannel?.id){
+      if (!selectedChannel?.id) {
         return null;
       }
       return await api.get<Chat[]>(API_URLS.CALL.BASE, {
@@ -59,31 +60,24 @@ export function useChats() {
           channelId: selectedChannel?.id,
         },
       });
-      // if (chats.length === 0) {
-      // }
     },
     {
       refetchOnWindowFocus: false,
-      // refetchInterval: 2000,
+      refetchInterval: false,
+      // enabled: chats.length === 0 || !chats,
+      // refetchOnMount: true,
     }
   );
 
   useEffect(() => {
-    // if (query.data && !!query.data.data.length && !chats.length) {
-    //   setChats(query.data.data);
-    // }
-    if(query.data){
-      setChats(query.data.data)
+    if (query.data) {
+      setChats(query.data.data);
     }
   }, [query.data]);
 
   useEffect(() => {
     setSelectedChat(chats.find((chat) => chat.id === selectedChatId) || null);
   }, [selectedChatId]);
-
-  // function getSelectedChat() {
-  //   return chats.find((chat) => chat.id === chatsStore.getState().selectedChatId);
-  // }
 
   return {
     query: query,
