@@ -11,7 +11,11 @@ export function getMinutesFromTime(time: string) {
 }
 
 export function getTimeFromMinutes(time: number) {
-  return Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2);
+  let hours = String(Math.floor(time / 60));
+  hours = hours.length < 2 ? `0${hours}` : hours;
+  let minutes = String(time % 60);
+  minutes = minutes.length < 2 ? `0${minutes}` : minutes;
+  return `${hours}:${minutes}`;
 }
 
 export function formatDateTime(date?: string) {

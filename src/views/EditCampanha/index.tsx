@@ -9,123 +9,36 @@ import {
   Select,
   Box,
   SelectChangeEvent,
-  Divider,
 } from '@mui/material';
 import MaterialButton from '@mui/material/Button';
 import Button from '@mui/joy/Button';
-import axios from 'axios';
-import TableContactsFromApi from '../../components/TableContacts/TableContactsFromApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { TextArea } from '../../components/TextArea';
 import Swal from 'sweetalert2';
 import api from '../../services/api';
-import moment from 'moment';
 
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import { CANAL, TABLE_CONTACTS_SIZE } from '../../utils/constants';
+import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 import { theme } from '../../styles/theme';
 import PreviewWppMessage from '../../components/PreviewWppMessage';
 import { useToast } from '../../context/ToastContext';
 import {
   formatDate,
   formatDateTime,
-  getMinutesFromTime,
-  getNowOnlyDate,
   getTimeFromMinutes,
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
 import { Add } from '@mui/icons-material';
-import { phoneRegex } from '../CreateCampanha';
 import ContactModal from '../../components/modals/ContactModal';
-
-interface Campaign {
-  id: string;
-  companyId: string;
-  endDate: string;
-  isDeleted: boolean;
-  message: string;
-  scheduleDate: string;
-  sentContactsCount: number;
-  session: string;
-  startDate: string;
-  title: string;
-  image: {
-    data: any;
-  };
-}
-
-interface Company {
-  id: string;
-  name: string;
-  channel: {
-    id: string;
-    instanceName: string;
-  }[];
-}
-
-const editCampaignSchema = z
-  .object({
-    id: z.string(),
-    title: z
-      .string()
-      .min(6, 'Muito curto!')
-      .max(70, 'Muito extenso!')
-      .nonempty('Campo obrigatório.'),
-    message: z.string().min(6, 'Muito curto!'),
-    scheduleDate: z
-      .string()
-      .transform((date) => (date ? new Date(date) : ''))
-      .refine(
-        (date) => {
-          if (!date) return false;
-          return true;
-        },
-        { message: 'Escolha uma data!' }
-      )
-      .optional(),
-    startTime: z
-      .string({
-        invalid_type_error: 'Horário inválido.',
-        required_error: 'Campo obrigatório.',
-      })
-      .transform((time) => {
-        return getMinutesFromTime(time);
-      }),
-    endTime: z
-      .string({
-        invalid_type_error: 'Horário inválido.',
-        required_error: 'Campo obrigatório.',
-      })
-      .transform((time) => {
-        return getMinutesFromTime(time);
-      }),
-    status: z.string(),
-    startDate: z.string(),
-    endDate: z.string().optional(),
-    sendDelay: z
-      .string()
-      .transform((delay) => Number(delay))
-      .refine(
-        (delay) => {
-          if (delay < 10) return false;
-          return true;
-        },
-        { message: 'O tempo mínimo é de 10 segundos.' }
-      ),
-    channel_id: z.string().nonempty('Selecione uma opção!'),
-  })
-  .refine((values) => values.startTime < values.endTime, {
-    message: 'O horário de início deve ser menor que o horário de término.',
-    path: ['startTime'],
-  });
-
-type EditCampaignSchemaType = z.infer<typeof editCampaignSchema>;
+import { EditCampaignSchemaType, editCampaignSchema } from './schemas/edit';
+import useChannels from './hooks/useChannels';
+import { usePagination } from '../../hooks/usePagination';
+import { phoneRegex } from '../CreateCampanha';
 
 export default function EditCampanha() {
   const {
@@ -135,6 +48,7 @@ export default function EditCampanha() {
     reset,
     watch,
     setValue,
+    getValues,
   } = useForm<EditCampaignSchemaType>({
     resolver: zodResolver(editCampaignSchema),
   });
@@ -142,18 +56,39 @@ export default function EditCampanha() {
   const channel_id = watch('channel_id');
   const message = watch('message');
 
+  const [company, setCompany] = useState<any>();
+  const [data, setData] = useState<any>();
+
   const toast = useToast();
 
-  const [data, setData] = useState<any>();
+  const {
+    data: channels,
+    isLoading: isChannelsLoading,
+    isSuccess: isChannelsSuccess,
+    isError: isChannelError,
+  } = useChannels();
+  const activeChannels = channels?.filter(
+    (channel: any) => channel.state === 'connected'
+  );
+  useEffect(() => {
+    if (isChannelError) {
+      toast.error('Erro ao carregar canais');
+      return navigate('/campanhas');
+    }
+    // if (isChannelsSuccess && !activeChannels?.length) {
+    //   toast.error('Não há canais disponíveis');
+    //   return navigate('/campanhas');
+    // }
+  }, [isChannelsSuccess, isChannelError]);
 
   const [statusState, setStatusState] = useState('');
   useEffect(() => {
     setStatusState(status);
   }, [status]);
 
-  const [company, setCompany] = useState<Company>();
   const [contacts, setContacts] = useState<any[]>([]);
   const [editedContacts, setEditedContacts] = useState<any[]>([]);
+  const [removedContacts, setRemovedContacts] = useState<any[]>([]);
 
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(NaN);
@@ -165,34 +100,22 @@ export default function EditCampanha() {
   let midiaSrc = data?.midia;
   if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
 
-  const midiaType = (data?.midiaType?.toLowerCase() as string)?.replace(
-    '_url',
-    ''
-  );
+  const { dataToShow, page, setPage, selectedIndex } = usePagination({
+    data: contacts,
+    selectedFromPageIndex: selectedContact,
+  });
 
-  const [page, setPage] = useState(0);
   const [contactKey, setContactKey] = useState('');
 
-  const contactsToShow = contacts.slice(
-    page * TABLE_CONTACTS_SIZE,
-    page * TABLE_CONTACTS_SIZE + TABLE_CONTACTS_SIZE
-  );
-
-  let selectedIndexFromPage = NaN;
-
-  if (!Number.isNaN(selectedContact)) {
-    selectedIndexFromPage = selectedContact + page * TABLE_CONTACTS_SIZE;
-  }
-
   const selectedContactObject = JSON.parse(
-    contacts?.[selectedIndexFromPage]?.variables || '{}'
+    contacts?.[selectedIndex]?.variables || '{}'
   );
 
   const contactTableHeaders = Object.keys(
     JSON.parse(contacts?.[0]?.variables || '{}')
   ).concat(['status']);
   const contactsFormatted =
-    contactsToShow?.map((item: any) => {
+    dataToShow?.map((item: any) => {
       return {
         ...JSON.parse(item.variables || '{}'),
         status: item.status,
@@ -224,13 +147,6 @@ export default function EditCampanha() {
 
         const { data: companyData } = await api.get(`/companies`);
 
-        if (companyData.channel?.length === 0) {
-          toast.error(
-            'Nenhum canal ativo no momento. Ative ao menos um canal para editar a campanha.'
-          );
-          navigate('./..');
-        }
-
         const formattedValues = JSON.parse(
           data?.contacts?.[0]?.variables || '{}'
         );
@@ -255,10 +171,12 @@ export default function EditCampanha() {
     getData();
   }, []);
 
+  useEffect(() => {
+    console.log('getValues', getValues('startTime'));
+  }, [data]);
+
   async function handleSave(values: EditCampaignSchemaType) {
     setIsLoading(true);
-
-    console.log('edited contacts', editedContacts);
 
     try {
       await api.patch(`/campaign/${id}`, {
@@ -270,7 +188,8 @@ export default function EditCampanha() {
         status: values.status,
         sendDelay: values.sendDelay,
         channel_id: values.channel_id,
-        contacts: contacts,
+        contacts: editedContacts,
+        removedContacts: removedContacts,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('campanhas');
@@ -310,7 +229,14 @@ export default function EditCampanha() {
 
     const newContactsObject = [...contacts];
 
-    newContactsObject.splice(indexToSlice, 1);
+    const contactToRemove = newContactsObject.splice(indexToSlice, 1);
+
+    if (contactToRemove?.[0]?.id) {
+      setRemovedContacts([
+        newContactsObject?.[indexToSlice],
+        ...removedContacts,
+      ]);
+    }
 
     setContacts(newContactsObject);
   }
@@ -359,20 +285,19 @@ export default function EditCampanha() {
           }, {});
 
           const objectToSave = {
-            id: contacts?.[selectedIndexFromPage]?.id,
+            id: contacts?.[selectedIndex]?.id,
             contact: cont[contactKey],
             variables: JSON.stringify(newObjVariables),
-            status: contacts?.[selectedIndexFromPage]?.status,
+            status: contacts?.[selectedIndex]?.status,
           };
 
           const newValues = [...contacts];
-          newValues[selectedIndexFromPage] = objectToSave;
+          newValues[selectedIndex] = objectToSave;
           setContacts(newValues);
 
           const isEditingCreated = editedContacts.find(
             (i) =>
-              JSON.stringify(i) ===
-              JSON.stringify(contacts?.[selectedIndexFromPage])
+              JSON.stringify(i) === JSON.stringify(contacts?.[selectedIndex])
           );
 
           if (!isEditingCreated) {
@@ -447,7 +372,7 @@ export default function EditCampanha() {
               value={channel_id || ''}
               onChange={handleCanalSelect}
             >
-              {company?.channel.map((option) => (
+              {channels?.map((option: any) => (
                 <MenuItem value={option.id} key={option.id}>
                   {option.instanceName}
                 </MenuItem>
@@ -464,6 +389,9 @@ export default function EditCampanha() {
               fullWidth
               value={statusState}
             >
+              <MenuItem value={'CHANNEL_DISCONNECTED'}>
+                CHANNEL_DISCONNECTED
+              </MenuItem>
               <MenuItem value={'CANCELADO'}>CANCELADO</MenuItem>
               <MenuItem value={'PAUSADO'}>PAUSADO</MenuItem>
               <MenuItem value={'EM_PROGRESSO'}>EM_PROGRESSO</MenuItem>
@@ -522,20 +450,17 @@ export default function EditCampanha() {
           <TextArea
             {...register('message')}
             disabled={isLoading}
-            error={errors.message}
+            errorMessage={errors.message?.message}
+            // error={errors.message}
           />
         </Grid>
         <Grid item xs={12} sx={{ marginBottom: 2 }}>
           <InputLabel sx={{ color: theme.palette.primary.main }}>
             Preview da mensagem:
           </InputLabel>
-          <PreviewWppMessage
-            imgSrc={midiaType === 'image' ? midiaSrc : undefined}
-            messagePreview={message}
-          />
+          <PreviewWppMessage imgSrc={midiaSrc} messagePreview={message} />
         </Grid>
       </Grid>
-      {/* <TableContactsFromApi id={id} message={getValues('id')} /> */}
       <TableContacts
         headers={contactTableHeaders}
         onEdit={(index) => setSelectedContact(index)}
