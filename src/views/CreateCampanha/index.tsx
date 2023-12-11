@@ -168,9 +168,11 @@ export default function CreateCampanha() {
     midiaBase64?.substring(0, 16)?.split('/')[0]?.split(':')[1] === 'image';
 
   useEffect(() => {
+    setIsLoading(true);
     async function getCompany() {
       const { data } = await api.get<Company>('/companies');
       setCompany(data);
+      setIsLoading(false);
     }
     getCompany();
   }, []);

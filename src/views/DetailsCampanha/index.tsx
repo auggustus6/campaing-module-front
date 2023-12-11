@@ -79,12 +79,13 @@ export default function DetailsCampanha() {
 
   const contactTableHeaders = Object.keys(
     JSON.parse(contactsObject?.[0]?.variables || '{}')
-  ).concat(['status']);
+  ).concat(['status', 'sentDate']);
   const contactsFormatted =
     contactsToShow?.map((item: any) => {
       return {
         ...JSON.parse(item.variables || '{}'),
         status: item.status,
+        sentDate: item.sentDate,
       };
     }) || [];
 
@@ -402,6 +403,7 @@ export default function DetailsCampanha() {
             </Box>
           </>
         }
+        showFinished={showFinished}
         contacts={contactsFormatted}
         headers={contactTableHeaders}
         total={contactsObject?.length || 0}

@@ -15,6 +15,7 @@ import React, { ReactNode } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import { DeleteOutline } from '@mui/icons-material';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
+import { tableFormatDateTime } from '../../utils/dateAndTimeUtils';
 
 interface TableContactsProps {
   title?: ReactNode;
@@ -26,6 +27,8 @@ interface TableContactsProps {
   onEdit?: (index: number) => void;
   onDelete?: (index: number) => void;
   isEditing?: boolean;
+
+  showFinished?: boolean;
 }
 
 export default function TableContacts({
@@ -38,12 +41,19 @@ export default function TableContacts({
   onEdit,
   onDelete,
   isEditing = false,
+  showFinished = false,
 }: TableContactsProps) {
   const [page, setPage] = React.useState(0);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
     onChangePage && onChangePage(newPage);
+  };
+
+  const mapHeaders = (header?: string) => {
+    if (header == 'status') return 'Status';
+    if (header == 'sentDate') return 'Data de envio';
+    return header;
   };
 
   const statusNotAllowed = ['ENVIADO', 'ERRO'];
@@ -63,9 +73,11 @@ export default function TableContacts({
       <Table sx={{ minWidth: 800 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            {headers.map((row) => (
-              <TableCell key={row}>{row}</TableCell>
-            ))}
+            {headers.map((row) => {
+              if (row === 'sentDate' && !showFinished) return null;
+              return <TableCell key={row}>{mapHeaders(row)}</TableCell>;
+            })}
+
             {allowEdit && <TableCell align="right">Ações</TableCell>}
           </TableRow>
         </TableHead>
@@ -84,9 +96,18 @@ export default function TableContacts({
                     : 'not-allowed',
               }}
             >
-              {headers.map((item, k) => (
-                <TableCell key={k}>{row[item]}</TableCell>
-              ))}
+              {headers.map((item, k) => {
+                if (item == 'sentDate' && !showFinished) return null;
+
+                if (item == 'sentDate')
+                  return (
+                    <TableCell key={k}>
+                      {tableFormatDateTime(row[item])}
+                    </TableCell>
+                  );
+
+                return <TableCell key={k}>{row[item]}</TableCell>;
+              })}
               {allowEdit && (
                 <TableCell align="right">
                   <Box>
