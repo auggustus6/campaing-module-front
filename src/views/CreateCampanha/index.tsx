@@ -44,7 +44,7 @@ import {
   getNowOnlyDate,
 } from '../../utils/dateAndTimeUtils';
 import ContactModal from '../../components/modals/ContactModal';
-import { Box, Stack, Tooltip } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, FormGroup, Stack, Tooltip } from '@mui/material';
 import { addBrazilianCountryCode } from '../../utils/phoneNumbers';
 import CustomTooltip from '../../components/CustomTooltip';
 import TableContacts from '../../components/TableContacts';
@@ -125,6 +125,8 @@ const campaignSchema = z
         { message: 'O tempo mínimo é de 10 segundos.' }
       ),
     session: z.string().min(10, 'Selecio  ne uma opção!'),
+    runOnSaturday: z.boolean().default(false),
+    runOnSunday: z.boolean().default(false),
   })
   .refine((values) => values.startTime < values.endTime, {
     message: 'O horário de início deve ser menor que o horário de término.',
@@ -312,6 +314,8 @@ export default function CreateCampanha() {
         midia: midiaBase64,
         midiaUrl: values.midiaUrl,
         midiaType: midiaType || 'TEXT',
+        runOnSaturday: values.runOnSaturday,
+        runOnSunday: values.runOnSunday,
       });
 
       navigate('/campanhas');
@@ -548,6 +552,24 @@ export default function CreateCampanha() {
             helperText={errors.endTime?.message}
             fullWidth
           />
+        </Grid>
+
+        <Grid item xs={12}>
+          <FormGroup>
+            <FormControlLabel
+              control={<Checkbox />}
+              label="Rodar aos sábados"
+              disabled={isLoading || shouldDisable}
+              {...register('runOnSaturday')}
+            />
+            <FormControlLabel
+              control={<Checkbox />}
+              label="Rodar aos domingos"
+              disabled={isLoading || shouldDisable}
+              {...register('runOnSunday')}
+            />
+
+          </FormGroup>
         </Grid>
 
         <Grid item xs={12}>

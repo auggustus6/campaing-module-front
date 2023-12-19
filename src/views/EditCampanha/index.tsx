@@ -9,6 +9,9 @@ import {
   Select,
   Box,
   SelectChangeEvent,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
 } from '@mui/material';
 import MaterialButton from '@mui/material/Button';
 import Button from '@mui/joy/Button';
@@ -97,6 +100,9 @@ export default function EditCampanha() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [runOnSaturday, setRunOnSaturday] = useState(false);
+  const [runOnSunday, setRunOnSunday] = useState(false);
+
   let midiaSrc = data?.midia;
   if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
 
@@ -145,6 +151,9 @@ export default function EditCampanha() {
           channel_id: data.channel_id,
         });
 
+        setRunOnSaturday(data.runOnSaturday);
+        setRunOnSunday(data.runOnSunday);
+
         const { data: companyData } = await api.get(`/companies`);
 
         const formattedValues = JSON.parse(
@@ -190,6 +199,8 @@ export default function EditCampanha() {
         channel_id: values.channel_id,
         contacts: editedContacts,
         removedContacts: removedContacts,
+        runOnSaturday: runOnSaturday,
+        runOnSunday: runOnSunday,
       });
       Swal.fire('Sucesso', 'Alterações feitas com sucesso!', 'success');
       navigate('campanhas');
@@ -444,6 +455,34 @@ export default function EditCampanha() {
             helperText={errors.endTime?.message}
             fullWidth
           />
+        </Grid>
+        <Grid item xs={12}>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={runOnSaturday}
+                  onChange={(e) => {
+                    setRunOnSaturday(!runOnSaturday);
+                  }}
+                />
+              }
+              label="Rodar aos sábados"
+              disabled={isLoading}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={runOnSunday}
+                  onChange={(e) => {
+                    setRunOnSunday(!runOnSunday);
+                  }}
+                />
+              }
+              label="Rodar aos domingos"
+              disabled={isLoading}
+            />
+          </FormGroup>
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>

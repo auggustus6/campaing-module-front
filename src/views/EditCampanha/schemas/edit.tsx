@@ -53,6 +53,8 @@ export const editCampaignSchema = z
         { message: 'O tempo mínimo é de 10 segundos.' }
       ),
     channel_id: z.string().nonempty('Selecione uma opção!'),
+    runOnSaturday: z.boolean().default(false),
+    runOnSunday: z.boolean().default(false),
   })
   .refine((values) => values.startTime < values.endTime, {
     message: 'O horário de início deve ser menor que o horário de término.',

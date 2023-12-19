@@ -30,7 +30,7 @@ import {
 } from '../../utils/dateAndTimeUtils';
 import TableContacts from '../../components/TableContacts';
 import { useQuery } from 'react-query';
-import { Switch } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { TABLE_CONTACTS_SIZE } from '../../utils/constants';
 
 interface DataContacts {
@@ -52,6 +52,8 @@ export default function DetailsCampanha() {
   const [contactsWithError, setContactsWithError] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [runOnSaturday, setRunOnSaturday] = useState(false);
+  const [runOnSunday, setRunOnSunday] = useState(false);
 
   let midiaSrc = data?.midia;
   if (data?.midiaUrl) midiaSrc = data?.midiaUrl;
@@ -71,6 +73,8 @@ export default function DetailsCampanha() {
       return item.status !== 'ENVIADO';
     }
   });
+
+  console.log('data', data);
 
   const contactsToShow = contactsObject.slice(
     page * TABLE_CONTACTS_SIZE,
@@ -105,6 +109,9 @@ export default function DetailsCampanha() {
 
         setContactsWithError(conts || []);
       }
+
+      setRunOnSaturday(result.data.runOnSaturday);
+      setRunOnSunday(result.data.runOnSunday);
 
       setData(result.data);
     } catch (error) {
@@ -311,6 +318,22 @@ export default function DetailsCampanha() {
             disabled
           />
         </Grid>
+
+        <Grid item xs={12}>
+          <FormGroup>
+            <FormControlLabel
+              control={<Checkbox checked={runOnSaturday}/>}
+              label="Rodar aos sábados"
+              disabled
+            />
+            <FormControlLabel
+              control={<Checkbox checked={runOnSunday}/>}
+              label="Rodar aos domingos"
+              disabled
+            />
+          </FormGroup>
+        </Grid>
+
         <Grid item xs={12}>
           <InputLabel>Mensagem:</InputLabel>
           <TextArea value={data?.message} disabled />
